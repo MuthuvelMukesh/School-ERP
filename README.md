@@ -1,22 +1,53 @@
 # School ERP System
 
-## Overview
-This School ERP (Enterprise Resource Planning) project is designed to streamline and automate the administrative and academic processes of educational institutions. It provides a centralized platform for managing student data, academic records, fee collection, library resources, and more.
+## Description
+Web-based School ERP to manage student, staff, academic, financial and administrative operations for small-medium schools.
 
-## Features
-- **Student Information System**: Manage student profiles, admissions, and attendance.
-- **Academic Management**: Course scheduling, grading, and report card generation.
-- **HR & Payroll**: Manage staff details, attendance, and payroll processing.
-- **Fee Management**: Track fee payments, generate invoices, and handle dues.
-- **Library Management**: Book cataloging, issuing, and tracking.
-- **Transport Management**: Route planning and vehicle tracking.
-- **Communication Module**: Notifications and alerts for parents and students.
+## Core Objectives
+- Digitize school administration
+- Reduce manual paperwork
+- Provide real-time data access
+- Support multiple user roles with permissions
 
-## Technology Stack
-- **Frontend**: [e.g., React, Angular, Vue.js, HTML/CSS]
-- **Backend**: [e.g., Node.js, Django, Spring Boot, Laravel]
-- **Database**: [e.g., MySQL, PostgreSQL, MongoDB]
-- **Authentication**: [e.g., JWT, OAuth]
+## Target Users
+- Admin / Principal
+- Teachers
+- Students / Parents (limited view)
+- Accountant / Fee staff
+- Transport / Library staff (optional)
+
+## Key Modules (MVP)
+- **Student Management**: admission, profile, documents
+- **Fee Management**: structure, collection, receipts, defaulters
+- **Attendance**: manual / bulk entry
+- **Timetable**: class / teacher wise
+- **Examination**: marks entry, report cards
+- **Staff Management**: profile, leave, salary
+- **Notifications**: SMS / Email
+- **Admin Dashboard + Role-based Access Control**
+
+## Nice-to-have (future phases)
+- Transport management
+- Library
+- Hostel
+- Mobile app
+- Payment gateway integration
+- Analytics / Reports
+
+## Technical Requirements
+- **Web app**: responsive
+- **Backend**: [your choice, e.g. Node.js / Laravel / Django / Spring]
+- **Frontend**: [React / Next.js / Blade / Vue]
+- **Database**: MySQL / PostgreSQL
+- **Authentication**: JWT / Session-based
+- **Deployment**: Cloud (Vercel / Railway / AWS) or self-hosted
+
+## Non-Functional Requirements
+- Secure (HTTPS, data encryption, role checks)
+- Fast loading (< 3s per page)
+- Scalable to 1000+ students
+- Backup & recovery support
+- Multi-language (English + Tamil priority)
 
 ## Getting Started
 
