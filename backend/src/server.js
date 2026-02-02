@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const logger = require('./utils/logger');
+const { sanitizeInputs } = require('./middleware/sanitization.middleware');
+const { errorHandler, requestTiming, notFoundHandler, asyncHandler } = require('./middleware/errorHandler.middleware');
 
 // Load environment variables
 dotenv.config();
@@ -18,12 +20,19 @@ const timetableRoutes = require('./routes/timetable.routes');
 const examRoutes = require('./routes/exam.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const notificationRoutes = require('./routes/notification.routes');
+const activityRoutes = require('./routes/activity.routes');
+const fileRoutes = require('./routes/file.routes');
+const paymentRoutes = require('./routes/payment.routes');
+const { activityLogger } = require('./utils/activity');
 
 // Initialize express
 const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// Request timing middleware
+app.use(requestTiming);
 
 // CORS configuration
 app.use(cors({
@@ -43,6 +52,12 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Sanitization middleware (must be after body parser)
+app.use(sanitizeInputs);
+
+// Activity logging middleware
+app.use(activityLogger);
+
 // Static files
 app.use('/uploads', express.static('uploads'));
 
@@ -56,34 +71,25 @@ app.use('/api/timetable', timetableRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'School ERP API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
   });
 });
 
 // 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found'
-  });
-});
+app.use(notFoundHandler);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  
-  res.status(err.status || 500).json({
-    status: 'error',
-    message: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+// Global error handler (must be last)
+app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;

@@ -76,21 +76,63 @@ enum PaymentMode {
   UPI
 }
 
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  VIEW
+  DOWNLOAD
+  UPLOAD
+  APPROVE
+  REJECT
+  PAYMENT
+  ATTENDANCE_MARK
+  EXPORT
+  IMPORT
+}
+
+enum ActivityAction {
+  USER_LOGIN
+  USER_LOGOUT
+  STUDENT_CREATE
+  STUDENT_UPDATE
+  STUDENT_DELETE
+  STAFF_CREATE
+  STAFF_UPDATE
+  STAFF_DELETE
+  FEE_PAYMENT
+  ATTENDANCE_MARK
+  EXAM_MARK
+  TIMETABLE_CREATE
+  DOCUMENT_UPLOAD
+  DOCUMENT_DOWNLOAD
+  EXPORT_DATA
+  IMPORT_DATA
+  APPROVE_REQUEST
+  REJECT_REQUEST
+  SETTINGS_CHANGE
+  OTHER
+}
+
 // User Model (Authentication)
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password      String
-  role          UserRole
-  isActive      Boolean   @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  password              String
+  role                  UserRole
+  isActive              Boolean   @default(true)
+  lastLogin             DateTime?
+  passwordResetToken    String?   @unique
+  passwordResetExpires  DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   // Relations
-  student       Student?
-  staff         Staff?
-  parent        Parent?
+  student               Student?
+  staff                 Staff?
+  parent                Parent?
 
   @@map("users")
 }
@@ -424,4 +466,27 @@ model Notification {
   createdAt     DateTime  @default(now())
 
   @@map("notifications")
+}
+
+// Activity Log
+model Activity {
+  id            String    @id @default(uuid())
+  userId        String
+  action        ActivityAction
+  actionType    ActivityType
+  module        String    // e.g., "students", "fees", "attendance"
+  description   String
+  ipAddress     String?
+  userAgent     String?
+  resourceId    String?   // ID of the resource being acted upon (student/fee/etc.)
+  resourceType  String?   // Type of resource (student/fee/attendance/etc.)
+  changes       Json?     // Track what was changed (for updates)
+  status        String    @default("SUCCESS") // SUCCESS, FAILED, PENDING
+  createdAt     DateTime  @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+  @@index([module])
+  @@map("activities")
 }
