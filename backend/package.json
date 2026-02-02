@@ -11,7 +11,11 @@
     "prisma:studio": "prisma studio",
     "test": "jest"
   },
-  "keywords": ["school", "erp", "education"],
+  "keywords": [
+    "school",
+    "erp",
+    "education"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -33,5 +37,8 @@
     "nodemon": "^3.0.2",
     "prisma": "^5.7.1",
     "jest": "^29.7.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

@@ -27,7 +27,7 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 
@@ -77,7 +77,7 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   logger.error(err.stack);
-  
+
   res.status(err.status || 500).json({
     status: 'error',
     message: err.message || 'Internal server error',
