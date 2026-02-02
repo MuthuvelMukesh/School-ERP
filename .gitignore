@@ -1,0 +1,23 @@
+# Root .gitignore
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Backend specific
+backend/uploads/
+backend/logs/
+backend/prisma/.env
+
+# Frontend specific
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Database
+*.db
+*.sqlite

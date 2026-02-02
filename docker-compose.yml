@@ -1,0 +1,66 @@
+# School ERP System - Docker Setup
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: school-erp-db
+    environment:
+      POSTGRES_USER: school_admin
+      POSTGRES_PASSWORD: school_password_123
+      POSTGRES_DB: school_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - school-network
+    restart: unless-stopped
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: school-erp-backend
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://school_admin:school_password_123@postgres:5432/school_erp
+      JWT_SECRET: your_super_secret_jwt_key_change_in_production
+      JWT_EXPIRE: 7d
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - school-network
+    restart: unless-stopped
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: school-erp-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - school-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  school-network:
+    driver: bridge
