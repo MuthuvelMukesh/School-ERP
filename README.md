@@ -90,6 +90,9 @@ School-ERP/
 - PostgreSQL 14+
 - Git
 
+### Quick Start (Scripted)
+See [SETUP.md](SETUP.md) for OS-specific quick start steps.
+
 ### Installation
 
 1. **Clone the repository**
@@ -104,6 +107,11 @@ School-ERP/
    npm install
    
    # Create .env file from example
+   # Windows (PowerShell)
+   Copy-Item .env.example .env
+   # Windows (cmd)
+   copy .env.example .env
+   # macOS/Linux
    cp .env.example .env
    
    # Update .env with your database credentials:
@@ -126,6 +134,11 @@ School-ERP/
    npm install
    
    # Create .env.local file
+   # Windows (PowerShell)
+   Copy-Item .env.local.example .env.local
+   # Windows (cmd)
+   copy .env.local.example .env.local
+   # macOS/Linux
    cp .env.local.example .env.local
    
    # Update .env.local with:
@@ -139,11 +152,17 @@ School-ERP/
 
 4. **Access the Application**
    - Open http://localhost:3000 in your browser
-   - Login with demo credentials:
-     - Email: admin@school.com
-     - Password: admin123
-   
-   **Note**: You'll need to create an admin user first by using the register API endpoint or directly in the database.
+   - Create an admin user first using the register API or Prisma Studio (see [SETUP.md](SETUP.md)).
+
+### Docker (Optional)
+```bash
+docker compose up -d
+```
+
+If your Docker version doesn't support the new command, use:
+```bash
+docker-compose up -d
+```
 
 ## API Documentation
 
