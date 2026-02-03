@@ -1,33 +1,47 @@
 # School ERP System - Quick Start Guide
 
-## Initial Setup Script
+## Initial Setup
 
 ### For Windows (PowerShell)
 
+Terminal 1 (Backend):
 ```powershell
-# Navigate to project directory
-cd School-ERP
-
-# Backend setup
-Write-Host "Setting up Backend..." -ForegroundColor Green
-cd backend
+cd School-ERP\backend
 npm install
 Copy-Item .env.example .env
-Write-Host "Please update the .env file with your database credentials" -ForegroundColor Yellow
-Read-Host "Press Enter after updating .env file"
+# Update .env with database credentials
 npx prisma generate
 npx prisma migrate dev --name init
-npm run dev &
+npm run dev
+```
 
-# Frontend setup
-cd ../frontend
-Write-Host "Setting up Frontend..." -ForegroundColor Green
+Terminal 2 (Frontend):
+```powershell
+cd School-ERP\frontend
 npm install
 Copy-Item .env.local.example .env.local
 npm run dev
+```
 
-Write-Host "Setup complete! Backend running on http://localhost:5000" -ForegroundColor Green
-Write-Host "Frontend running on http://localhost:3000" -ForegroundColor Green
+### For Windows (cmd)
+
+Terminal 1 (Backend):
+```cmd
+cd School-ERP\backend
+npm install
+copy .env.example .env
+REM Update .env with database credentials
+npx prisma generate
+npx prisma migrate dev --name init
+npm run dev
+```
+
+Terminal 2 (Frontend):
+```cmd
+cd School-ERP\frontend
+npm install
+copy .env.local.example .env.local
+npm run dev
 ```
 
 ### For Linux/Mac (Bash)
@@ -35,47 +49,40 @@ Write-Host "Frontend running on http://localhost:3000" -ForegroundColor Green
 ```bash
 #!/bin/bash
 
-# Navigate to project directory
-cd School-ERP
-
-# Backend setup
-echo "Setting up Backend..."
-cd backend
+cd School-ERP/backend
 npm install
 cp .env.example .env
-echo "Please update the .env file with your database credentials"
-read -p "Press Enter after updating .env file..."
+# Update .env with database credentials
 npx prisma generate
 npx prisma migrate dev --name init
-npm run dev &
+npm run dev
+```
 
-# Frontend setup
-cd ../frontend
-echo "Setting up Frontend..."
+Terminal 2 (Frontend):
+```bash
+cd School-ERP/frontend
 npm install
 cp .env.local.example .env.local
-npm run dev &
-
-echo "Setup complete!"
-echo "Backend running on http://localhost:5000"
-echo "Frontend running on http://localhost:3000"
+npm run dev
 ```
 
 ## Docker Setup (Recommended for Production)
 
 ```bash
 # Start all services
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop all services
-docker-compose down
+docker compose down
 
 # Stop and remove volumes (clean slate)
-docker-compose down -v
+docker compose down -v
 ```
+
+If your Docker version doesn't support the new command, use `docker-compose` instead.
 
 ## Creating First Admin User
 
@@ -96,14 +103,7 @@ curl -X POST http://localhost:5000/api/auth/register \
     "password": "admin123",
     "role": "ADMIN",
     "firstName": "Admin",
-    "lastName": "User",
-    "phone": "1234567890",
-    "address": "School Address",
-    "employeeId": "EMP001",
-    "dateOfBirth": "1990-01-01",
-    "gender": "MALE",
-    "designation": "Administrator",
-    "salary": 50000
+    "lastName": "User"
   }'
 ```
 

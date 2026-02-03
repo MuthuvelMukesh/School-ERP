@@ -1,0 +1,101 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const dotenv = require('dotenv');
+const logger = require('./utils/logger');
+const { sanitizeInputs } = require('./middleware/sanitization.middleware');
+const { errorHandler, requestTiming, notFoundHandler, asyncHandler } = require('./middleware/errorHandler.middleware');
+
+// Load environment variables
+dotenv.config();
+
+// Import routes
+const authRoutes = require('./routes/auth.routes');
+const studentRoutes = require('./routes/student.routes');
+const staffRoutes = require('./routes/staff.routes');
+const feeRoutes = require('./routes/fee.routes');
+const attendanceRoutes = require('./routes/attendance.routes');
+const timetableRoutes = require('./routes/timetable.routes');
+const examRoutes = require('./routes/exam.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
+const notificationRoutes = require('./routes/notification.routes');
+const activityRoutes = require('./routes/activity.routes');
+const fileRoutes = require('./routes/file.routes');
+const paymentRoutes = require('./routes/payment.routes');
+const { activityLogger } = require('./utils/activity');
+
+// Initialize express
+const app = express();
+
+// Security middleware
+app.use(helmet());
+
+// Request timing middleware
+app.use(requestTiming);
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use('/api/', limiter);
+
+// Body parser middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Sanitization middleware (must be after body parser)
+app.use(sanitizeInputs);
+
+// Activity logging middleware
+app.use(activityLogger);
+
+// Static files
+app.use('/uploads', express.static('uploads'));
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/fees', feeRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/timetable', timetableRoutes);
+app.use('/api/exams', examRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/payments', paymentRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'School ERP API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
+  });
+});
+
+// 404 handler
+app.use(notFoundHandler);
+
+// Global error handler (must be last)
+app.use(errorHandler);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV}`);
+});
+
+module.exports = app;
