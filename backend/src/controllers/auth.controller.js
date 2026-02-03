@@ -1,9 +1,20 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
+const nodemailer = require('nodemailer');
 
 const prisma = new PrismaClient();
+
+// Setup email transporter
+const transporter = nodemailer.createTransport({
+  service: process.env.EMAIL_SERVICE || 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -274,6 +285,180 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Failed to change password'
+    });
+  }
+};
+
+// Forgot password - Generate reset token and send email
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      // Security: Don't reveal if user exists or not
+      return res.status(200).json({
+        status: 'success',
+        message: 'If a user with that email exists, a password reset link has been sent.'
+      });
+    }
+
+    // Generate reset token (valid for 1 hour)
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Save reset token to database
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: hashedToken,
+        passwordResetExpires: resetExpires
+      }
+    });
+
+    // Send email with reset link
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/reset-password/${resetToken}`;
+
+    try {
+      await transporter.sendMail({
+        to: email,
+        subject: 'Password Reset Request - School ERP',
+        html: `
+          <h2>Password Reset Request</h2>
+          <p>You have requested to reset your password. Click the link below to proceed:</p>
+          <p><a href="${resetUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Reset Password</a></p>
+          <p>Or copy this link: ${resetUrl}</p>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you did not request this, please ignore this email.</p>
+        `
+      });
+
+      logger.info(`Password reset email sent to ${email}`);
+    } catch (emailError) {
+      logger.error('Email sending error:', emailError);
+      // Clear the reset token if email fails
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordResetToken: null,
+          passwordResetExpires: null
+        }
+      });
+
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to send reset email. Please try again later.'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'If a user with that email exists, a password reset link has been sent.'
+    });
+  } catch (error) {
+    logger.error('Forgot password error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to process password reset request'
+    });
+  }
+};
+
+// Reset password - Verify token and set new password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Hash the token to compare with stored token
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid reset token
+    const user = await prisma.user.findFirst({
+      where: {
+        passwordResetToken: hashedToken,
+        passwordResetExpires: {
+          gt: new Date() // Token must not be expired
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear reset token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null
+      }
+    });
+
+    logger.info(`Password reset successful for user ${user.email}`);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Password has been reset successfully. You can now login with your new password.'
+    });
+  } catch (error) {
+    logger.error('Reset password error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to reset password'
+    });
+  }
+};
+
+// Verify reset token - Check if token is valid
+exports.verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // Hash the token to compare with stored token
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid reset token
+    const user = await prisma.user.findFirst({
+      where: {
+        passwordResetToken: hashedToken,
+        passwordResetExpires: {
+          gt: new Date() // Token must not be expired
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid or expired reset token'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token is valid',
+      data: {
+        email: user.email
+      }
+    });
+  } catch (error) {
+    logger.error('Verify reset token error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to verify reset token'
     });
   }
 };

@@ -9,6 +9,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
+    "seed": "node prisma/seed.js",
     "test": "jest"
   },
   "keywords": [
@@ -31,7 +32,9 @@
     "axios": "^1.6.2",
     "helmet": "^7.1.0",
     "express-rate-limit": "^7.1.5",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "xss": "^1.0.14",
+    "razorpay": "^2.9.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",

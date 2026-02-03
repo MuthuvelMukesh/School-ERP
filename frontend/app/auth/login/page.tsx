@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { authAPI } from '@/lib/api'
+import { config } from '@/lib/config'
 import toast, { Toaster } from 'react-hot-toast'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -38,7 +40,7 @@ export default function LoginPage() {
       <Toaster position="top-right" />
       <div className="card max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary-600 mb-2">School ERP</h1>
+          <h1 className="text-3xl font-bold text-primary-600 mb-2">{config.app.name}</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
 
@@ -76,9 +78,25 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Demo Credentials:</p>
-          <p className="mt-1">Admin: admin@school.com / admin123</p>
+        <div className="mt-6 space-y-2">
+          <div className="text-center">
+            <Link href="/auth/forgot-password" className="text-sm text-primary-600 hover:underline">
+              Forgot your password?
+            </Link>
+          </div>
+
+          {config.auth.showDemoCredentials && (
+            <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm">
+              <p className="font-semibold text-blue-900 mb-1">Demo Credentials:</p>
+              <p className="text-blue-800">Admin: admin@school.com / admin123</p>
+            </div>
+          )}
+
+          {!config.auth.showDemoCredentials && (
+            <div className="bg-gray-50 border border-gray-200 rounded p-3 text-center">
+              <p className="text-sm text-gray-600">{config.auth.helpText}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
