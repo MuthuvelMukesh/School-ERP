@@ -88,21 +88,8 @@ app.get('/api/health', (req, res) => {
 // 404 handler
 app.use(notFoundHandler);
 
-<<<<<<< HEAD
-// Global error handler
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-
-  res.status(err.status || 500).json({
-    status: 'error',
-    message: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
-=======
 // Global error handler (must be last)
 app.use(errorHandler);
->>>>>>> main
 
 // Start server
 const PORT = process.env.PORT || 5000;
