@@ -351,13 +351,110 @@ npm run lint
 ```
 
 ## Contributing
-Contributions are welcome! Please follow these steps:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+
+### How to Contribute
+
+#### 1. Fork and Clone
+```bash
+git clone https://github.com/YOUR_USERNAME/School-ERP.git
+cd School-ERP
+git remote add upstream https://github.com/MuthuvelMukesh/School-ERP.git
+```
+
+#### 2. Create a Feature Branch
+```bash
+git checkout -b feature/YourFeatureName
+```
+
+Use descriptive branch names:
+- `feature/student-portal` for new features
+- `bugfix/attendance-calculation` for bug fixes
+- `docs/api-documentation` for documentation
+
+#### 3. Make Your Changes
+- Follow the existing code style and structure
+- Add comments for complex logic
+- Test your changes thoroughly
+- Update documentation as needed
+
+#### 4. Commit with Clear Messages
+```bash
+git commit -m "Brief description of changes
+
+- Added feature X
+- Fixed bug Y
+- Updated documentation Z"
+```
+
+#### 5. Push and Create Pull Request
+```bash
+git push origin feature/YourFeatureName
+```
+
+Then open a Pull Request on GitHub with:
+- Clear title and description
+- Reference any related issues (#issue-number)
+- Screenshots for UI changes
+- Test results
+
+### Guidelines
+
+**Code Standards:**
+- Use consistent indentation (2 spaces for JS/TS, 4 spaces for Python)
+- Follow ES6+ syntax for JavaScript
+- Add error handling and validation
+- Include meaningful variable names
+
+**Git Workflow:**
+- Keep commits focused and atomic
+- Never commit directly to main branch
+- Rebase before pushing: `git rebase upstream/main`
+- Keep PRs manageable (< 400 lines if possible)
+
+**Testing:**
+- Write tests for new features
+- Ensure existing tests pass
+- Run linting before committing
+
+**Documentation:**
+- Update README for new features
+- Add JSDoc/TSDoc comments
+- Update API documentation
+- Include setup instructions if needed
+
+### Reporting Issues
+
+Found a bug? Please report it by:
+1. Checking existing issues first
+2. Creating a new issue with:
+   - Clear description of the problem
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Your environment (OS, Node version, etc.)
+
+### Feature Requests
+
+Have an idea? We'd love to hear it! Submit a feature request with:
+- Clear use case
+- How it benefits users
+- Suggested implementation (optional)
+
+### Questions?
+
+- Check [FAQ](FAQ.md) (coming soon)
+- Read existing issues and discussions
+- Open a discussion or email: support@schoolerp.com
+
+### Recognition
+
+Contributors will be recognized in:
+- [CONTRIBUTORS.md](CONTRIBUTORS.md) file
+- Release notes
+- GitHub contributors page
+
+Thank you for contributing! 🎉
 
 ## License
 MIT License - see the [LICENSE](LICENSE) file for details.
