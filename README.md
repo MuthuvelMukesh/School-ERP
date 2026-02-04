@@ -24,6 +24,7 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 - **Examination**: marks entry, report cards
 - **Staff Management**: profile, leave, salary
 - **Notifications**: SMS / Email
+- **LMS (Learning Management System)**: lesson notes, video lectures, assignments, submissions
 - **Admin Dashboard + Role-based Access Control**
 
 ## Nice-to-have (future phases)
@@ -73,6 +74,7 @@ School-ERP/
     ├── app/
     │   ├── auth/                  # Authentication pages
     │   ├── dashboard/             # Dashboard page
+   │   ├── lms/                   # LMS pages
     │   ├── globals.css            # Global styles
     │   ├── layout.tsx             # Root layout
     │   └── page.tsx               # Home page
@@ -232,6 +234,25 @@ http://localhost:5000/api
 - `GET /notifications` - Get all notifications
 - `POST /notifications` - Send notification
 
+### LMS Endpoints
+- `GET /lms` - Get LMS content (filters: classId, subjectId, teacherId, type, visibility, q)
+- `GET /lms/:id` - Get LMS content by ID
+- `POST /lms` - Create LMS content
+- `PUT /lms/:id` - Update LMS content
+- `DELETE /lms/:id` - Delete LMS content
+- `POST /lms/:id/attachments` - Upload LMS attachments
+- `DELETE /lms/:id/attachments/:attachmentId` - Delete LMS attachment
+- `GET /lms/:id/submissions` - Get submissions for assignment (teacher/admin)
+- `GET /lms/:id/submissions/me` - Get my submission (student)
+- `GET /lms/submissions/me` - List my submissions (student)
+- `POST /lms/:id/submissions` - Submit assignment (student)
+- `PUT /lms/:id/submissions/:submissionId` - Grade submission (teacher/admin)
+- `GET /lms/:id/analytics` - Assignment analytics (teacher/admin)
+
+### Metadata Endpoints
+- `GET /metadata/classes` - Get classes
+- `GET /metadata/subjects` - Get subjects (filters: classId, teacherId)
+
 ## Database Schema
 
 Key entities:
@@ -249,6 +270,23 @@ Key entities:
 - **ExamResult**: Student exam results
 - **Leave**: Staff leave applications
 - **Notification**: Communication records
+- **LmsContent**: Lesson notes, videos, assignments
+- **LmsContentFile**: LMS attachments
+- **LmsSubmission**: Assignment submissions
+- **LmsSubmissionFile**: Submission attachments
+
+## LMS Highlights
+- Upload multimedia lesson notes, video lectures, and assignments
+- Teacher-only content creation and attachments
+- Student assignment submissions with uploads
+- Grading workflow with feedback
+- Assignment analytics (total, graded, late, average grade)
+
+## Next Steps
+- Configure `DATABASE_URL` and run Prisma migrations
+- Add LMS calendar view and deadline reminders
+- Add submission notifications (email/in-app)
+- Add LMS widgets to student/teacher dashboard
 
 ## Security Features
 - JWT-based authentication

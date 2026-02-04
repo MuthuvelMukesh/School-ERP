@@ -10,8 +10,10 @@ const multer = require('multer');
 const logger = require('./logger');
 
 // Configuration
+const maxFileSizeMb = Number.parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB || '100', 10);
+
 const FILE_CONFIG = {
-  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+  MAX_FILE_SIZE: (Number.isNaN(maxFileSizeMb) ? 100 : maxFileSizeMb) * 1024 * 1024, // default 100MB
   ALLOWED_TYPES: [
     'application/pdf',
     'image/jpeg',
@@ -20,9 +22,28 @@ const FILE_CONFIG = {
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'video/mp4',
+    'video/webm',
+    'video/ogg',
+    'video/quicktime'
   ],
-  ALLOWED_EXTENSIONS: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'xls', 'xlsx'],
+  ALLOWED_EXTENSIONS: [
+    'pdf',
+    'jpg',
+    'jpeg',
+    'png',
+    'doc',
+    'docx',
+    'xls',
+    'xlsx',
+    'txt',
+    'mp4',
+    'webm',
+    'ogg',
+    'mov'
+  ],
   UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads'
 };
 
@@ -33,7 +54,8 @@ const initializeUploadDirs = () => {
     path.join(FILE_CONFIG.UPLOAD_DIR, 'students'),
     path.join(FILE_CONFIG.UPLOAD_DIR, 'staff'),
     path.join(FILE_CONFIG.UPLOAD_DIR, 'documents'),
-    path.join(FILE_CONFIG.UPLOAD_DIR, 'reports')
+    path.join(FILE_CONFIG.UPLOAD_DIR, 'reports'),
+    path.join(FILE_CONFIG.UPLOAD_DIR, 'lms')
   ];
 
   dirs.forEach(dir => {
@@ -61,6 +83,8 @@ const storage = multer.diskStorage({
       uploadPath = path.join(uploadPath, 'documents');
     } else if (req.body.type === 'report') {
       uploadPath = path.join(uploadPath, 'reports');
+    } else if (req.body.type === 'lms') {
+      uploadPath = path.join(uploadPath, 'lms');
     }
 
     // Create directory if it doesn't exist
@@ -139,9 +163,23 @@ exports.saveFileMetadata = async (prisma, fileData, userId) => {
 /**
  * Delete file from storage
  */
+const resolveUploadPath = (filePath) => {
+  const normalizedPath = path.normalize(filePath);
+
+  if (path.isAbsolute(normalizedPath)) {
+    return normalizedPath;
+  }
+
+  if (normalizedPath.startsWith(FILE_CONFIG.UPLOAD_DIR)) {
+    return normalizedPath;
+  }
+
+  return path.join(FILE_CONFIG.UPLOAD_DIR, normalizedPath);
+};
+
 exports.deleteFile = async (filePath) => {
   try {
-    const fullPath = path.join(FILE_CONFIG.UPLOAD_DIR, filePath);
+    const fullPath = resolveUploadPath(filePath);
     
     if (fs.existsSync(fullPath)) {
       fs.unlinkSync(fullPath);
@@ -162,7 +200,7 @@ exports.deleteFile = async (filePath) => {
  */
 exports.getFile = (filePath) => {
   try {
-    const fullPath = path.join(FILE_CONFIG.UPLOAD_DIR, filePath);
+    const fullPath = resolveUploadPath(filePath);
     
     if (!fs.existsSync(fullPath)) {
       return null;

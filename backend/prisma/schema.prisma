@@ -116,6 +116,24 @@ enum ActivityAction {
   OTHER
 }
 
+enum LmsContentType {
+  LESSON_NOTE
+  VIDEO_LECTURE
+  ASSIGNMENT
+}
+
+enum LmsVisibility {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LmsSubmissionStatus {
+  SUBMITTED
+  GRADED
+  LATE
+}
+
 // User Model (Authentication)
 model User {
   id                    String    @id @default(uuid())
@@ -174,6 +192,7 @@ model Class {
   timetables      Timetable[]
   attendances     Attendance[]
   examSchedules   ExamSchedule[]
+  lmsContents     LmsContent[]
 
   @@unique([name, section, academicYearId])
   @@map("classes")
@@ -195,6 +214,7 @@ model Subject {
   teacher       Staff?    @relation(fields: [teacherId], references: [id])
   timetables    Timetable[]
   examResults   ExamResult[]
+  lmsContents   LmsContent[]
 
   @@map("subjects")
 }
@@ -284,6 +304,7 @@ model Staff {
   classesAsTeacher  Class[]   @relation("ClassTeacher")
   leaves            Leave[]
   salaryPayments    SalaryPayment[]
+  lmsContents        LmsContent[]
 
   @@map("staff")
 }
@@ -489,4 +510,96 @@ model Activity {
   @@index([action])
   @@index([module])
   @@map("activities")
+}
+
+// LMS Content
+model LmsContent {
+  id            String         @id @default(uuid())
+  title         String
+  description   String?
+  type          LmsContentType
+  visibility    LmsVisibility  @default(DRAFT)
+  classId       String
+  subjectId     String
+  teacherId     String
+  dueDate       DateTime?
+  totalMarks    Int?
+  instructions  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  class         Class          @relation(fields: [classId], references: [id])
+  subject       Subject        @relation(fields: [subjectId], references: [id])
+  teacher       Staff          @relation(fields: [teacherId], references: [id])
+  attachments   LmsContentFile[]
+  submissions   LmsSubmission[]
+
+  @@index([classId])
+  @@index([subjectId])
+  @@index([teacherId])
+  @@map("lms_contents")
+}
+
+// LMS Content Attachments
+model LmsContentFile {
+  id            String    @id @default(uuid())
+  contentId     String
+  originalName  String
+  filename      String
+  path          String
+  size          Int
+  mimetype      String
+  category      String?
+  uploadedBy    String
+  uploadedAt    DateTime  @default(now())
+
+  // Relations
+  content       LmsContent @relation(fields: [contentId], references: [id])
+
+  @@index([contentId])
+  @@map("lms_content_files")
+}
+
+// LMS Assignment Submission
+model LmsSubmission {
+  id            String              @id @default(uuid())
+  contentId     String
+  studentId     String
+  status        LmsSubmissionStatus @default(SUBMITTED)
+  submittedAt   DateTime            @default(now())
+  grade         Float?
+  feedback      String?
+  gradedBy      String?
+  gradedAt      DateTime?
+
+  // Relations
+  content       LmsContent          @relation(fields: [contentId], references: [id])
+  student       Student             @relation(fields: [studentId], references: [id])
+  attachments   LmsSubmissionFile[]
+
+  @@unique([contentId, studentId])
+  @@index([contentId])
+  @@index([studentId])
+  @@map("lms_submissions")
+}
+
+// LMS Submission Attachments
+model LmsSubmissionFile {
+  id            String    @id @default(uuid())
+  submissionId  String
+  originalName  String
+  filename      String
+  path          String
+  size          Int
+  mimetype      String
+  category      String?
+  uploadedBy    String
+  uploadedAt    DateTime  @default(now())
+
+  // Relations
+  submission    LmsSubmission @relation(fields: [submissionId], references: [id])
+
+  @@index([submissionId])
+  @@map("lms_submission_files")
 }

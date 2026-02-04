@@ -153,3 +153,34 @@ export const notificationAPI = {
   getById: (id: string) => api.get(`/notifications/${id}`),
   send: (data: any) => api.post('/notifications', data),
 };
+
+// LMS API
+export const lmsAPI = {
+  getAll: (params?: any) => api.get('/lms', { params }),
+  getById: (id: string) => api.get(`/lms/${id}`),
+  create: (data: any) => api.post('/lms', data),
+  update: (id: string, data: any) => api.put(`/lms/${id}`, data),
+  delete: (id: string) => api.delete(`/lms/${id}`),
+  uploadAttachments: (id: string, formData: FormData) =>
+    api.post(`/lms/${id}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  deleteAttachment: (contentId: string, attachmentId: string) =>
+    api.delete(`/lms/${contentId}/attachments/${attachmentId}`),
+  getSubmissions: (contentId: string) => api.get(`/lms/${contentId}/submissions`),
+  getMySubmission: (contentId: string) => api.get(`/lms/${contentId}/submissions/me`),
+  getMySubmissions: () => api.get('/lms/submissions/me'),
+  createSubmission: (contentId: string, formData: FormData) =>
+    api.post(`/lms/${contentId}/submissions`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  gradeSubmission: (contentId: string, submissionId: string, data: any) =>
+    api.put(`/lms/${contentId}/submissions/${submissionId}`, data),
+  getAnalytics: (contentId: string) => api.get(`/lms/${contentId}/analytics`)
+};
+
+// Metadata API
+export const metadataAPI = {
+  getClasses: () => api.get('/metadata/classes'),
+  getSubjects: (params?: any) => api.get('/metadata/subjects', { params })
+};
