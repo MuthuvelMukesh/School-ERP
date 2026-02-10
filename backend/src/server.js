@@ -24,6 +24,7 @@ const activityRoutes = require('./routes/activity.routes');
 const fileRoutes = require('./routes/file.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const libraryRoutes = require('./routes/library.routes');
+const transportRoutes = require('./routes/transport.routes');
 const lmsRoutes = require('./routes/lms.routes');
 const metadataRoutes = require('./routes/metadata.routes');
 const { activityLogger } = require('./utils/activity');
@@ -78,6 +79,7 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/library', libraryRoutes);
+app.use('/api/transport', transportRoutes);
 app.use('/api/lms', lmsRoutes);
 app.use('/api/metadata', metadataRoutes);
 

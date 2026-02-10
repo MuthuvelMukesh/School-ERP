@@ -134,6 +134,21 @@ enum LmsSubmissionStatus {
   LATE
 }
 
+enum FuelType {
+  PETROL
+  DIESEL
+  CNG
+  ELECTRIC
+}
+
+enum VehicleCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  UNDER_MAINTENANCE
+}
+
 // User Model (Authentication)
 model User {
   id                    String    @id @default(uuid())
@@ -306,6 +321,8 @@ model Staff {
   leaves            Leave[]
   salaryPayments    SalaryPayment[]
   lmsContents        LmsContent[]
+  vehiclesAsDriver  Vehicle[] @relation("VehicleDriver")
+  vehiclesAsConductor Vehicle[] @relation("VehicleConductor")
 
   @@map("staff")
 }
@@ -708,4 +725,151 @@ model LmsSubmissionFile {
 
   @@index([submissionId])
   @@map("lms_submission_files")
+}
+
+// Transport/Bus Management System Models
+
+model Vehicle {
+  id                String            @id @default(uuid())
+  registrationNo    String            @unique
+  model             String
+  capacity          Int
+  driverId          String?
+  conductorId       String?
+  serviceDate       DateTime
+  maintenanceDate   DateTime?
+  fuelType          FuelType
+  averageMileage    Float
+  currentMileage    Int               @default(0)
+  gpsDeviceId       String?
+  condition         VehicleCondition  @default(GOOD)
+  insuranceExpiry   DateTime?
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  // Relations
+  driver            Staff?            @relation("VehicleDriver", fields: [driverId], references: [id])
+  conductor         Staff?            @relation("VehicleConductor", fields: [conductorId], references: [id])
+  route             Route?
+  maintenanceRecords MaintenanceRecord[]
+  boardingRecords   VehicleBoarding[]
+
+  @@index([registrationNo])
+  @@index([condition])
+  @@map("vehicles")
+}
+
+model Route {
+  id          String    @id @default(uuid())
+  name        String
+  vehicleId   String    @unique
+  monthlyFee  Float
+  totalStops  Int       @default(0)
+  estimatedDuration Int? // in minutes
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  stops       BusStop[]
+  students    StudentTransport[]
+
+  @@index([vehicleId])
+  @@map("routes")
+}
+
+model BusStop {
+  id        String    @id @default(uuid())
+  routeId   String
+  stopName  String
+  location  String
+  latitude  Float?
+  longitude Float?
+  stopOrder Int
+  arrivalTime String?
+  estimatedWaitTime Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  route     Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, stopOrder])
+  @@index([routeId])
+  @@map("bus_stops")
+}
+
+model StudentTransport {
+  id            String    @id @default(uuid())
+  studentId     String
+  routeId       String
+  pickupStop    String
+  dropoffStop   String
+  monthlyFee    Float
+  feePaid       Boolean   @default(false)
+  feePaymentDate DateTime?
+  boardingStatus Boolean  @default(true)
+  enrollmentDate DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  route         Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, routeId])
+  @@index([routeId])
+  @@index([studentId])
+  @@map("student_transport")
+}
+
+model MaintenanceRecord {
+  id          String    @id @default(uuid())
+  vehicleId   String
+  description String
+  cost        Float
+  date        DateTime
+  nextServiceDate DateTime?
+  parts       String?
+  mechanic    String?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([date])
+  @@map("maintenance_records")
+}
+
+model VehicleBoarding {
+  id            String    @id @default(uuid())
+  vehicleId     String
+  date          DateTime
+  studentCount  Int       @default(0)
+  capacity      Int
+  remarks       String?
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, date])
+  @@index([vehicleId])
+  @@index([date])
+  @@map("vehicle_boarding")
+}
+
+model TransportSettings {
+  id                        String    @id @default(uuid())
+  defaultMonthlyFee         Float     @default(1000)
+  lateFeePercentage         Float     @default(10)
+  maxStudentsPerVehicle     Int       @default(50)
+  maintenanceCheckInterval  Int       @default(30)
+  fineForNoBoarding         Float     @default(100)
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  @@map("transport_settings")
 }
