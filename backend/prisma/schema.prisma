@@ -134,6 +134,47 @@ enum LmsSubmissionStatus {
   LATE
 }
 
+enum FuelType {
+  PETROL
+  DIESEL
+  CNG
+  ELECTRIC
+}
+
+enum VehicleCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  UNDER_MAINTENANCE
+}
+
+enum HostelType {
+  BOYS
+  GIRLS
+  CO_ED
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TRIPLE
+  DORMITORY
+}
+
+enum BedStatus {
+  OCCUPIED
+  VACANT
+  MAINTENANCE
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
 // User Model (Authentication)
 model User {
   id                    String    @id @default(uuid())
@@ -248,6 +289,7 @@ model Student {
   attendances       Attendance[]
   feePayments       FeePayment[]
   examResults       ExamResult[]
+  lmsSubmissions    LmsSubmission[]
 
   @@map("students")
 }
@@ -305,6 +347,9 @@ model Staff {
   leaves            Leave[]
   salaryPayments    SalaryPayment[]
   lmsContents        LmsContent[]
+  vehiclesAsDriver  Vehicle[] @relation("VehicleDriver")
+  vehiclesAsConductor Vehicle[] @relation("VehicleConductor")
+  hostelsAsWarden   Hostel[]  @relation("HostelWarden")
 
   @@map("staff")
 }
@@ -512,7 +557,115 @@ model Activity {
   @@map("activities")
 }
 
-// LMS Content
+// ==================== LIBRARY MANAGEMENT SYSTEM MODELS ====================
+
+model Book {
+  id            String    @id @default(uuid())
+  title         String
+  author        String
+  isbn          String    @unique
+  publisher     String?
+  edition       String?
+  category      String
+  description   String?
+  totalCopies   Int       @default(1)
+  costPrice     Float
+  sellingPrice  Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  copies        BookCopy[]
+  borrowRecords BorrowRecord[]
+
+  @@index([title])
+  @@index([author])
+  @@index([isbn])
+  @@index([category])
+  @@map("books")
+}
+
+model BookCopy {
+  id            String    @id @default(uuid())
+  bookId        String
+  barcode       String    @unique
+  status        String    // AVAILABLE, ISSUED, DAMAGED, LOST, PENDING_REPAIR
+  condition     String    // GOOD, FAIR, POOR
+  issuedTo      String?   // Student or Staff ID
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([barcode])
+  @@index([status])
+  @@map("book_copies")
+}
+
+model BorrowRecord {
+  id            String    @id @default(uuid())
+  bookId        String
+  memberId      String    // Student or Staff ID
+  issueDate     DateTime  @default(now())
+  dueDate       DateTime
+  returnDate    DateTime?
+  fineAmount    Float     @default(0)
+  finePaid      Boolean   @default(false)
+  finePaymentDate DateTime?
+  renewalCount  Int       @default(0)
+  maxRenewals   Int       @default(3)
+  remarks       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([memberId])
+  @@index([dueDate])
+  @@index([returnDate])
+  @@map("borrow_records")
+}
+
+model BookHoldRequest {
+  id            String    @id @default(uuid())
+  bookId        String
+  memberId      String    // Student or Staff ID
+  requestDate   DateTime  @default(now())
+  fulfillmentDate DateTime?
+  status        String    @default("PENDING") // PENDING, FULFILLED, CANCELLED
+  expiryDate    DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([memberId])
+  @@index([status])
+  @@map("book_hold_requests")
+}
+
+model LibrarySettings {
+  id                    String    @id @default(uuid())
+  issueLimit            Int       @default(5) // Books per member
+  issuePeriodDays       Int       @default(14)
+  finePerDay            Float     @default(5) // Currency per day
+  maxFineLimit          Float     @default(100)
+  holdRequestExpiryDays Int       @default(7)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("library_settings")
+}
+
+// ==================== LMS (LEARNING MANAGEMENT SYSTEM) MODELS ====================
+
 model LmsContent {
   id            String         @id @default(uuid())
   title         String
@@ -541,7 +694,6 @@ model LmsContent {
   @@map("lms_contents")
 }
 
-// LMS Content Attachments
 model LmsContentFile {
   id            String    @id @default(uuid())
   contentId     String
@@ -561,7 +713,6 @@ model LmsContentFile {
   @@map("lms_content_files")
 }
 
-// LMS Assignment Submission
 model LmsSubmission {
   id            String              @id @default(uuid())
   contentId     String
@@ -584,7 +735,6 @@ model LmsSubmission {
   @@map("lms_submissions")
 }
 
-// LMS Submission Attachments
 model LmsSubmissionFile {
   id            String    @id @default(uuid())
   submissionId  String
@@ -602,4 +752,361 @@ model LmsSubmissionFile {
 
   @@index([submissionId])
   @@map("lms_submission_files")
+}
+
+// Transport/Bus Management System Models
+
+model Vehicle {
+  id                String            @id @default(uuid())
+  registrationNo    String            @unique
+  model             String
+  capacity          Int
+  driverId          String?
+  conductorId       String?
+  serviceDate       DateTime
+  maintenanceDate   DateTime?
+  fuelType          FuelType
+  averageMileage    Float
+  currentMileage    Int               @default(0)
+  gpsDeviceId       String?
+  condition         VehicleCondition  @default(GOOD)
+  insuranceExpiry   DateTime?
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  // Relations
+  driver            Staff?            @relation("VehicleDriver", fields: [driverId], references: [id])
+  conductor         Staff?            @relation("VehicleConductor", fields: [conductorId], references: [id])
+  route             Route?
+  maintenanceRecords MaintenanceRecord[]
+  boardingRecords   VehicleBoarding[]
+
+  @@index([registrationNo])
+  @@index([condition])
+  @@map("vehicles")
+}
+
+model Route {
+  id          String    @id @default(uuid())
+  name        String
+  vehicleId   String    @unique
+  monthlyFee  Float
+  totalStops  Int       @default(0)
+  estimatedDuration Int? // in minutes
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  stops       BusStop[]
+  students    StudentTransport[]
+
+  @@index([vehicleId])
+  @@map("routes")
+}
+
+model BusStop {
+  id        String    @id @default(uuid())
+  routeId   String
+  stopName  String
+  location  String
+  latitude  Float?
+  longitude Float?
+  stopOrder Int
+  arrivalTime String?
+  estimatedWaitTime Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  route     Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, stopOrder])
+  @@index([routeId])
+  @@map("bus_stops")
+}
+
+model StudentTransport {
+  id            String    @id @default(uuid())
+  studentId     String
+  routeId       String
+  pickupStop    String
+  dropoffStop   String
+  monthlyFee    Float
+  feePaid       Boolean   @default(false)
+  feePaymentDate DateTime?
+  boardingStatus Boolean  @default(true)
+  enrollmentDate DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  route         Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, routeId])
+  @@index([routeId])
+  @@index([studentId])
+  @@map("student_transport")
+}
+
+model MaintenanceRecord {
+  id          String    @id @default(uuid())
+  vehicleId   String
+  description String
+  cost        Float
+  date        DateTime
+  nextServiceDate DateTime?
+  parts       String?
+  mechanic    String?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([date])
+  @@map("maintenance_records")
+}
+
+model VehicleBoarding {
+  id            String    @id @default(uuid())
+  vehicleId     String
+  date          DateTime
+  studentCount  Int       @default(0)
+  capacity      Int
+  remarks       String?
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, date])
+  @@index([vehicleId])
+  @@index([date])
+  @@map("vehicle_boarding")
+}
+
+model TransportSettings {
+  id                        String    @id @default(uuid())
+  defaultMonthlyFee         Float     @default(1000)
+  lateFeePercentage         Float     @default(10)
+  maxStudentsPerVehicle     Int       @default(50)
+  maintenanceCheckInterval  Int       @default(30)
+  fineForNoBoarding         Float     @default(100)
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  @@map("transport_settings")
+}
+
+// ==================== Hostel Management Models ====================
+
+model Hostel {
+  id          String    @id @default(uuid())
+  name        String
+  type        HostelType
+  capacity    Int
+  wardenId    String?
+  address     String?
+  contactNo   String?
+  facilities  String?   // Comma-separated facilities
+  rules       String?   // Hostel rules and policies
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  warden      Staff?    @relation("HostelWarden", fields: [wardenId], references: [id])
+  rooms       HostelRoom[]
+  students    HostelStudent[]
+  notices     HostelNotice[]
+
+  @@index([type])
+  @@map("hostels")
+}
+
+model HostelRoom {
+  id          String    @id @default(uuid())
+  hostelId    String
+  roomNumber  String
+  floor       Int?
+  capacity    Int
+  type        RoomType
+  rentAmount  Float
+  amenities   String?   // Comma-separated amenities
+  status      String    @default("AVAILABLE") // AVAILABLE, FULL, MAINTENANCE
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  hostel      Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  beds        HostelBed[]
+
+  @@unique([hostelId, roomNumber])
+  @@index([hostelId])
+  @@index([status])
+  @@map("hostel_rooms")
+}
+
+model HostelBed {
+  id        String    @id @default(uuid())
+  roomId    String
+  bedNo     Int
+  status    BedStatus @default(VACANT)
+  studentId String?   // Current occupant
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  room      HostelRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, bedNo])
+  @@index([roomId])
+  @@index([status])
+  @@map("hostel_beds")
+}
+
+model HostelStudent {
+  id              String    @id @default(uuid())
+  studentId       String
+  hostelId        String
+  roomId          String
+  bedId           String
+  checkInDate     DateTime
+  checkOutDate    DateTime?
+  depositAmount   Float
+  depositRefunded Boolean   @default(false)
+  monthlyFee      Float
+  feePaid         Boolean   @default(false)
+  feePaymentDate  DateTime?
+  emergencyContact String?
+  specialRequirements String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  hostel          Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, hostelId])
+  @@index([hostelId])
+  @@index([studentId])
+  @@index([roomId])
+  @@map("hostel_students")
+}
+
+model HostelVisitor {
+  id          String    @id @default(uuid())
+  studentId   String
+  visitorName String
+  relation    String?
+  contactNo   String?
+  purpose     String
+  visitDate   DateTime
+  inTime      DateTime?
+  outTime     DateTime?
+  approved    Boolean   @default(false)
+  approvedBy  String?
+  remarks     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([visitDate])
+  @@map("hostel_visitors")
+}
+
+model HostelComplaint {
+  id          String    @id @default(uuid())
+  studentId   String
+  hostelId    String
+  category    String    // MAINTENANCE, CLEANLINESS, SECURITY, NOISE, OTHER
+  subject     String
+  description String
+  priority    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status      ComplaintStatus @default(OPEN)
+  assignedTo  String?
+  resolvedDate DateTime?
+  resolution  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([hostelId])
+  @@index([status])
+  @@map("hostel_complaints")
+}
+
+model HostelLeave {
+  id          String    @id @default(uuid())
+  studentId   String
+  hostelId    String
+  leaveFrom   DateTime
+  leaveTo     DateTime
+  reason      String
+  destination String?
+  contactNo   String
+  status      LeaveStatus @default(PENDING)
+  approvedBy  String?
+  approvedDate DateTime?
+  remarks     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([hostelId])
+  @@index([status])
+  @@map("hostel_leaves")
+}
+
+model HostelNotice {
+  id        String    @id @default(uuid())
+  hostelId  String
+  title     String
+  content   String
+  priority  String    @default("NORMAL") // NORMAL, IMPORTANT, URGENT
+  isActive  Boolean   @default(true)
+  createdBy String
+  expiryDate DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  hostel    Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@index([hostelId])
+  @@index([isActive])
+  @@map("hostel_notices")
+}
+
+model HostelAttendance {
+  id          String    @id @default(uuid())
+  studentId   String
+  hostelId    String
+  date        DateTime
+  isPresent   Boolean   @default(true)
+  remarks     String?
+  recordedBy  String?
+  recordedAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+
+  @@unique([studentId, hostelId, date])
+  @@index([hostelId])
+  @@index([studentId])
+  @@index([date])
+  @@map("hostel_attendance")
+}
+
+model HostelSettings {
+  id                    String    @id @default(uuid())
+  defaultMonthlyFee     Float     @default(3000)
+  defaultDepositAmount  Float     @default(5000)
+  visitorTimeFrom       String    @default("09:00") // HH:MM format
+  visitorTimeTo         String    @default("18:00") // HH:MM format
+  leaveApprovalRequired Boolean   @default(true)
+  attendanceRequired    Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("hostel_settings")
 }
