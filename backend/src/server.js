@@ -23,6 +23,7 @@ const notificationRoutes = require('./routes/notification.routes');
 const activityRoutes = require('./routes/activity.routes');
 const fileRoutes = require('./routes/file.routes');
 const paymentRoutes = require('./routes/payment.routes');
+const libraryRoutes = require('./routes/library.routes');
 const { activityLogger } = require('./utils/activity');
 
 // Initialize express
@@ -74,6 +75,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/library', libraryRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

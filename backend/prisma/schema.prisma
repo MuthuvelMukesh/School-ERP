@@ -490,3 +490,109 @@ model Activity {
   @@index([module])
   @@map("activities")
 }
+
+// Library Management System Models
+model Book {
+  id            String    @id @default(uuid())
+  title         String
+  author        String
+  isbn          String    @unique
+  publisher     String?
+  edition       String?
+  category      String
+  description   String?
+  totalCopies   Int       @default(1)
+  costPrice     Float
+  sellingPrice  Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  copies        BookCopy[]
+  borrowRecords BorrowRecord[]
+
+  @@index([title])
+  @@index([author])
+  @@index([isbn])
+  @@index([category])
+  @@map("books")
+}
+
+model BookCopy {
+  id            String    @id @default(uuid())
+  bookId        String
+  barcode       String    @unique
+  status        String    // AVAILABLE, ISSUED, DAMAGED, LOST, PENDING_REPAIR
+  condition     String    // GOOD, FAIR, POOR
+  issuedTo      String?   // Student or Staff ID
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([barcode])
+  @@index([status])
+  @@map("book_copies")
+}
+
+model BorrowRecord {
+  id            String    @id @default(uuid())
+  bookId        String
+  memberId      String    // Student or Staff ID
+  issueDate     DateTime  @default(now())
+  dueDate       DateTime
+  returnDate    DateTime?
+  fineAmount    Float     @default(0)
+  finePaid      Boolean   @default(false)
+  finePaymentDate DateTime?
+  renewalCount  Int       @default(0)
+  maxRenewals   Int       @default(3)
+  remarks       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([memberId])
+  @@index([dueDate])
+  @@index([returnDate])
+  @@map("borrow_records")
+}
+
+model BookHoldRequest {
+  id            String    @id @default(uuid())
+  bookId        String
+  memberId      String    // Student or Staff ID
+  requestDate   DateTime  @default(now())
+  fulfillmentDate DateTime?
+  status        String    @default("PENDING") // PENDING, FULFILLED, CANCELLED
+  expiryDate    DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([memberId])
+  @@index([status])
+  @@map("book_hold_requests")
+}
+
+model LibrarySettings {
+  id                    String    @id @default(uuid())
+  issueLimit            Int       @default(5) // Books per member
+  issuePeriodDays       Int       @default(14)
+  finePerDay            Float     @default(5) // Currency per day
+  maxFineLimit          Float     @default(100)
+  holdRequestExpiryDays Int       @default(7)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("library_settings")
+}
