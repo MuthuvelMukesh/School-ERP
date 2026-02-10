@@ -24,6 +24,8 @@ const activityRoutes = require('./routes/activity.routes');
 const fileRoutes = require('./routes/file.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const libraryRoutes = require('./routes/library.routes');
+const lmsRoutes = require('./routes/lms.routes');
+const metadataRoutes = require('./routes/metadata.routes');
 const { activityLogger } = require('./utils/activity');
 
 // Initialize express
@@ -37,7 +39,7 @@ app.use(requestTiming);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 
@@ -76,6 +78,8 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/library', libraryRoutes);
+app.use('/api/lms', lmsRoutes);
+app.use('/api/metadata', metadataRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -90,8 +94,21 @@ app.get('/api/health', (req, res) => {
 // 404 handler
 app.use(notFoundHandler);
 
+<<<<<<< HEAD
+// Global error handler
+app.use((err, req, res, next) => {
+  logger.error(err.stack);
+
+  res.status(err.status || 500).json({
+    status: 'error',
+    message: err.message || 'Internal server error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
+=======
 // Global error handler (must be last)
 app.use(errorHandler);
+>>>>>>> main
 
 // Start server
 const PORT = process.env.PORT || 5000;

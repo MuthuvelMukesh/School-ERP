@@ -1,6 +1,10 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!API_URL) {
+  throw new Error('NEXT_PUBLIC_API_URL environment variable is not defined');
+}
 
 const api = axios.create({
   baseURL: API_URL,
@@ -11,26 +15,31 @@ const api = axios.create({
 
 // Request interceptor to add token
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  (config: InternalAxiosRequestConfig) => {
+    // Check if we are in the browser before accessing localStorage
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
-  (error) => {
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/auth/login';
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/auth/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -143,4 +152,35 @@ export const notificationAPI = {
   getAll: (params?: any) => api.get('/notifications', { params }),
   getById: (id: string) => api.get(`/notifications/${id}`),
   send: (data: any) => api.post('/notifications', data),
+};
+
+// LMS API
+export const lmsAPI = {
+  getAll: (params?: any) => api.get('/lms', { params }),
+  getById: (id: string) => api.get(`/lms/${id}`),
+  create: (data: any) => api.post('/lms', data),
+  update: (id: string, data: any) => api.put(`/lms/${id}`, data),
+  delete: (id: string) => api.delete(`/lms/${id}`),
+  uploadAttachments: (id: string, formData: FormData) =>
+    api.post(`/lms/${id}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  deleteAttachment: (contentId: string, attachmentId: string) =>
+    api.delete(`/lms/${contentId}/attachments/${attachmentId}`),
+  getSubmissions: (contentId: string) => api.get(`/lms/${contentId}/submissions`),
+  getMySubmission: (contentId: string) => api.get(`/lms/${contentId}/submissions/me`),
+  getMySubmissions: () => api.get('/lms/submissions/me'),
+  createSubmission: (contentId: string, formData: FormData) =>
+    api.post(`/lms/${contentId}/submissions`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  gradeSubmission: (contentId: string, submissionId: string, data: any) =>
+    api.put(`/lms/${contentId}/submissions/${submissionId}`, data),
+  getAnalytics: (contentId: string) => api.get(`/lms/${contentId}/analytics`)
+};
+
+// Metadata API
+export const metadataAPI = {
+  getClasses: () => api.get('/metadata/classes'),
+  getSubjects: (params?: any) => api.get('/metadata/subjects', { params })
 };
