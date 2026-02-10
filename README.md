@@ -24,6 +24,7 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 - **Examination**: marks entry, report cards
 - **Staff Management**: profile, leave, salary
 - **Notifications**: SMS / Email
+- **LMS (Learning Management System)**: lesson notes, video lectures, assignments, submissions
 - **Admin Dashboard + Role-based Access Control**
 
 ## Nice-to-have (future phases)
@@ -73,6 +74,7 @@ School-ERP/
     ├── app/
     │   ├── auth/                  # Authentication pages
     │   ├── dashboard/             # Dashboard page
+   │   ├── lms/                   # LMS pages
     │   ├── globals.css            # Global styles
     │   ├── layout.tsx             # Root layout
     │   └── page.tsx               # Home page
@@ -232,6 +234,25 @@ http://localhost:5000/api
 - `GET /notifications` - Get all notifications
 - `POST /notifications` - Send notification
 
+### LMS Endpoints
+- `GET /lms` - Get LMS content (filters: classId, subjectId, teacherId, type, visibility, q)
+- `GET /lms/:id` - Get LMS content by ID
+- `POST /lms` - Create LMS content
+- `PUT /lms/:id` - Update LMS content
+- `DELETE /lms/:id` - Delete LMS content
+- `POST /lms/:id/attachments` - Upload LMS attachments
+- `DELETE /lms/:id/attachments/:attachmentId` - Delete LMS attachment
+- `GET /lms/:id/submissions` - Get submissions for assignment (teacher/admin)
+- `GET /lms/:id/submissions/me` - Get my submission (student)
+- `GET /lms/submissions/me` - List my submissions (student)
+- `POST /lms/:id/submissions` - Submit assignment (student)
+- `PUT /lms/:id/submissions/:submissionId` - Grade submission (teacher/admin)
+- `GET /lms/:id/analytics` - Assignment analytics (teacher/admin)
+
+### Metadata Endpoints
+- `GET /metadata/classes` - Get classes
+- `GET /metadata/subjects` - Get subjects (filters: classId, teacherId)
+
 ## Database Schema
 
 Key entities:
@@ -249,6 +270,23 @@ Key entities:
 - **ExamResult**: Student exam results
 - **Leave**: Staff leave applications
 - **Notification**: Communication records
+- **LmsContent**: Lesson notes, videos, assignments
+- **LmsContentFile**: LMS attachments
+- **LmsSubmission**: Assignment submissions
+- **LmsSubmissionFile**: Submission attachments
+
+## LMS Highlights
+- Upload multimedia lesson notes, video lectures, and assignments
+- Teacher-only content creation and attachments
+- Student assignment submissions with uploads
+- Grading workflow with feedback
+- Assignment analytics (total, graded, late, average grade)
+
+## Next Steps
+- Configure `DATABASE_URL` and run Prisma migrations
+- Add LMS calendar view and deadline reminders
+- Add submission notifications (email/in-app)
+- Add LMS widgets to student/teacher dashboard
 
 ## Security Features
 - JWT-based authentication
@@ -313,13 +351,110 @@ npm run lint
 ```
 
 ## Contributing
-Contributions are welcome! Please follow these steps:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+
+### How to Contribute
+
+#### 1. Fork and Clone
+```bash
+git clone https://github.com/YOUR_USERNAME/School-ERP.git
+cd School-ERP
+git remote add upstream https://github.com/MuthuvelMukesh/School-ERP.git
+```
+
+#### 2. Create a Feature Branch
+```bash
+git checkout -b feature/YourFeatureName
+```
+
+Use descriptive branch names:
+- `feature/student-portal` for new features
+- `bugfix/attendance-calculation` for bug fixes
+- `docs/api-documentation` for documentation
+
+#### 3. Make Your Changes
+- Follow the existing code style and structure
+- Add comments for complex logic
+- Test your changes thoroughly
+- Update documentation as needed
+
+#### 4. Commit with Clear Messages
+```bash
+git commit -m "Brief description of changes
+
+- Added feature X
+- Fixed bug Y
+- Updated documentation Z"
+```
+
+#### 5. Push and Create Pull Request
+```bash
+git push origin feature/YourFeatureName
+```
+
+Then open a Pull Request on GitHub with:
+- Clear title and description
+- Reference any related issues (#issue-number)
+- Screenshots for UI changes
+- Test results
+
+### Guidelines
+
+**Code Standards:**
+- Use consistent indentation (2 spaces for JS/TS, 4 spaces for Python)
+- Follow ES6+ syntax for JavaScript
+- Add error handling and validation
+- Include meaningful variable names
+
+**Git Workflow:**
+- Keep commits focused and atomic
+- Never commit directly to main branch
+- Rebase before pushing: `git rebase upstream/main`
+- Keep PRs manageable (< 400 lines if possible)
+
+**Testing:**
+- Write tests for new features
+- Ensure existing tests pass
+- Run linting before committing
+
+**Documentation:**
+- Update README for new features
+- Add JSDoc/TSDoc comments
+- Update API documentation
+- Include setup instructions if needed
+
+### Reporting Issues
+
+Found a bug? Please report it by:
+1. Checking existing issues first
+2. Creating a new issue with:
+   - Clear description of the problem
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Your environment (OS, Node version, etc.)
+
+### Feature Requests
+
+Have an idea? We'd love to hear it! Submit a feature request with:
+- Clear use case
+- How it benefits users
+- Suggested implementation (optional)
+
+### Questions?
+
+- Check [FAQ](FAQ.md) (coming soon)
+- Read existing issues and discussions
+- Open a discussion or email: support@schoolerp.com
+
+### Recognition
+
+Contributors will be recognized in:
+- [CONTRIBUTORS.md](CONTRIBUTORS.md) file
+- Release notes
+- GitHub contributors page
+
+Thank you for contributing! 🎉
 
 ## License
 MIT License - see the [LICENSE](LICENSE) file for details.

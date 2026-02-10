@@ -11,6 +11,7 @@ import {
   Calendar,
   ClipboardList,
   GraduationCap,
+  BookOpen,
   Bell,
   LogOut,
   Menu,
@@ -62,6 +63,7 @@ export default function DashboardPage() {
     { icon: Calendar, label: 'Attendance', href: '/attendance' },
     { icon: ClipboardList, label: 'Timetable', href: '/timetable' },
     { icon: GraduationCap, label: 'Examinations', href: '/exams' },
+    { icon: BookOpen, label: 'LMS', href: '/lms' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
   ]
 
