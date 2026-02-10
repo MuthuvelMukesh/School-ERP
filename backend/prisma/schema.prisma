@@ -149,6 +149,32 @@ enum VehicleCondition {
   UNDER_MAINTENANCE
 }
 
+enum HostelType {
+  BOYS
+  GIRLS
+  CO_ED
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TRIPLE
+  DORMITORY
+}
+
+enum BedStatus {
+  OCCUPIED
+  VACANT
+  MAINTENANCE
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
 // User Model (Authentication)
 model User {
   id                    String    @id @default(uuid())
@@ -323,6 +349,7 @@ model Staff {
   lmsContents        LmsContent[]
   vehiclesAsDriver  Vehicle[] @relation("VehicleDriver")
   vehiclesAsConductor Vehicle[] @relation("VehicleConductor")
+  hostelsAsWarden   Hostel[]  @relation("HostelWarden")
 
   @@map("staff")
 }
@@ -872,4 +899,214 @@ model TransportSettings {
   updatedAt                 DateTime  @updatedAt
 
   @@map("transport_settings")
+}
+
+// ==================== Hostel Management Models ====================
+
+model Hostel {
+  id          String    @id @default(uuid())
+  name        String
+  type        HostelType
+  capacity    Int
+  wardenId    String?
+  address     String?
+  contactNo   String?
+  facilities  String?   // Comma-separated facilities
+  rules       String?   // Hostel rules and policies
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  warden      Staff?    @relation("HostelWarden", fields: [wardenId], references: [id])
+  rooms       HostelRoom[]
+  students    HostelStudent[]
+  notices     HostelNotice[]
+
+  @@index([type])
+  @@map("hostels")
+}
+
+model HostelRoom {
+  id          String    @id @default(uuid())
+  hostelId    String
+  roomNumber  String
+  floor       Int?
+  capacity    Int
+  type        RoomType
+  rentAmount  Float
+  amenities   String?   // Comma-separated amenities
+  status      String    @default("AVAILABLE") // AVAILABLE, FULL, MAINTENANCE
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  hostel      Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  beds        HostelBed[]
+
+  @@unique([hostelId, roomNumber])
+  @@index([hostelId])
+  @@index([status])
+  @@map("hostel_rooms")
+}
+
+model HostelBed {
+  id        String    @id @default(uuid())
+  roomId    String
+  bedNo     Int
+  status    BedStatus @default(VACANT)
+  studentId String?   // Current occupant
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  room      HostelRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, bedNo])
+  @@index([roomId])
+  @@index([status])
+  @@map("hostel_beds")
+}
+
+model HostelStudent {
+  id              String    @id @default(uuid())
+  studentId       String
+  hostelId        String
+  roomId          String
+  bedId           String
+  checkInDate     DateTime
+  checkOutDate    DateTime?
+  depositAmount   Float
+  depositRefunded Boolean   @default(false)
+  monthlyFee      Float
+  feePaid         Boolean   @default(false)
+  feePaymentDate  DateTime?
+  emergencyContact String?
+  specialRequirements String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  hostel          Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, hostelId])
+  @@index([hostelId])
+  @@index([studentId])
+  @@index([roomId])
+  @@map("hostel_students")
+}
+
+model HostelVisitor {
+  id          String    @id @default(uuid())
+  studentId   String
+  visitorName String
+  relation    String?
+  contactNo   String?
+  purpose     String
+  visitDate   DateTime
+  inTime      DateTime?
+  outTime     DateTime?
+  approved    Boolean   @default(false)
+  approvedBy  String?
+  remarks     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([visitDate])
+  @@map("hostel_visitors")
+}
+
+model HostelComplaint {
+  id          String    @id @default(uuid())
+  studentId   String
+  hostelId    String
+  category    String    // MAINTENANCE, CLEANLINESS, SECURITY, NOISE, OTHER
+  subject     String
+  description String
+  priority    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status      ComplaintStatus @default(OPEN)
+  assignedTo  String?
+  resolvedDate DateTime?
+  resolution  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([hostelId])
+  @@index([status])
+  @@map("hostel_complaints")
+}
+
+model HostelLeave {
+  id          String    @id @default(uuid())
+  studentId   String
+  hostelId    String
+  leaveFrom   DateTime
+  leaveTo     DateTime
+  reason      String
+  destination String?
+  contactNo   String
+  status      LeaveStatus @default(PENDING)
+  approvedBy  String?
+  approvedDate DateTime?
+  remarks     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([hostelId])
+  @@index([status])
+  @@map("hostel_leaves")
+}
+
+model HostelNotice {
+  id        String    @id @default(uuid())
+  hostelId  String
+  title     String
+  content   String
+  priority  String    @default("NORMAL") // NORMAL, IMPORTANT, URGENT
+  isActive  Boolean   @default(true)
+  createdBy String
+  expiryDate DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  hostel    Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@index([hostelId])
+  @@index([isActive])
+  @@map("hostel_notices")
+}
+
+model HostelAttendance {
+  id          String    @id @default(uuid())
+  studentId   String
+  hostelId    String
+  date        DateTime
+  isPresent   Boolean   @default(true)
+  remarks     String?
+  recordedBy  String?
+  recordedAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+
+  @@unique([studentId, hostelId, date])
+  @@index([hostelId])
+  @@index([studentId])
+  @@index([date])
+  @@map("hostel_attendance")
+}
+
+model HostelSettings {
+  id                    String    @id @default(uuid())
+  defaultMonthlyFee     Float     @default(3000)
+  defaultDepositAmount  Float     @default(5000)
+  visitorTimeFrom       String    @default("09:00") // HH:MM format
+  visitorTimeTo         String    @default("18:00") // HH:MM format
+  leaveApprovalRequired Boolean   @default(true)
+  attendanceRequired    Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("hostel_settings")
 }
