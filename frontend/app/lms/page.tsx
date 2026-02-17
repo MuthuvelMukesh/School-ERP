@@ -77,8 +77,46 @@ export default function LmsPage() {
         classId: parsed?.profile?.classId || ''
       }))
     }
-    fetchMetadata(parsed)
-    fetchContent()
+
+    const initializePage = async () => {
+      try {
+        const classesResponse = await metadataAPI.getClasses()
+        setClassOptions(classesResponse.data.data.classes || [])
+
+        const subjectParams: Record<string, string> = {}
+        if (parsed?.role === 'TEACHER') {
+          subjectParams.teacherId = parsed?.profile?.id || ''
+        }
+        if (parsed?.role === 'STUDENT') {
+          subjectParams.classId = parsed?.profile?.classId || ''
+        }
+
+        const subjectsResponse = await metadataAPI.getSubjects(subjectParams)
+        setSubjectOptions(subjectsResponse.data.data.subjects || [])
+      } catch (error) {
+        toast.error('Failed to load class/subject data')
+      }
+
+      try {
+        setLoading(true)
+        const initialFilters = {
+          classId: parsed?.role === 'STUDENT' ? parsed?.profile?.classId || '' : '',
+          subjectId: '',
+          teacherId: parsed?.role === 'TEACHER' ? parsed?.profile?.id || '' : '',
+          type: '',
+          visibility: '',
+          q: ''
+        }
+        const response = await lmsAPI.getAll(initialFilters)
+        setItems(response.data.data.items || [])
+      } catch (error) {
+        toast.error('Failed to fetch LMS content')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    initializePage()
   }, [router])
 
   const fetchMetadata = async (currentUser: any) => {

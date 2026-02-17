@@ -1,49 +1,9 @@
-<<<<<<< HEAD
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-
-const prisma = new PrismaClient();
-
-async function main() {
-    const email = process.env.ADMIN_EMAIL || 'admin@school.com';
-    const password = process.env.ADMIN_PASSWORD || 'Admin@123';
-
-    if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
-        console.warn('⚠️  ADMIN_EMAIL or ADMIN_PASSWORD not found in environment.');
-        console.warn('⚠️  Using default credentials: admin@school.com / Admin@123');
-        console.warn('⚠️  Please provide these variables in your .env file for production!');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const admin = await prisma.user.upsert({
-        where: { email },
-        update: {},
-        create: {
-            email,
-            password: hashedPassword,
-            role: 'ADMIN',
-            isActive: true,
-        },
-    });
-
-    console.log('✅ Admin user seeded:', admin.email);
-}
-
-main()
-    .then(async () => {
-        await prisma.$disconnect();
-    })
-    .catch(async (e) => {
-        console.error(e);
-        await prisma.$disconnect();
-        process.exit(1);
-    });
-=======
 /**
  * Database Seeding Script - Initialize default data
  * Run with: npm run seed
  */
+
+require('dotenv').config();
 
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
@@ -77,7 +37,7 @@ async function main() {
       
       if (replaceAdmin.toLowerCase() !== 'yes') {
         console.log('\nSeeding cancelled.');
-        process.exit(0);
+        return;
       }
 
       // Delete existing admin
@@ -98,19 +58,19 @@ async function main() {
     // Validate inputs
     if (!adminEmail || !adminPassword || !firstName || !lastName) {
       console.error('\n❌ All required fields must be filled!');
-      process.exit(1);
+      return;
     }
 
     if (adminPassword.length < 8) {
       console.error('\n❌ Password must be at least 8 characters!');
-      process.exit(1);
+      return;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(adminEmail)) {
       console.error('\n❌ Invalid email format!');
-      process.exit(1);
+      return;
     }
 
     // Check if email already exists
@@ -120,7 +80,7 @@ async function main() {
 
     if (userExists) {
       console.error('\n❌ User with this email already exists!');
-      process.exit(1);
+      return;
     }
 
     // Hash password
@@ -138,7 +98,7 @@ async function main() {
     });
 
     // Create admin staff profile
-    const adminStaff = await prisma.staff.create({
+    await prisma.staff.create({
       data: {
         userId: adminUser.id,
         firstName,
@@ -230,4 +190,3 @@ main()
     console.error(error);
     process.exit(1);
   });
->>>>>>> main
