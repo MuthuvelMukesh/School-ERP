@@ -310,141 +310,141 @@ export default function LmsPage() {
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         {user?.role !== 'STUDENT' && user?.role !== 'PARENT' && (
           <section className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Create LMS Content</h2>
-          <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Title *</label>
-              <input
-                value={form.title}
-                onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                placeholder="Lesson title"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Type *</label>
-              <select
-                value={form.type}
-                onChange={(event) => setForm((prev) => ({ ...prev, type: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-              >
-                <option value="LESSON_NOTE">Lesson Note</option>
-                <option value="VIDEO_LECTURE">Video Lecture</option>
-                <option value="ASSIGNMENT">Assignment</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Visibility *</label>
-              <select
-                value={form.visibility}
-                onChange={(event) => setForm((prev) => ({ ...prev, visibility: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-              >
-                <option value="DRAFT">Draft</option>
-                <option value="PUBLISHED">Published</option>
-                <option value="ARCHIVED">Archived</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Class *</label>
-              <select
-                value={form.classId}
-                onChange={async (event) => {
-                  const classId = event.target.value
-                  setForm((prev) => ({ ...prev, classId }))
-                  if (classId) {
-                    const subjectsResponse = await metadataAPI.getSubjects({ classId })
-                    setSubjectOptions(subjectsResponse.data.data.subjects || [])
-                  }
-                }}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                required
-              >
-                <option value="">Select class</option>
-                {classOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name} {option.section ? `(${option.section})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Subject *</label>
-              <select
-                value={form.subjectId}
-                onChange={(event) => setForm((prev) => ({ ...prev, subjectId: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                required
-              >
-                <option value="">Select subject</option>
-                {subjectOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name} ({option.code})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Teacher ID *</label>
-              <input
-                value={form.teacherId}
-                onChange={(event) => setForm((prev) => ({ ...prev, teacherId: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                placeholder="Teacher ID"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Due Date</label>
-              <input
-                type="date"
-                value={form.dueDate}
-                onChange={(event) => setForm((prev) => ({ ...prev, dueDate: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Total Marks</label>
-              <input
-                type="number"
-                value={form.totalMarks}
-                onChange={(event) => setForm((prev) => ({ ...prev, totalMarks: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                min="0"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                value={form.description}
-                onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                rows={3}
-                placeholder="Brief description"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Instructions</label>
-              <textarea
-                value={form.instructions}
-                onChange={(event) => setForm((prev) => ({ ...prev, instructions: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
-                rows={3}
-                placeholder="Assignment or lesson instructions"
-              />
-            </div>
-            <div className="md:col-span-2 flex justify-end">
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-6 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
-              >
-                {saving ? 'Saving...' : 'Create Content'}
-              </button>
-            </div>
-          </form>
-        </section>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Create LMS Content</h2>
+            <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Title *</label>
+                <input
+                  value={form.title}
+                  onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  placeholder="Lesson title"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Type *</label>
+                <select
+                  value={form.type}
+                  onChange={(event) => setForm((prev) => ({ ...prev, type: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                >
+                  <option value="LESSON_NOTE">Lesson Note</option>
+                  <option value="VIDEO_LECTURE">Video Lecture</option>
+                  <option value="ASSIGNMENT">Assignment</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Visibility *</label>
+                <select
+                  value={form.visibility}
+                  onChange={(event) => setForm((prev) => ({ ...prev, visibility: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                >
+                  <option value="DRAFT">Draft</option>
+                  <option value="PUBLISHED">Published</option>
+                  <option value="ARCHIVED">Archived</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Class *</label>
+                <select
+                  value={form.classId}
+                  onChange={async (event) => {
+                    const classId = event.target.value
+                    setForm((prev) => ({ ...prev, classId }))
+                    if (classId) {
+                      const subjectsResponse = await metadataAPI.getSubjects({ classId })
+                      setSubjectOptions(subjectsResponse.data.data.subjects || [])
+                    }
+                  }}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  required
+                >
+                  <option value="">Select class</option>
+                  {classOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name} {option.section ? `(${option.section})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Subject *</label>
+                <select
+                  value={form.subjectId}
+                  onChange={(event) => setForm((prev) => ({ ...prev, subjectId: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  required
+                >
+                  <option value="">Select subject</option>
+                  {subjectOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name} ({option.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Teacher ID *</label>
+                <input
+                  value={form.teacherId}
+                  onChange={(event) => setForm((prev) => ({ ...prev, teacherId: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  placeholder="Teacher ID"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Due Date</label>
+                <input
+                  type="date"
+                  value={form.dueDate}
+                  onChange={(event) => setForm((prev) => ({ ...prev, dueDate: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Total Marks</label>
+                <input
+                  type="number"
+                  value={form.totalMarks}
+                  onChange={(event) => setForm((prev) => ({ ...prev, totalMarks: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  min="0"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  value={form.description}
+                  onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  rows={3}
+                  placeholder="Brief description"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">Instructions</label>
+                <textarea
+                  value={form.instructions}
+                  onChange={(event) => setForm((prev) => ({ ...prev, instructions: event.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2"
+                  rows={3}
+                  placeholder="Assignment or lesson instructions"
+                />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-6 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
+                >
+                  {saving ? 'Saving...' : 'Create Content'}
+                </button>
+              </div>
+            </form>
+          </section>
         )}
 
         <section className="bg-white rounded-xl shadow-sm p-6">
