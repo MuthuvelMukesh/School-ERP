@@ -13,6 +13,8 @@ import {
   GraduationCap,
   BookOpen,
   Bell,
+  Shield,
+  ArrowUpDown,
   LogOut,
   Menu,
   X,
@@ -65,6 +67,8 @@ export default function DashboardPage() {
     { icon: GraduationCap, label: 'Examinations', href: '/exams' },
     { icon: BookOpen, label: 'LMS', href: '/lms' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
+    { icon: ArrowUpDown, label: 'Student Progression', href: '/students/progression' },
+    { icon: Shield, label: 'Permission Matrix', href: '/permissions' },
   ]
 
   if (loading) {
@@ -206,6 +210,12 @@ export default function DashboardPage() {
                   <div className="flex items-center space-x-3">
                     <DollarSign className="w-5 h-5 text-primary-600" />
                     <span className="font-medium">Collect Fees</span>
+                  </div>
+                </Link>
+                <Link href="/students/progression" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <ArrowUpDown className="w-5 h-5 text-primary-600" />
+                    <span className="font-medium">Promote or Transfer Students</span>
                   </div>
                 </Link>
               </div>

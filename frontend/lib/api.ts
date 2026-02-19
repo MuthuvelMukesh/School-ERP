@@ -60,6 +60,21 @@ export const studentAPI = {
   create: (data: any) => api.post('/students', data),
   update: (id: string, data: any) => api.put(`/students/${id}`, data),
   delete: (id: string) => api.delete(`/students/${id}`),
+  promote: (data: { studentIds: string[]; toClassId: string; reason?: string; remarks?: string }) =>
+    api.post('/students/promotions', data),
+  detain: (data: { studentIds: string[]; reason?: string; remarks?: string }) =>
+    api.post('/students/detentions', data),
+  transfer: (data: {
+    studentId: string;
+    transferType: 'INTERNAL' | 'EXTERNAL';
+    toClassId?: string;
+    toSchoolName?: string;
+    toSchoolAddress?: string;
+    transferDate?: string;
+    reason?: string;
+    remarks?: string;
+  }) => api.post('/students/transfers', data),
+  getProgressHistory: (id: string) => api.get(`/students/${id}/progress-history`),
   getByClass: (classId: string) => api.get(`/students/class/${classId}`),
   getAttendance: (id: string, params?: any) =>
     api.get(`/students/${id}/attendance`, { params }),
@@ -179,4 +194,19 @@ export const lmsAPI = {
 export const metadataAPI = {
   getClasses: () => api.get('/metadata/classes'),
   getSubjects: (params?: any) => api.get('/metadata/subjects', { params })
+};
+
+// Permission API
+export const permissionAPI = {
+  getAll: () => api.get('/permissions'),
+  initialize: () => api.post('/permissions/initialize'),
+  create: (data: { key: string; name: string; module: string; description?: string }) =>
+    api.post('/permissions', data),
+  setRolePermissions: (data: { role: string; permissions: { key: string; allowed: boolean }[] }) =>
+    api.put('/permissions/roles', data),
+  setUserPermissions: (data: { userId: string; permissions: { key: string; allowed: boolean }[] }) =>
+    api.put('/permissions/users', data),
+  getHierarchy: () => api.get('/permissions/hierarchy'),
+  setHierarchy: (data: { parentRole: string; childRole: string }) =>
+    api.put('/permissions/hierarchy', data)
 };

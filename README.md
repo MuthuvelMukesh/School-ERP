@@ -3,6 +3,12 @@
 ## Description
 Web-based School ERP to manage student, staff, academic, financial and administrative operations for small-medium schools.
 
+## Latest Updates (Feb 2026)
+- Added fine-grained permission matrix with custom permissions, role permissions, user-level overrides, and role hierarchy APIs.
+- Added student progression workflows: class promotion, detention, internal transfer, external transfer, and progression history.
+- Added frontend management screens for all core dashboard modules.
+- Added admin frontend screens for Permission Matrix and Student Promotion/Transfer operations.
+
 ## Core Objectives
 - Digitize school administration
 - Reduce manual paperwork
@@ -186,6 +192,10 @@ http://localhost:5000/api
 - `POST /students` - Create new student
 - `PUT /students/:id` - Update student
 - `DELETE /students/:id` - Delete student
+- `POST /students/promotions` - Promote students to next class
+- `POST /students/detentions` - Detain students in current class
+- `POST /students/transfers` - Transfer student (internal/external)
+- `GET /students/:id/progress-history` - Promotion/transfer history
 - `GET /students/class/:classId` - Get students by class
 - `GET /students/:id/attendance` - Get student attendance
 - `GET /students/:id/fees` - Get student fees
@@ -253,6 +263,15 @@ http://localhost:5000/api
 - `GET /metadata/classes` - Get classes
 - `GET /metadata/subjects` - Get subjects (filters: classId, teacherId)
 
+### Permission Endpoints
+- `GET /permissions` - List permissions and assignments
+- `POST /permissions/initialize` - Initialize default permissions (admin)
+- `POST /permissions` - Create custom permission
+- `PUT /permissions/roles` - Set role permissions
+- `PUT /permissions/users` - Set user-level permission overrides
+- `GET /permissions/hierarchy` - Get role hierarchy
+- `PUT /permissions/hierarchy` - Create/update role hierarchy mapping
+
 ## Database Schema
 
 Key entities:
@@ -274,6 +293,10 @@ Key entities:
 - **LmsContentFile**: LMS attachments
 - **LmsSubmission**: Assignment submissions
 - **LmsSubmissionFile**: Submission attachments
+- **Permission/RolePermission/UserPermission**: Fine-grained access control
+- **RoleHierarchy**: Parent-child role inheritance mapping
+- **StudentPromotion**: Promotion/detention/transfer progression history
+- **StudentTransfer**: Internal/external transfer records
 
 ## LMS Highlights
 - Upload multimedia lesson notes, video lectures, and assignments
