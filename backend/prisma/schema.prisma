@@ -577,6 +577,7 @@ model Book {
   // Relations
   copies        BookCopy[]
   borrowRecords BorrowRecord[]
+  holdRequests  BookHoldRequest[]
 
   @@index([title])
   @@index([author])

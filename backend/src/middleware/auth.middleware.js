@@ -72,6 +72,9 @@ exports.authenticate = async (req, res, next) => {
   }
 };
 
+// Backward-compatible alias used by several route modules
+exports.validateToken = exports.authenticate;
+
 // Authorize by role
 exports.authorize = (...roles) => {
   return (req, res, next) => {

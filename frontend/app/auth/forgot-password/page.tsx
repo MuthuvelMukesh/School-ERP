@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
             A password reset link has been sent to your email address. Please check your inbox and follow the instructions.
           </p>
           <p className="text-sm text-gray-500">
-            Didn't receive an email? Check your spam folder or contact support.
+            Didn&apos;t receive an email? Check your spam folder or contact support.
           </p>
           <p className="text-xs text-gray-400 mt-4">
             Redirecting to login in 3 seconds...
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              We'll send you a link to reset your password
+              We&apos;ll send you a link to reset your password
             </p>
           </div>
 
