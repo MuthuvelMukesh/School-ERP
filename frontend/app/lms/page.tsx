@@ -58,6 +58,13 @@ export default function LmsPage() {
     }
 
     const parsed = JSON.parse(userData)
+
+    if (['ACCOUNTANT'].includes(parsed?.role)) {
+      toast.error('You do not have permission to access this page')
+      router.push('/dashboard')
+      return
+    }
+
     setUser(parsed)
 
     if (parsed?.role === 'TEACHER') {

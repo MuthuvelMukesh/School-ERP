@@ -21,6 +21,11 @@ enum UserRole {
   TRANSPORT_STAFF
 }
 
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -178,10 +183,11 @@ enum ComplaintStatus {
 // User Model (Authentication)
 model User {
   id                    String    @id @default(uuid())
+  name                  String    @default("Unknown")
   email                 String    @unique
   password              String
   role                  UserRole
-  isActive              Boolean   @default(true)
+  status                UserStatus @default(ACTIVE)
   lastLogin             DateTime?
   passwordResetToken    String?   @unique
   passwordResetExpires  DateTime?

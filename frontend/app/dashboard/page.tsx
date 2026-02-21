@@ -56,16 +56,16 @@ export default function DashboardPage() {
   }
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-    { icon: Users, label: 'Students', href: '/students' },
-    { icon: UserCog, label: 'Staff', href: '/staff' },
-    { icon: DollarSign, label: 'Fees', href: '/fees' },
-    { icon: Calendar, label: 'Attendance', href: '/attendance' },
-    { icon: ClipboardList, label: 'Timetable', href: '/timetable' },
-    { icon: GraduationCap, label: 'Examinations', href: '/exams' },
-    { icon: BookOpen, label: 'LMS', href: '/lms' },
-    { icon: Bell, label: 'Notifications', href: '/notifications' },
-  ]
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT'] },
+    { icon: Users, label: 'Students', href: '/students', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: UserCog, label: 'Staff', href: '/staff', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'] },
+    { icon: DollarSign, label: 'Fees', href: '/fees', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT'] },
+    { icon: Calendar, label: 'Attendance', href: '/attendance', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: ClipboardList, label: 'Timetable', href: '/timetable', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: GraduationCap, label: 'Examinations', href: '/exams', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: BookOpen, label: 'LMS', href: '/lms', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: Bell, label: 'Notifications', href: '/notifications', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT'] },
+  ].filter(item => !user || item.roles.includes(user.role))
 
   if (loading) {
     return (
@@ -81,7 +81,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster position="top-right" />
-      
+
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between p-4 border-b">
@@ -190,24 +190,30 @@ export default function DashboardPage() {
             <div className="card">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
               <div className="space-y-2">
-                <Link href="/students" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <Users className="w-5 h-5 text-primary-600" />
-                    <span className="font-medium">Manage Students</span>
-                  </div>
-                </Link>
-                <Link href="/attendance" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="w-5 h-5 text-primary-600" />
-                    <span className="font-medium">Mark Attendance</span>
-                  </div>
-                </Link>
-                <Link href="/fees" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <DollarSign className="w-5 h-5 text-primary-600" />
-                    <span className="font-medium">Collect Fees</span>
-                  </div>
-                </Link>
+                {['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role) && (
+                  <Link href="/students" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <Users className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium">Manage Students</span>
+                    </div>
+                  </Link>
+                )}
+                {['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role) && (
+                  <Link href="/attendance" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium">Mark Attendance</span>
+                    </div>
+                  </Link>
+                )}
+                {['ADMIN', 'PRINCIPAL', 'ACCOUNTANT'].includes(user?.role) && (
+                  <Link href="/fees" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <DollarSign className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium">Collect Fees</span>
+                    </div>
+                  </Link>
+                )}
               </div>
             </div>
 
