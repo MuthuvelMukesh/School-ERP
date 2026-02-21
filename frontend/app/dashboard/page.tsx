@@ -18,6 +18,12 @@ import {
   LogOut,
   Menu,
   X,
+  Library,
+  Bus,
+  Building2,
+  CreditCard,
+  Activity,
+  FolderOpen,
 } from 'lucide-react'
 import { dashboardAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
@@ -62,11 +68,17 @@ export default function DashboardPage() {
     { icon: Users, label: 'Students', href: '/students' },
     { icon: UserCog, label: 'Staff', href: '/staff' },
     { icon: DollarSign, label: 'Fees', href: '/fees' },
+    { icon: CreditCard, label: 'Payments', href: '/payments' },
     { icon: Calendar, label: 'Attendance', href: '/attendance' },
     { icon: ClipboardList, label: 'Timetable', href: '/timetable' },
     { icon: GraduationCap, label: 'Examinations', href: '/exams' },
     { icon: BookOpen, label: 'LMS', href: '/lms' },
+    { icon: Library, label: 'Library', href: '/library' },
+    { icon: Bus, label: 'Transport', href: '/transport' },
+    { icon: Building2, label: 'Hostel', href: '/hostel' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
+    { icon: Activity, label: 'Activity Logs', href: '/activities' },
+    { icon: FolderOpen, label: 'Files', href: '/files' },
     { icon: ArrowUpDown, label: 'Student Progression', href: '/students/progression' },
     { icon: Shield, label: 'Permission Matrix', href: '/permissions' },
   ]

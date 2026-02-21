@@ -210,3 +210,166 @@ export const permissionAPI = {
   setHierarchy: (data: { parentRole: string; childRole: string }) =>
     api.put('/permissions/hierarchy', data)
 };
+
+// Library API
+export const libraryAPI = {
+  // Books
+  addBook: (data: any) => api.post('/library/books', data),
+  getAllBooks: (params?: any) => api.get('/library/books', { params }),
+  getBookDetails: (bookId: string) => api.get(`/library/books/${bookId}`),
+  updateBook: (bookId: string, data: any) => api.put(`/library/books/${bookId}`, data),
+  deleteBook: (bookId: string) => api.delete(`/library/books/${bookId}`),
+  // Copies
+  addBookCopy: (bookId: string, data: any) => api.post(`/library/books/${bookId}/copies`, data),
+  updateCopyStatus: (copyId: string, data: any) => api.patch(`/library/copies/${copyId}/status`, data),
+  // Borrow & Return
+  issueBook: (data: any) => api.post('/library/borrow', data),
+  returnBook: (data: any) => api.post('/library/return', data),
+  renewBook: (data: any) => api.post('/library/renew', data),
+  getMemberCheckouts: (memberId: string) => api.get(`/library/member/${memberId}/checkouts`),
+  // Holds
+  createHoldRequest: (data: any) => api.post('/library/hold', data),
+  getMemberHolds: (memberId: string) => api.get(`/library/member/${memberId}/holds`),
+  // Reports
+  getOverdueBooks: () => api.get('/library/reports/overdue'),
+  getMostBorrowed: (params?: any) => api.get('/library/reports/most-borrowed', { params }),
+  getMemberHistory: (memberId: string) => api.get(`/library/member/${memberId}/history`),
+  getStats: () => api.get('/library/stats'),
+  // Settings
+  getSettings: () => api.get('/library/settings'),
+  updateSettings: (data: any) => api.put('/library/settings', data),
+};
+
+// Transport API
+export const transportAPI = {
+  // Vehicles
+  addVehicle: (data: any) => api.post('/transport/vehicles', data),
+  getAllVehicles: (params?: any) => api.get('/transport/vehicles', { params }),
+  getVehicleDetails: (vehicleId: string) => api.get(`/transport/vehicles/${vehicleId}`),
+  updateVehicle: (vehicleId: string, data: any) => api.put(`/transport/vehicles/${vehicleId}`, data),
+  assignDriver: (vehicleId: string, data: any) => api.post(`/transport/vehicles/${vehicleId}/driver`, data),
+  assignConductor: (vehicleId: string, data: any) => api.post(`/transport/vehicles/${vehicleId}/conductor`, data),
+  // Routes
+  createRoute: (data: any) => api.post('/transport/routes', data),
+  getAllRoutes: (params?: any) => api.get('/transport/routes', { params }),
+  getRouteDetails: (routeId: string) => api.get(`/transport/routes/${routeId}`),
+  updateRoute: (routeId: string, data: any) => api.put(`/transport/routes/${routeId}`, data),
+  // Stops
+  addBusStop: (routeId: string, data: any) => api.post(`/transport/routes/${routeId}/stops`, data),
+  getRouteStops: (routeId: string) => api.get(`/transport/routes/${routeId}/stops`),
+  updateBusStop: (stopId: string, data: any) => api.put(`/transport/stops/${stopId}`, data),
+  deleteBusStop: (stopId: string) => api.delete(`/transport/stops/${stopId}`),
+  // Student Transport
+  enrollStudent: (data: any) => api.post('/transport/students/enroll', data),
+  getStudentEnrollment: (studentId: string) => api.get(`/transport/students/${studentId}`),
+  getRouteStudents: (routeId: string) => api.get(`/transport/routes/${routeId}/students`),
+  updateStudentEnrollment: (enrollmentId: string, data: any) => api.put(`/transport/students/${enrollmentId}`, data),
+  markTransportFeePaid: (enrollmentId: string) => api.post(`/transport/students/${enrollmentId}/mark-paid`),
+  // Maintenance
+  addMaintenance: (vehicleId: string, data: any) => api.post(`/transport/vehicles/${vehicleId}/maintenance`, data),
+  getMaintenanceHistory: (vehicleId: string) => api.get(`/transport/vehicles/${vehicleId}/maintenance`),
+  getDueMaintenance: () => api.get('/transport/maintenance/due'),
+  // Boarding
+  recordBoarding: (vehicleId: string, data: any) => api.post(`/transport/vehicles/${vehicleId}/boarding`, data),
+  getBoardingStats: (vehicleId: string, params?: any) => api.get(`/transport/vehicles/${vehicleId}/boarding/stats`, { params }),
+  // Reports
+  getSummary: () => api.get('/transport/summary'),
+  getFeeReport: () => api.get('/transport/reports/fees'),
+  // Settings
+  getSettings: () => api.get('/transport/settings'),
+  updateSettings: (data: any) => api.put('/transport/settings', data),
+};
+
+// Hostel API
+export const hostelAPI = {
+  // Hostels
+  addHostel: (data: any) => api.post('/hostel/hostels', data),
+  getAllHostels: (params?: any) => api.get('/hostel/hostels', { params }),
+  getHostelDetails: (hostelId: string) => api.get(`/hostel/hostels/${hostelId}`),
+  updateHostel: (hostelId: string, data: any) => api.put(`/hostel/hostels/${hostelId}`, data),
+  deleteHostel: (hostelId: string) => api.delete(`/hostel/hostels/${hostelId}`),
+  // Rooms
+  addRoom: (data: any) => api.post('/hostel/rooms', data),
+  getRoomsByHostel: (hostelId: string, params?: any) => api.get(`/hostel/hostels/${hostelId}/rooms`, { params }),
+  updateRoom: (roomId: string, data: any) => api.put(`/hostel/rooms/${roomId}`, data),
+  deleteRoom: (roomId: string) => api.delete(`/hostel/rooms/${roomId}`),
+  // Beds
+  getBedsByRoom: (roomId: string) => api.get(`/hostel/rooms/${roomId}/beds`),
+  getVacantBeds: (hostelId: string, params?: any) => api.get(`/hostel/hostels/${hostelId}/beds/vacant`, { params }),
+  updateBedStatus: (bedId: string, data: any) => api.put(`/hostel/beds/${bedId}`, data),
+  // Student Allocation
+  allocateStudent: (data: any) => api.post('/hostel/students/allocate', data),
+  deallocateStudent: (allocationId: string, data: any) => api.post(`/hostel/students/${allocationId}/deallocate`, data),
+  getStudentAllocation: (studentId: string) => api.get(`/hostel/students/${studentId}/allocation`),
+  getHostelStudents: (hostelId: string, params?: any) => api.get(`/hostel/hostels/${hostelId}/students`, { params }),
+  updateStudentAllocation: (allocationId: string, data: any) => api.put(`/hostel/students/${allocationId}`, data),
+  markHostelFeePaid: (allocationId: string) => api.post(`/hostel/students/${allocationId}/mark-paid`),
+  // Visitors
+  registerVisitor: (data: any) => api.post('/hostel/visitors', data),
+  getVisitorsByStudent: (studentId: string, params?: any) => api.get(`/hostel/students/${studentId}/visitors`, { params }),
+  getVisitorsByHostel: (hostelId: string, params?: any) => api.get(`/hostel/hostels/${hostelId}/visitors`, { params }),
+  updateVisitor: (visitorId: string, data: any) => api.put(`/hostel/visitors/${visitorId}`, data),
+  approveVisitor: (visitorId: string) => api.post(`/hostel/visitors/${visitorId}/approve`),
+  // Complaints
+  registerComplaint: (data: any) => api.post('/hostel/complaints', data),
+  getComplaints: (params?: any) => api.get('/hostel/complaints', { params }),
+  updateComplaintStatus: (complaintId: string, data: any) => api.put(`/hostel/complaints/${complaintId}/status`, data),
+  resolveComplaint: (complaintId: string, data: any) => api.post(`/hostel/complaints/${complaintId}/resolve`, data),
+  // Leaves
+  applyLeave: (data: any) => api.post('/hostel/leaves', data),
+  getLeaveRequests: (params?: any) => api.get('/hostel/leaves', { params }),
+  approveLeave: (leaveId: string, data?: any) => api.post(`/hostel/leaves/${leaveId}/approve`, data),
+  rejectLeave: (leaveId: string, data: any) => api.post(`/hostel/leaves/${leaveId}/reject`, data),
+  // Notices
+  createNotice: (data: any) => api.post('/hostel/notices', data),
+  getNotices: (hostelId: string, params?: any) => api.get(`/hostel/hostels/${hostelId}/notices`, { params }),
+  updateNotice: (noticeId: string, data: any) => api.put(`/hostel/notices/${noticeId}`, data),
+  deleteNotice: (noticeId: string) => api.delete(`/hostel/notices/${noticeId}`),
+  // Attendance
+  recordAttendance: (data: any) => api.post('/hostel/attendance', data),
+  getAttendanceByHostel: (hostelId: string, params?: any) => api.get(`/hostel/hostels/${hostelId}/attendance`, { params }),
+  getAttendanceByStudent: (studentId: string, params?: any) => api.get(`/hostel/students/${studentId}/attendance`, { params }),
+  // Reports
+  getSummary: () => api.get('/hostel/summary'),
+  getOccupancyReport: (hostelId: string) => api.get(`/hostel/hostels/${hostelId}/occupancy-report`),
+  getFeeReport: (params?: any) => api.get('/hostel/reports/fees', { params }),
+  // Settings
+  getSettings: () => api.get('/hostel/settings'),
+  updateSettings: (data: any) => api.put('/hostel/settings', data),
+};
+
+// Payment API
+export const paymentAPI = {
+  getStatus: () => api.get('/payments/status'),
+  createOrder: (data: { feeId: string; studentId: string; amount: number }) =>
+    api.post('/payments/create-order', data),
+  verifyPayment: (data: { orderId: string; paymentId: string; signature: string; feeId: string }) =>
+    api.post('/payments/verify', data),
+  getHistory: (studentId: string) => api.get(`/payments/history/${studentId}`),
+  refund: (data: { paymentId: string; feeId: string; amount?: number; reason?: string }) =>
+    api.post('/payments/refund', data),
+  getReport: () => api.get('/payments/report'),
+};
+
+// Activity API
+export const activityAPI = {
+  getRecent: () => api.get('/activities/recent'),
+  getAll: (params?: any) => api.get('/activities', { params }),
+  getUserSummary: (userId: string) => api.get(`/activities/user/${userId}/summary`),
+  getModuleStats: (module: string) => api.get(`/activities/module/${module}/stats`),
+  exportCsv: () => api.get('/activities/export/csv'),
+  getById: (id: string) => api.get(`/activities/${id}`),
+  cleanup: () => api.delete('/activities/cleanup/old'),
+};
+
+// File API
+export const fileAPI = {
+  uploadStudentDocument: (formData: FormData) =>
+    api.post('/files/upload/student', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  uploadStaffDocument: (formData: FormData) =>
+    api.post('/files/upload/staff', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  downloadFile: (filePath: string) => api.get(`/files/download/${filePath}`, { responseType: 'blob' }),
+  deleteFile: (filePath: string) => api.delete(`/files/delete/${filePath}`),
+  getStats: () => api.get('/files/stats'),
+  cleanup: () => api.post('/files/cleanup'),
+};
