@@ -13,9 +13,17 @@ import {
   GraduationCap,
   BookOpen,
   Bell,
+  Shield,
+  ArrowUpDown,
   LogOut,
   Menu,
   X,
+  Library,
+  Bus,
+  Building2,
+  CreditCard,
+  Activity,
+  FolderOpen,
 } from 'lucide-react'
 import { dashboardAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
@@ -60,11 +68,19 @@ export default function DashboardPage() {
     { icon: Users, label: 'Students', href: '/students', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
     { icon: UserCog, label: 'Staff', href: '/staff', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'] },
     { icon: DollarSign, label: 'Fees', href: '/fees', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT'] },
+    { icon: CreditCard, label: 'Payments', href: '/payments', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT'] },
     { icon: Calendar, label: 'Attendance', href: '/attendance', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
     { icon: ClipboardList, label: 'Timetable', href: '/timetable', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
     { icon: GraduationCap, label: 'Examinations', href: '/exams', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
     { icon: BookOpen, label: 'LMS', href: '/lms', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: Library, label: 'Library', href: '/library', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: Bus, label: 'Transport', href: '/transport', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: Building2, label: 'Hostel', href: '/hostel', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
     { icon: Bell, label: 'Notifications', href: '/notifications', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT'] },
+    { icon: Activity, label: 'Activity Logs', href: '/activities', roles: ['ADMIN', 'PRINCIPAL'] },
+    { icon: FolderOpen, label: 'Files', href: '/files', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'] },
+    { icon: ArrowUpDown, label: 'Student Progression', href: '/students/progression', roles: ['ADMIN', 'PRINCIPAL'] },
+    { icon: Shield, label: 'Permission Matrix', href: '/permissions', roles: ['ADMIN'] },
   ].filter(item => !user || item.roles.includes(user.role))
 
   if (loading) {
@@ -211,6 +227,14 @@ export default function DashboardPage() {
                     <div className="flex items-center space-x-3">
                       <DollarSign className="w-5 h-5 text-primary-600" />
                       <span className="font-medium">Collect Fees</span>
+                    </div>
+                  </Link>
+                )}
+                {['ADMIN', 'PRINCIPAL'].includes(user?.role) && (
+                  <Link href="/students/progression" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <ArrowUpDown className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium">Promote or Transfer Students</span>
                     </div>
                   </Link>
                 )}

