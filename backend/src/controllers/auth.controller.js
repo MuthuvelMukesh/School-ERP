@@ -48,6 +48,7 @@ exports.register = async (req, res) => {
       // Create user
       const user = await tx.user.create({
         data: {
+          name: `${firstName} ${lastName}`,
           email,
           password: hashedPassword,
           role
@@ -110,6 +111,7 @@ exports.register = async (req, res) => {
       data: {
         user: {
           id: result.user.id,
+          name: result.user.name,
           email: result.user.email,
           role: result.user.role
         },
@@ -148,7 +150,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    if (!user.isActive) {
+    if (user.status !== 'ACTIVE') {
       return res.status(403).json({
         status: 'error',
         message: 'Account is deactivated. Please contact administrator.'
@@ -190,6 +192,7 @@ exports.login = async (req, res) => {
       data: {
         user: {
           id: user.id,
+          name: user.name,
           email: user.email,
           role: user.role,
           profile
@@ -219,9 +222,10 @@ exports.getMe = async (req, res) => {
       },
       select: {
         id: true,
+        name: true,
         email: true,
         role: true,
-        isActive: true,
+        status: true,
         lastLogin: true,
         student: true,
         staff: true,

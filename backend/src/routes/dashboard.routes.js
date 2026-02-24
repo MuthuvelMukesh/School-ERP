@@ -1,6 +1,6 @@
 const express = require('express');
 const dashboardController = require('../controllers/dashboard.controller');
-const { authenticate } = require('../middleware/auth.middleware');
+const { authenticate, authorize } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
@@ -11,12 +11,12 @@ router.use(authenticate);
 router.get('/stats', dashboardController.getDashboardStats);
 
 // Analytics endpoints
-router.get('/analytics/attendance-trends', dashboardController.getAttendanceTrends);
-router.get('/analytics/grade-distribution', dashboardController.getGradeDistribution);
-router.get('/analytics/financial', dashboardController.getFinancialAnalytics);
-router.get('/analytics/class-performance', dashboardController.getClassPerformance);
+router.get('/analytics/attendance-trends', authorize('ADMIN', 'PRINCIPAL', 'TEACHER'), dashboardController.getAttendanceTrends);
+router.get('/analytics/grade-distribution', authorize('ADMIN', 'PRINCIPAL', 'TEACHER'), dashboardController.getGradeDistribution);
+router.get('/analytics/financial', authorize('ADMIN', 'PRINCIPAL', 'ACCOUNTANT'), dashboardController.getFinancialAnalytics);
+router.get('/analytics/class-performance', authorize('ADMIN', 'PRINCIPAL', 'TEACHER'), dashboardController.getClassPerformance);
 
 // Activity logs
-router.get('/recent-activities', dashboardController.getRecentActivities);
+router.get('/recent-activities', authorize('ADMIN', 'PRINCIPAL'), dashboardController.getRecentActivities);
 
 module.exports = router;
