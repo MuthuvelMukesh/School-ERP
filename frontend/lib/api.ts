@@ -359,7 +359,7 @@ export const activityAPI = {
   getModuleStats: (module: string) => api.get(`/activities/module/${module}/stats`),
   exportCsv: () => api.get('/activities/export/csv'),
   getById: (id: string) => api.get(`/activities/${id}`),
-  cleanup: () => api.delete('/activities/cleanup/old'),
+  cleanup: () => api.post('/activities/cleanup/old'),
 };
 
 // File API

@@ -35,6 +35,9 @@ const lmsCreateValidation = [
 // All routes require authentication
 router.use(authenticate);
 
+// Non-parameterized routes MUST come before /:id to prevent shadowing
+router.get('/submissions/me', authorize('STUDENT'), lmsController.getMySubmissions);
+
 // LMS content routes
 router.get('/', lmsController.getAllLmsContent);
 router.get('/:id', lmsController.getLmsContentById);
@@ -68,12 +71,6 @@ router.get(
   '/:id/submissions/me',
   authorize('STUDENT'),
   lmsController.getMySubmission
-);
-
-router.get(
-  '/submissions/me',
-  authorize('STUDENT'),
-  lmsController.getMySubmissions
 );
 
 router.post(

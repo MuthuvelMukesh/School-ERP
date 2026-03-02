@@ -1,35 +1,50 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 exports.getAttendance = async (req, res) => {
   try {
-    const { date, classId } = req.query;
+    const { date, classId, page = 1, limit = 50 } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = Math.min(parseInt(limit), 200); // cap at 200
+    const skip = (parsedPage - 1) * parsedLimit;
 
     const where = {};
     if (date) where.date = new Date(date);
     if (classId) where.classId = classId;
 
-    const attendance = await prisma.attendance.findMany({
-      where,
-      include: {
-        student: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            admissionNo: true
-          }
+    const [attendance, total] = await Promise.all([
+      prisma.attendance.findMany({
+        where,
+        include: {
+          student: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              admissionNo: true
+            }
+          },
+          class: true
         },
-        class: true
-      },
-      orderBy: { date: 'desc' }
-    });
+        orderBy: { date: 'desc' },
+        skip,
+        take: parsedLimit
+      }),
+      prisma.attendance.count({ where })
+    ]);
 
     res.status(200).json({
       status: 'success',
-      data: { attendance }
+      data: {
+        attendance,
+        pagination: {
+          total,
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(total / parsedLimit)
+        }
+      }
     });
   } catch (error) {
     logger.error('Get attendance error:', error);
@@ -85,7 +100,7 @@ exports.bulkMarkAttendance = async (req, res) => {
     const { classId, date, attendanceData } = req.body;
     // attendanceData: [{ studentId, status, remarks }]
 
-    const attendanceRecords = await Promise.all(
+    const attendanceRecords = await prisma.$transaction(
       attendanceData.map(data =>
         prisma.attendance.upsert({
           where: {

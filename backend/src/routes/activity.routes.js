@@ -25,7 +25,7 @@ router.get('/export/csv', activityController.exportActivities);
 // Get activity by ID
 router.get('/:id', activityController.getActivityById);
 
-// Delete old activities (admin only)
-router.delete('/cleanup/old', activityController.cleanupOldActivities);
+// Delete old activities (admin only) - using POST as DELETE with body is not universally supported
+router.post('/cleanup/old', activityController.cleanupOldActivities);
 
 module.exports = router;

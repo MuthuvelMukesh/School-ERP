@@ -1,8 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
@@ -95,28 +94,33 @@ exports.sendNotification = async (req, res) => {
 
     // Send emails if type is EMAIL
     if (type === 'EMAIL') {
-      // Get recipient emails
-      const users = await prisma.user.findMany({
-        where: {
-          id: {
-            in: recipients
+      try {
+        // Get recipient emails
+        const users = await prisma.user.findMany({
+          where: {
+            id: {
+              in: recipients
+            }
+          },
+          select: {
+            email: true
           }
-        },
-        select: {
-          email: true
-        }
-      });
+        });
 
-      const emails = users.map(u => u.email);
+        const emails = users.map(u => u.email);
 
-      // Send email
-      await transporter.sendMail({
-        from: process.env.SMTP_USER,
-        to: emails.join(','),
-        subject: title,
-        text: message,
-        html: `<p>${message}</p>`
-      });
+        // Send email
+        await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: emails.join(','),
+          subject: title,
+          text: message,
+          html: `<p>${message}</p>`
+        });
+      } catch (emailError) {
+        logger.error('Email sending failed:', emailError);
+        // Don't fail the request if email fails - notification is already saved
+      }
     }
 
     res.status(201).json({

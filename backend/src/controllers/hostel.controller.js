@@ -1,6 +1,5 @@
 const hostelService = require('../utils/hostelService');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 const logger = require('../utils/logger');
 
 // ==================== Hostel Management ====================
@@ -27,7 +26,7 @@ exports.addHostel = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Created hostel: ${name}`,
@@ -90,7 +89,7 @@ exports.updateHostel = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated hostel: ${hostel.name}`,
@@ -118,7 +117,7 @@ exports.deleteHostel = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'DELETE',
         module: 'hostel',
         description: `Deleted hostel: ${hostelId}`,
@@ -157,7 +156,7 @@ exports.addRoom = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Added room ${roomNumber} to hostel`,
@@ -200,7 +199,7 @@ exports.updateRoom = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated room ${room.roomNumber}`,
@@ -228,7 +227,7 @@ exports.deleteRoom = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'DELETE',
         module: 'hostel',
         description: `Deleted room ${roomId}`,
@@ -287,7 +286,7 @@ exports.updateBedStatus = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated bed ${bedId} status to ${status}`,
@@ -331,7 +330,7 @@ exports.allocateStudent = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Allocated student ${studentId} to hostel`,
@@ -368,7 +367,7 @@ exports.deallocateStudent = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Deallocated student from hostel`,
@@ -431,7 +430,7 @@ exports.updateStudentAllocation = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated student allocation`,
@@ -459,7 +458,7 @@ exports.markHostelFeePaid = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Marked hostel fee as paid`,
@@ -502,7 +501,7 @@ exports.registerVisitor = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Registered visitor ${visitorName} for student ${studentId}`,
@@ -569,14 +568,14 @@ exports.updateVisitor = async (req, res) => {
 exports.approveVisitor = async (req, res) => {
   try {
     const { visitorId } = req.params;
-    const approvedBy = req.user.userId;
+    const approvedBy = req.user.id;
     
     const visitor = await hostelService.approveVisitor(visitorId, approvedBy);
     
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'APPROVE',
         module: 'hostel',
         description: `Approved visitor ${visitorId}`,
@@ -617,7 +616,7 @@ exports.registerComplaint = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Registered complaint: ${subject}`,
@@ -671,7 +670,7 @@ exports.updateComplaintStatus = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated complaint ${complaintId} status to ${status}`,
@@ -704,7 +703,7 @@ exports.resolveComplaint = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Resolved complaint ${complaintId}`,
@@ -746,7 +745,7 @@ exports.applyLeave = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Applied for hostel leave`,
@@ -788,14 +787,14 @@ exports.approveLeave = async (req, res) => {
   try {
     const { leaveId } = req.params;
     const { remarks } = req.body;
-    const approvedBy = req.user.userId;
+    const approvedBy = req.user.id;
     
     const leave = await hostelService.approveLeave(leaveId, approvedBy, remarks);
     
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'APPROVE',
         module: 'hostel',
         description: `Approved hostel leave ${leaveId}`,
@@ -818,7 +817,7 @@ exports.rejectLeave = async (req, res) => {
   try {
     const { leaveId } = req.params;
     const { remarks } = req.body;
-    const approvedBy = req.user.userId;
+    const approvedBy = req.user.id;
     
     if (!remarks) {
       return res.status(400).json({ error: 'Remarks are required for rejection' });
@@ -829,7 +828,7 @@ exports.rejectLeave = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'REJECT',
         module: 'hostel',
         description: `Rejected hostel leave ${leaveId}`,
@@ -853,7 +852,7 @@ exports.rejectLeave = async (req, res) => {
 exports.createNotice = async (req, res) => {
   try {
     const { hostelId, title, content, priority, expiryDate } = req.body;
-    const createdBy = req.user.userId;
+    const createdBy = req.user.id;
     
     if (!hostelId || !title || !content) {
       return res.status(400).json({ error: 'Hostel ID, title, and content are required' });
@@ -871,7 +870,7 @@ exports.createNotice = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'CREATE',
         module: 'hostel',
         description: `Created notice: ${title}`,
@@ -917,7 +916,7 @@ exports.updateNotice = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated notice ${noticeId}`,
@@ -945,7 +944,7 @@ exports.deleteNotice = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'DELETE',
         module: 'hostel',
         description: `Deleted notice ${noticeId}`,
@@ -966,7 +965,7 @@ exports.deleteNotice = async (req, res) => {
 exports.recordAttendance = async (req, res) => {
   try {
     const { studentId, hostelId, date, isPresent, remarks } = req.body;
-    const recordedBy = req.user.userId;
+    const recordedBy = req.user.id;
     
     if (!studentId || !hostelId || !date) {
       return res.status(400).json({ error: 'Student ID, hostel ID, and date are required' });
@@ -1088,7 +1087,7 @@ exports.updateHostelSettings = async (req, res) => {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: req.user.userId,
+        userId: req.user.id,
         action: 'UPDATE',
         module: 'hostel',
         description: `Updated hostel settings`,

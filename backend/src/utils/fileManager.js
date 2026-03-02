@@ -324,26 +324,26 @@ exports.getFileCategory = (filename) => {
 /**
  * Get upload directory size
  */
-exports.getUploadDirSize = () => {
+exports.getUploadDirSize = async () => {
   try {
+    const fsPromises = require('fs').promises;
     let totalSize = 0;
 
-    const walkDir = (dir) => {
-      const files = fs.readdirSync(dir);
+    const walkDir = async (dir) => {
+      const files = await fsPromises.readdir(dir, { withFileTypes: true });
 
-      files.forEach(file => {
-        const filePath = path.join(dir, file);
-        const stats = fs.statSync(filePath);
-
-        if (stats.isDirectory()) {
-          walkDir(filePath);
+      for (const file of files) {
+        const filePath = path.join(dir, file.name);
+        if (file.isDirectory()) {
+          await walkDir(filePath);
         } else {
+          const stats = await fsPromises.stat(filePath);
           totalSize += stats.size;
         }
-      });
+      }
     };
 
-    walkDir(FILE_CONFIG.UPLOAD_DIR);
+    await walkDir(FILE_CONFIG.UPLOAD_DIR);
 
     return {
       bytes: totalSize,
@@ -359,29 +359,31 @@ exports.getUploadDirSize = () => {
 /**
  * Cleanup old files (for maintenance)
  */
-exports.cleanupOldFiles = (daysOld = 30) => {
+exports.cleanupOldFiles = async (daysOld = 30) => {
   try {
+    const fsPromises = require('fs').promises;
     const cutoffDate = Date.now() - (daysOld * 24 * 60 * 60 * 1000);
     let deletedCount = 0;
 
-    const walkDir = (dir) => {
-      const files = fs.readdirSync(dir);
+    const walkDir = async (dir) => {
+      const files = await fsPromises.readdir(dir, { withFileTypes: true });
 
-      files.forEach(file => {
-        const filePath = path.join(dir, file);
-        const stats = fs.statSync(filePath);
-
-        if (stats.isDirectory()) {
-          walkDir(filePath);
-        } else if (stats.mtime.getTime() < cutoffDate) {
-          fs.unlinkSync(filePath);
-          deletedCount++;
-          logger.info(`Deleted old file: ${filePath}`);
+      for (const file of files) {
+        const filePath = path.join(dir, file.name);
+        if (file.isDirectory()) {
+          await walkDir(filePath);
+        } else {
+          const stats = await fsPromises.stat(filePath);
+          if (stats.mtime.getTime() < cutoffDate) {
+            await fsPromises.unlink(filePath);
+            deletedCount++;
+            logger.info(`Deleted old file: ${filePath}`);
+          }
         }
-      });
+      }
     };
 
-    walkDir(FILE_CONFIG.UPLOAD_DIR);
+    await walkDir(FILE_CONFIG.UPLOAD_DIR);
 
     return {
       deletedCount,

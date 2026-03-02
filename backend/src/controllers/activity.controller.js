@@ -1,8 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 const activityService = require('../utils/activity');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 /**
  * Get recent activities (dashboard view)

@@ -1,7 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 exports.getAllExamSchedules = async (req, res) => {
   try {
@@ -151,25 +150,43 @@ exports.deleteExamSchedule = async (req, res) => {
 
 exports.getAllResults = async (req, res) => {
   try {
-    const results = await prisma.examResult.findMany({
-      include: {
-        student: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            admissionNo: true
-          }
+    const { page = 1, limit = 50 } = req.query;
+    const parsedPage = parseInt(page);
+    const parsedLimit = Math.min(parseInt(limit), 200);
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const [results, total] = await Promise.all([
+      prisma.examResult.findMany({
+        include: {
+          student: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              admissionNo: true
+            }
+          },
+          examSchedule: true,
+          subject: true
         },
-        examSchedule: true,
-        subject: true
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: parsedLimit
+      }),
+      prisma.examResult.count()
+    ]);
 
     res.status(200).json({
       status: 'success',
-      data: { results }
+      data: {
+        results,
+        pagination: {
+          total,
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(total / parsedLimit)
+        }
+      }
     });
   } catch (error) {
     logger.error('Get results error:', error);
@@ -327,10 +344,31 @@ exports.getReportCard = async (req, res) => {
       })
     ]);
 
+    if (!student) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Student not found'
+      });
+    }
+
+    if (!examSchedule) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Exam schedule not found'
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No results found for this student and exam'
+      });
+    }
+
     // Calculate total and percentage
     const totalMarks = results.reduce((sum, r) => sum + r.marksObtained, 0);
     const maxMarks = examSchedule.totalMarks * results.length;
-    const percentage = (totalMarks / maxMarks) * 100;
+    const percentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;
 
     res.status(200).json({
       status: 'success',

@@ -1,11 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 // Setup email transporter
 const transporter = nodemailer.createTransport({
@@ -122,8 +121,7 @@ exports.register = async (req, res) => {
     logger.error('Register error:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Registration failed',
-      error: error.message
+      message: 'Registration failed'
     });
   }
 };
@@ -204,8 +202,7 @@ exports.login = async (req, res) => {
     logger.error('Login error:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Login failed',
-      error: error.message
+      message: 'Login failed'
     });
   }
 };
@@ -215,11 +212,6 @@ exports.getMe = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      include: {
-        student: true,
-        staff: true,
-        parent: true
-      },
       select: {
         id: true,
         name: true,

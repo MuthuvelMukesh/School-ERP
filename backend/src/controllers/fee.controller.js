@@ -1,7 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 exports.getAllFeeStructures = async (req, res) => {
   try {
@@ -100,7 +99,9 @@ exports.deleteFeeStructure = async (req, res) => {
 exports.getAllPayments = async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
-    const skip = (page - 1) * limit;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
+    const skip = (parsedPage - 1) * parsedLimit;
 
     const where = {};
     if (status) where.status = status;
@@ -108,8 +109,8 @@ exports.getAllPayments = async (req, res) => {
     const [payments, total] = await Promise.all([
       prisma.feePayment.findMany({
         where,
-        skip: parseInt(skip),
-        take: parseInt(limit),
+        skip,
+        take: parsedLimit,
         include: {
           student: {
             select: {
@@ -131,9 +132,9 @@ exports.getAllPayments = async (req, res) => {
         payments,
         pagination: {
           total,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          totalPages: Math.ceil(total / limit)
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(total / parsedLimit)
         }
       }
     });

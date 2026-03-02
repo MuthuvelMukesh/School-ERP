@@ -64,8 +64,9 @@ app.use(sanitizeInputs);
 // Activity logging middleware
 app.use(activityLogger);
 
-// Static files
-app.use('/uploads', express.static('uploads'));
+// Static files — require authentication
+const { authenticate } = require('./middleware/auth.middleware');
+app.use('/uploads', authenticate, express.static('uploads'));
 
 // API Routes
 app.use('/api/auth', authRoutes);

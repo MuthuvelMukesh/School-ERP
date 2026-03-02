@@ -1,9 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 const paymentService = require('../utils/paymentService');
 const activityService = require('../utils/activity');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 /**
  * Check payment gateway availability
@@ -45,17 +44,12 @@ exports.createPaymentOrder = async (req, res) => {
 
     const { feeId, studentId, amount } = req.body;
 
-    // Validate fee exists
-    const fee = await prisma.fee.findUnique({
-      where: { id: feeId },
-      include: {
-        student: {
-          include: { user: true }
-        }
-      }
+    // Validate fee structure exists
+    const feeStructure = await prisma.feeStructure.findUnique({
+      where: { id: feeId }
     });
 
-    if (!fee) {
+    if (!feeStructure) {
       return res.status(404).json({
         status: 'error',
         message: 'Fee record not found'
@@ -79,7 +73,7 @@ exports.createPaymentOrder = async (req, res) => {
     const orderData = {
       studentId: student.id,
       amount,
-      description: `School Fees - ${fee.type || 'Fee Payment'}`,
+      description: `School Fees - ${feeStructure.name || 'Fee Payment'}`,
       studentEmail: student.user.email,
       studentName: `${student.firstName} ${student.lastName}`
     };
@@ -182,17 +176,19 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    // Update fee record
-    const fee = await prisma.fee.update({
-      where: { id: feeId },
+    // Record payment in database
+    const feePayment = await prisma.feePayment.create({
       data: {
-        amountPaid: {
-          increment: paymentDetails.amount
-        },
-        status: 'PAID',
-        paymentMethod: 'ONLINE',
+        studentId: req.body.studentId || paymentDetails.notes?.studentId,
+        feeStructureId: feeId,
+        amount: paymentDetails.amount,
         paymentDate: new Date(),
-        notes: `Online payment via Razorpay - Transaction ID: ${paymentId}`
+        paymentMode: 'ONLINE',
+        transactionId: paymentId,
+        receiptNo: `RCP-${Date.now()}`,
+        status: 'PAID',
+        remarks: `Online payment via Razorpay - Order: ${orderId}`,
+        collectedBy: req.user.id
       }
     });
 
@@ -223,7 +219,7 @@ exports.verifyPayment = async (req, res) => {
         paymentId: paymentDetails.id,
         amount: paymentDetails.amount,
         status: paymentDetails.status,
-        fee: fee
+        fee: feePayment
       }
     });
   } catch (error) {
@@ -246,29 +242,22 @@ exports.getPaymentHistory = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const [payments, total] = await Promise.all([
-      prisma.fee.findMany({
+      prisma.feePayment.findMany({
         where: {
-          studentId,
-          paymentDate: { not: null }
+          studentId
         },
         orderBy: { paymentDate: 'desc' },
         skip,
         take: parseInt(limit),
-        select: {
-          id: true,
-          type: true,
-          amount: true,
-          amountPaid: true,
-          status: true,
-          paymentDate: true,
-          paymentMethod: true,
-          notes: true
+        include: {
+          feeStructure: {
+            select: { name: true, amount: true }
+          }
         }
       }),
-      prisma.fee.count({
+      prisma.feePayment.count({
         where: {
-          studentId,
-          paymentDate: { not: null }
+          studentId
         }
       })
     ]);
@@ -280,7 +269,7 @@ exports.getPaymentHistory = async (req, res) => {
         payments,
         pagination: {
           total,
-          pages: Math.ceil(total / limit),
+          pages: Math.ceil(total / parseInt(limit)),
           currentPage: parseInt(page),
           limit: parseInt(limit)
         }
@@ -309,12 +298,12 @@ exports.refundPayment = async (req, res) => {
 
     const { paymentId, feeId, amount, reason } = req.body;
 
-    // Get fee details
-    const fee = await prisma.fee.findUnique({
+    // Get fee payment details
+    const feePayment = await prisma.feePayment.findUnique({
       where: { id: feeId }
     });
 
-    if (!fee) {
+    if (!feePayment) {
       return res.status(404).json({
         status: 'error',
         message: 'Fee record not found'
@@ -324,15 +313,12 @@ exports.refundPayment = async (req, res) => {
     // Process refund
     const refund = await paymentService.refundPayment(paymentId, amount);
 
-    // Update fee record
-    const updatedFee = await prisma.fee.update({
+    // Update fee payment record
+    const updatedFee = await prisma.feePayment.update({
       where: { id: feeId },
       data: {
-        amountPaid: {
-          decrement: amount || fee.amountPaid
-        },
-        status: amount < fee.amountPaid ? 'PARTIAL' : 'PENDING',
-        notes: `Refund processed - ID: ${refund.id}. Reason: ${reason || 'Not specified'}`
+        status: 'PENDING',
+        remarks: `Refund processed - ID: ${refund.id}. Reason: ${reason || 'Not specified'}`
       }
     });
 
@@ -342,14 +328,14 @@ exports.refundPayment = async (req, res) => {
       'PAYMENT_REFUNDED',
       'PAYMENT',
       'fees',
-      `Refund processed - Amount: ${amount || fee.amountPaid}`,
+      `Refund processed - Amount: ${amount || feePayment.amount}`,
       {
         ipAddress: req.ip,
         resourceId: feeId,
         resourceType: 'fee',
         changes: {
           refundId: refund.id,
-          amount: amount || fee.amountPaid,
+          amount: amount || feePayment.amount,
           reason
         },
         status: 'SUCCESS'

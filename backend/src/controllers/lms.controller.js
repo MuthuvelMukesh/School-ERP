@@ -1,10 +1,9 @@
 const path = require('path');
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 const fileManager = require('../utils/fileManager');
 const activityService = require('../utils/activity');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 const uploadRoot = path.resolve(process.env.UPLOAD_DIR || 'uploads');
 
 const resolveUploadPath = (filePath) => {

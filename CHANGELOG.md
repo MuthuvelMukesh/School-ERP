@@ -6,6 +6,48 @@ All notable changes to the School ERP project are documented in this file.
 
 ---
 
+## [v1.2.0] - March 2, 2026
+
+### Fixed
+
+#### 🐛 Critical Runtime Fixes
+- **auth.controller.js**: Removed illegal `include` + `select` combo in `getMe` query (Prisma throws at runtime)
+- **dashboard.controller.js**: Replaced all `prisma.fee.*` calls with correct `prisma.feePayment` / `prisma.feeStructure` models (Fee model doesn't exist in schema)
+- **payment.controller.js**: Same `prisma.fee` → `prisma.feePayment`/`prisma.feeStructure` migration; fixed field name mismatches (`amountPaid` → `amount`)
+- **hostel.controller.js**: Fixed 28 occurrences of `req.user.userId` (always `undefined`) → `req.user.id`
+- **student.routes.js**: Fixed route ordering — moved `/class/:classId` before `/:id` to prevent shadowing
+- **lms.routes.js**: Fixed route ordering — moved `/submissions/me` before `/:id` to prevent shadowing
+- **exam.controller.js**: Added null checks in `getReportCard` for missing student, exam schedule, and empty results
+- **dashboard.controller.js**: Fixed DateTime comparisons — date string equality replaced with proper `gte`/`lt` range queries
+- **dashboard.controller.js**: Fixed `groupBy` on relation field `examSchedule` → scalar `examScheduleId`
+
+#### 🔒 Security Fixes
+- **server.js**: Static `/uploads` route now requires JWT authentication
+- **auth.controller.js**: Removed `error.message` from register/login error responses to prevent internal detail leaks
+- **file.controller.js**: Strengthened path traversal protection using `path.resolve()` + prefix verification + null byte check
+- **notification.controller.js**: Wrapped email sending in try-catch so failures don't crash the notification request
+
+#### 🐛 Bug Fixes
+- **file.controller.js**: Fixed JSON double-parse issue — Prisma `Json?` fields return parsed objects, not strings
+- **fee.controller.js** / **staff.controller.js**: Fixed string-based pagination math (`parseInt` at parse time)
+- **payment.controller.js**: Fixed `Math.ceil(total / limit)` with string `limit` value
+- **activity.routes.js**: Changed cleanup endpoint from DELETE to POST (DELETE with body is unreliable across HTTP clients)
+- **frontend api.ts**: Synced activity cleanup call to use POST
+
+### Added
+
+#### ⚡ Performance Optimizations
+- **Prisma Singleton**: Consolidated 23+ separate `new PrismaClient()` instances into a shared singleton (`utils/prisma.js`) to prevent database connection pool exhaustion
+- **attendance.controller.js**: Added pagination to `getAttendance` endpoint (capped at 200 per page)
+- **exam.controller.js**: Added pagination to `getAllResults` endpoint (capped at 200 per page)
+- **attendance.controller.js**: Bulk attendance now uses `prisma.$transaction()` instead of `Promise.all` with individual queries
+- **fileManager.js**: Converted `getUploadDirSize` and `cleanupOldFiles` from synchronous (`readdirSync`/`statSync`/`unlinkSync`) to async (`fs.promises`) to prevent event loop blocking
+
+#### 🎨 Frontend Fixes
+- **files/page.tsx**: Fixed 4 TypeScript compile errors — corrected API method names (`uploadStudentDoc` → `uploadStudentDocument`, `uploadStaffDoc` → `uploadStaffDocument`, `download` → `downloadFile`, `delete` → `deleteFile`)
+
+---
+
 ## [v1.1.0] - February 20, 2026
 
 ### Added

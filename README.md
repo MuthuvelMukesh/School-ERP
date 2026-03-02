@@ -3,11 +3,21 @@
 ## Description
 Web-based School ERP to manage student, staff, academic, financial and administrative operations for small-medium schools.
 
-## Latest Updates (Feb 2026)
-- Added fine-grained permission matrix with custom permissions, role permissions, user-level overrides, and role hierarchy APIs.
-- Added student progression workflows: class promotion, detention, internal transfer, external transfer, and progression history.
-- Added frontend management screens for all core dashboard modules.
-- Added admin frontend screens for Permission Matrix and Student Promotion/Transfer operations.
+## Latest Updates (Mar 2026)
+- **Critical Bug Fixes**: Fixed 9 runtime-crashing bugs across backend controllers
+- **Security Hardening**: Authenticated file uploads route, strengthened path traversal protection, removed error message leaks
+- **Database Optimization**: Consolidated 23+ PrismaClient instances into a single shared singleton to prevent connection pool exhaustion
+- **Prisma Model Fixes**: Replaced all non-existent `prisma.fee` references with correct `prisma.feePayment` / `prisma.feeStructure` models
+- **Route Ordering Fixes**: Fixed shadowed routes in student and LMS modules where `/:id` was catching `/class/:classId` and `/submissions/me`
+- **Pagination**: Added pagination to attendance and exam results endpoints; fixed string-based pagination math
+- **Performance**: Converted sync file operations to async; bulk attendance now uses `$transaction`
+- **Frontend**: Fixed 4 TypeScript compile errors in file management page; synced API client
+
+### Previous Updates (Feb 2026)
+- Added fine-grained permission matrix with custom permissions, role permissions, user-level overrides, and role hierarchy APIs
+- Added student progression workflows: class promotion, detention, internal transfer, external transfer, and progression history
+- Added frontend management screens for all core dashboard modules
+- Added admin frontend screens for Permission Matrix and Student Promotion/Transfer operations
 
 ## Core Objectives
 - Digitize school administration
@@ -314,12 +324,15 @@ Key entities:
 ## Security Features
 - JWT-based authentication
 - Password hashing with bcrypt
-- Role-based access control (RBAC)
+- Role-based access control (RBAC) with fine-grained permission matrix
 - API rate limiting
 - CORS configuration
 - Helmet security headers
-- Input validation
+- Input validation and sanitization
 - SQL injection prevention (Prisma ORM)
+- Authenticated static file serving (uploads require valid JWT)
+- Path traversal protection on file download/delete endpoints
+- Error message sanitization (no internal details leaked to clients)
 
 ## Deployment
 
@@ -490,9 +503,9 @@ For support, email https://raw.githubusercontent.com/tharun27102006/School-ERP/m
 - [ ] SMS notifications
 - [ ] Report generation (PDF)
 - [ ] Mobile app (React Native)
-- [ ] Library management
-- [ ] Transport management
-- [ ] Hostel management
+- [x] Library management
+- [x] Transport management
+- [x] Hostel management
 - [ ] Multi-language support
 - [ ] Advanced analytics and reporting
 

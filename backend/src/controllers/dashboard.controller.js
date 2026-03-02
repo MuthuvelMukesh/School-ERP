@@ -1,7 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 /**
  * Get comprehensive dashboard stats
@@ -18,7 +17,7 @@ exports.getDashboardStats = async (req, res) => {
         totalStaff,
         totalClasses,
         recentPayments,
-        totalFees,
+        totalFeeStructures,
         feesCollected,
         feesOverdue,
         attendanceStats
@@ -26,21 +25,21 @@ exports.getDashboardStats = async (req, res) => {
         prisma.student.count({ where: { isActive: true } }),
         prisma.staff.count({ where: { isActive: true } }),
         prisma.class.count(),
-        prisma.fee.count({
+        prisma.feePayment.count({
           where: {
             paymentDate: {
               gte: new Date(new Date().setDate(new Date().getDate() - 7))
             }
           }
         }),
-        prisma.fee.aggregate({
+        prisma.feeStructure.aggregate({
           _sum: { amount: true }
         }),
-        prisma.fee.aggregate({
-          _sum: { amountPaid: true },
+        prisma.feePayment.aggregate({
+          _sum: { amount: true },
           where: { status: { in: ['PAID', 'PARTIAL'] } }
         }),
-        prisma.fee.count({
+        prisma.feePayment.count({
           where: { status: 'OVERDUE' }
         }),
         getAttendanceStats()
@@ -59,9 +58,9 @@ exports.getDashboardStats = async (req, res) => {
           total: totalClasses
         },
         finance: {
-          totalFees: totalFees._sum.amount || 0,
-          collected: feesCollected._sum.amountPaid || 0,
-          pending: (totalFees._sum.amount || 0) - (feesCollected._sum.amountPaid || 0),
+          totalFees: totalFeeStructures._sum.amount || 0,
+          collected: feesCollected._sum.amount || 0,
+          pending: (totalFeeStructures._sum.amount || 0) - (feesCollected._sum.amount || 0),
           overdue: feesOverdue,
           recentPayments: recentPayments
         },
@@ -85,14 +84,20 @@ exports.getDashboardStats = async (req, res) => {
           where: {
             classId: { in: classIds },
             status: 'PRESENT',
-            date: new Date().toISOString().split('T')[0]
+            date: {
+              gte: new Date(new Date().toISOString().split('T')[0]),
+              lt: new Date(new Date(new Date().toISOString().split('T')[0]).getTime() + 86400000)
+            }
           }
         }),
         prisma.attendance.count({
           where: {
             classId: { in: classIds },
             status: 'ABSENT',
-            date: new Date().toISOString().split('T')[0]
+            date: {
+              gte: new Date(new Date().toISOString().split('T')[0]),
+              lt: new Date(new Date(new Date().toISOString().split('T')[0]).getTime() + 86400000)
+            }
           }
         })
       ]);
@@ -140,7 +145,7 @@ exports.getAttendanceTrends = async (req, res) => {
     startDate.setDate(startDate.getDate() - days);
 
     const where = {
-      date: { gte: startDate.toISOString().split('T')[0] }
+      date: { gte: startDate }
     };
 
     if (classId) {
@@ -266,20 +271,20 @@ exports.getFinancialAnalytics = async (req, res) => {
     startDate.setMonth(startDate.getMonth() - months);
 
     // Get fee collection trends
-    const feeData = await prisma.fee.groupBy({
+    const feeData = await prisma.feePayment.groupBy({
       by: ['paymentDate'],
       where: {
         paymentDate: { gte: startDate },
         status: { in: ['PAID', 'PARTIAL'] }
       },
       _sum: {
-        amountPaid: true
+        amount: true
       },
       orderBy: { paymentDate: 'asc' }
     });
 
     // Get fee status breakdown
-    const feeStatus = await prisma.fee.groupBy({
+    const feeStatus = await prisma.feePayment.groupBy({
       by: ['status'],
       _count: { id: true },
       _sum: { amount: true }
@@ -293,7 +298,7 @@ exports.getFinancialAnalytics = async (req, res) => {
         if (!monthlyData[month]) {
           monthlyData[month] = 0;
         }
-        monthlyData[month] += record._sum.amountPaid || 0;
+        monthlyData[month] += record._sum.amount || 0;
       }
     });
 
@@ -349,10 +354,10 @@ exports.getClassPerformance = async (req, res) => {
 
     // Get average marks per class
     const avgMarks = await prisma.examResult.groupBy({
-      by: ['examSchedule'],
-      where: {
-        examSchedule: { classId: classId || undefined }
-      },
+      by: ['examScheduleId'],
+      where: classId ? {
+        examSchedule: { classId }
+      } : {},
       _avg: { marksObtained: true },
       _count: { id: true }
     });
@@ -412,17 +417,19 @@ exports.getRecentActivities = async (req, res) => {
  * Helper function to calculate attendance stats
  */
 async function getAttendanceStats() {
-  const today = new Date().toISOString().split('T')[0];
+  const todayStart = new Date(new Date().toISOString().split('T')[0]);
+  const todayEnd = new Date(todayStart.getTime() + 86400000);
+  const todayRange = { gte: todayStart, lt: todayEnd };
 
   const [present, absent, late] = await Promise.all([
     prisma.attendance.count({
-      where: { date: today, status: 'PRESENT' }
+      where: { date: todayRange, status: 'PRESENT' }
     }),
     prisma.attendance.count({
-      where: { date: today, status: 'ABSENT' }
+      where: { date: todayRange, status: 'ABSENT' }
     }),
     prisma.attendance.count({
-      where: { date: today, status: 'LATE' }
+      where: { date: todayRange, status: 'LATE' }
     })
   ]);
 

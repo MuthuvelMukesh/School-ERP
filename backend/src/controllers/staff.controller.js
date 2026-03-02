@@ -1,12 +1,13 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 exports.getAllStaff = async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
-    const skip = (page - 1) * limit;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
+    const skip = (parsedPage - 1) * parsedLimit;
 
     const where = {};
     
@@ -21,8 +22,8 @@ exports.getAllStaff = async (req, res) => {
     const [staff, total] = await Promise.all([
       prisma.staff.findMany({
         where,
-        skip: parseInt(skip),
-        take: parseInt(limit),
+        skip,
+        take: parsedLimit,
         include: {
           user: {
             select: {
@@ -43,9 +44,9 @@ exports.getAllStaff = async (req, res) => {
         staff,
         pagination: {
           total,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          totalPages: Math.ceil(total / limit)
+          page: parsedPage,
+          limit: parsedLimit,
+          totalPages: Math.ceil(total / parsedLimit)
         }
       }
     });

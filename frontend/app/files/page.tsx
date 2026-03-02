@@ -53,7 +53,7 @@ export default function FilesPage() {
 
     setUploading(true)
     try {
-      const fn = uploadType === 'student' ? fileAPI.uploadStudentDoc : fileAPI.uploadStaffDoc
+      const fn = uploadType === 'student' ? fileAPI.uploadStudentDocument : fileAPI.uploadStaffDocument
       await fn(formData)
       toast.success('File uploaded successfully')
       setEntityId('')
@@ -66,7 +66,7 @@ export default function FilesPage() {
 
   const handleDownload = async (filePath: string) => {
     try {
-      const res = await fileAPI.download(filePath)
+      const res = await fileAPI.downloadFile(filePath)
       const blob = new Blob([res.data])
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -80,7 +80,7 @@ export default function FilesPage() {
   const handleDelete = async (filePath: string) => {
     if (!confirm('Delete this file permanently?')) return
     try {
-      await fileAPI.delete(filePath)
+      await fileAPI.deleteFile(filePath)
       toast.success('File deleted')
       fetchStats()
     } catch (err: any) { toast.error(err.response?.data?.message || 'Delete failed') }

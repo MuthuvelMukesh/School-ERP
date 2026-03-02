@@ -1,9 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 const fileManager = require('../utils/fileManager');
 const activityService = require('../utils/activity');
 
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 /**
  * Upload student document
@@ -47,13 +46,13 @@ exports.uploadStudentDocument = async (req, res) => {
     };
 
     // Update student documents (JSON field)
-    const currentDocuments = student.documents ? JSON.parse(student.documents) : [];
+    const currentDocuments = Array.isArray(student.documents) ? student.documents : (student.documents ? [student.documents] : []);
     currentDocuments.push(fileData);
 
     const updatedStudent = await prisma.student.update({
       where: { id: studentId },
       data: {
-        documents: JSON.stringify(currentDocuments)
+        documents: currentDocuments
       }
     });
 
@@ -137,13 +136,13 @@ exports.uploadStaffDocument = async (req, res) => {
     };
 
     // Update staff documents
-    const currentDocuments = staff.documents ? JSON.parse(staff.documents) : [];
+    const currentDocuments = Array.isArray(staff.documents) ? staff.documents : (staff.documents ? [staff.documents] : []);
     currentDocuments.push(fileData);
 
     const updatedStaff = await prisma.staff.update({
       where: { id: staffId },
       data: {
-        documents: JSON.stringify(currentDocuments)
+        documents: currentDocuments
       }
     });
 
@@ -193,7 +192,10 @@ exports.downloadFile = async (req, res) => {
     const { filePath } = req.params;
 
     // Security: Prevent path traversal attacks
-    if (filePath.includes('..')) {
+    const path = require('path');
+    const resolvedPath = path.resolve('uploads', filePath);
+    const uploadsDir = path.resolve('uploads');
+    if (!resolvedPath.startsWith(uploadsDir) || filePath.includes('..') || filePath.includes('\0')) {
       return res.status(403).json({
         status: 'error',
         message: 'Access denied'
@@ -241,7 +243,10 @@ exports.deleteFile = async (req, res) => {
     const { filePath } = req.params;
 
     // Security: Prevent path traversal attacks
-    if (filePath.includes('..')) {
+    const path = require('path');
+    const resolvedPath = path.resolve('uploads', filePath);
+    const uploadsDir = path.resolve('uploads');
+    if (!resolvedPath.startsWith(uploadsDir) || filePath.includes('..') || filePath.includes('\0')) {
       return res.status(403).json({
         status: 'error',
         message: 'Access denied'
@@ -296,7 +301,7 @@ exports.getUploadStats = async (req, res) => {
       });
     }
 
-    const stats = fileManager.getUploadDirSize();
+    const stats = await fileManager.getUploadDirSize();
 
     res.status(200).json({
       status: 'success',
@@ -327,7 +332,7 @@ exports.cleanupOldFiles = async (req, res) => {
 
     const { daysOld = 30 } = req.body;
 
-    const result = fileManager.cleanupOldFiles(daysOld);
+    const result = await fileManager.cleanupOldFiles(daysOld);
 
     // Log cleanup activity
     await activityService.logActivity(
