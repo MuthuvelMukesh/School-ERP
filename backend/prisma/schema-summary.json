@@ -1,0 +1,1314 @@
+{
+  "models": [
+    {
+      "name": "User",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "email"
+      ]
+    },
+    {
+      "name": "AcademicYear",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "year",
+        "startDate"
+      ]
+    },
+    {
+      "name": "Class",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "section"
+      ]
+    },
+    {
+      "name": "Subject",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "code"
+      ]
+    },
+    {
+      "name": "Student",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "admissionNo",
+        "firstName"
+      ]
+    },
+    {
+      "name": "Permission",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "key",
+        "name"
+      ]
+    },
+    {
+      "name": "RolePermission",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "role",
+        "allowed"
+      ]
+    },
+    {
+      "name": "UserPermission",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "allowed"
+      ]
+    },
+    {
+      "name": "RoleHierarchy",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "parentRole",
+        "childRole"
+      ]
+    },
+    {
+      "name": "StudentPromotion",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "status",
+        "reason"
+      ]
+    },
+    {
+      "name": "StudentTransfer",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "transferType",
+        "toSchoolName"
+      ]
+    },
+    {
+      "name": "Parent",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "firstName",
+        "lastName"
+      ]
+    },
+    {
+      "name": "Staff",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "firstName",
+        "lastName"
+      ]
+    },
+    {
+      "name": "Attendance",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "date",
+        "status"
+      ]
+    },
+    {
+      "name": "Leave",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "startDate",
+        "endDate"
+      ]
+    },
+    {
+      "name": "FeeStructure",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "amount"
+      ]
+    },
+    {
+      "name": "FeePayment",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "amount",
+        "paymentDate"
+      ]
+    },
+    {
+      "name": "SalaryPayment",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "month",
+        "amount"
+      ]
+    },
+    {
+      "name": "Timetable",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "dayOfWeek",
+        "startTime"
+      ]
+    },
+    {
+      "name": "ExamSchedule",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "examType"
+      ]
+    },
+    {
+      "name": "ExamResult",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "marksObtained",
+        "remarks"
+      ]
+    },
+    {
+      "name": "Notification",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "title",
+        "message"
+      ]
+    },
+    {
+      "name": "Activity",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "action",
+        "actionType"
+      ]
+    },
+    {
+      "name": "Book",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "title",
+        "author"
+      ]
+    },
+    {
+      "name": "BookCopy",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "barcode",
+        "status"
+      ]
+    },
+    {
+      "name": "BorrowRecord",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "issueDate",
+        "dueDate"
+      ]
+    },
+    {
+      "name": "BookHoldRequest",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "requestDate",
+        "fulfillmentDate"
+      ]
+    },
+    {
+      "name": "LibrarySettings",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "issueLimit",
+        "issuePeriodDays"
+      ]
+    },
+    {
+      "name": "LmsContent",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "title",
+        "description"
+      ]
+    },
+    {
+      "name": "LmsContentFile",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "originalName",
+        "filename"
+      ]
+    },
+    {
+      "name": "LmsSubmission",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "status",
+        "submittedAt"
+      ]
+    },
+    {
+      "name": "LmsSubmissionFile",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "originalName",
+        "filename"
+      ]
+    },
+    {
+      "name": "Vehicle",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "registrationNo",
+        "model"
+      ]
+    },
+    {
+      "name": "Route",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "monthlyFee"
+      ]
+    },
+    {
+      "name": "BusStop",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "stopName",
+        "location"
+      ]
+    },
+    {
+      "name": "StudentTransport",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "pickupStop",
+        "dropoffStop"
+      ]
+    },
+    {
+      "name": "MaintenanceRecord",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "description",
+        "cost"
+      ]
+    },
+    {
+      "name": "VehicleBoarding",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "date",
+        "studentCount"
+      ]
+    },
+    {
+      "name": "TransportSettings",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "defaultMonthlyFee",
+        "lateFeePercentage"
+      ]
+    },
+    {
+      "name": "Hostel",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "name",
+        "type"
+      ]
+    },
+    {
+      "name": "HostelRoom",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "roomNumber",
+        "floor"
+      ]
+    },
+    {
+      "name": "HostelBed",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "bedNo",
+        "status"
+      ]
+    },
+    {
+      "name": "HostelStudent",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "checkInDate",
+        "checkOutDate"
+      ]
+    },
+    {
+      "name": "HostelVisitor",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "visitorName",
+        "relation"
+      ]
+    },
+    {
+      "name": "HostelComplaint",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "category",
+        "subject"
+      ]
+    },
+    {
+      "name": "HostelLeave",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "leaveFrom",
+        "leaveTo"
+      ]
+    },
+    {
+      "name": "HostelNotice",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "title",
+        "content"
+      ]
+    },
+    {
+      "name": "HostelAttendance",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "date",
+        "isPresent"
+      ]
+    },
+    {
+      "name": "HostelSettings",
+      "pk": [
+        "id"
+      ],
+      "attrs": [
+        "id",
+        "defaultMonthlyFee",
+        "defaultDepositAmount"
+      ]
+    }
+  ],
+  "relationFields": [
+    {
+      "from": "User",
+      "field": "student",
+      "to": "Student",
+      "kind": "zero-or-one",
+      "raw": "student               Student?"
+    },
+    {
+      "from": "User",
+      "field": "staff",
+      "to": "Staff",
+      "kind": "zero-or-one",
+      "raw": "staff                 Staff?"
+    },
+    {
+      "from": "User",
+      "field": "parent",
+      "to": "Parent",
+      "kind": "zero-or-one",
+      "raw": "parent                Parent?"
+    },
+    {
+      "from": "User",
+      "field": "userPermissions",
+      "to": "UserPermission",
+      "kind": "many",
+      "raw": "userPermissions       UserPermission[]"
+    },
+    {
+      "from": "AcademicYear",
+      "field": "classes",
+      "to": "Class",
+      "kind": "many",
+      "raw": "classes       Class[]"
+    },
+    {
+      "from": "AcademicYear",
+      "field": "examSchedules",
+      "to": "ExamSchedule",
+      "kind": "many",
+      "raw": "examSchedules ExamSchedule[]"
+    },
+    {
+      "from": "AcademicYear",
+      "field": "feeStructures",
+      "to": "FeeStructure",
+      "kind": "many",
+      "raw": "feeStructures FeeStructure[]"
+    },
+    {
+      "from": "Class",
+      "field": "academicYear",
+      "to": "AcademicYear",
+      "kind": "one",
+      "raw": "academicYear    AcademicYear @relation(fields: [academicYearId], references: [id])"
+    },
+    {
+      "from": "Class",
+      "field": "classTeacher",
+      "to": "Staff",
+      "kind": "zero-or-one",
+      "raw": "classTeacher    Staff?       @relation(\"ClassTeacher\", fields: [classTeacherId], references: [id])"
+    },
+    {
+      "from": "Class",
+      "field": "students",
+      "to": "Student",
+      "kind": "many",
+      "raw": "students        Student[]"
+    },
+    {
+      "from": "Class",
+      "field": "subjects",
+      "to": "Subject",
+      "kind": "many",
+      "raw": "subjects        Subject[]"
+    },
+    {
+      "from": "Class",
+      "field": "timetables",
+      "to": "Timetable",
+      "kind": "many",
+      "raw": "timetables      Timetable[]"
+    },
+    {
+      "from": "Class",
+      "field": "attendances",
+      "to": "Attendance",
+      "kind": "many",
+      "raw": "attendances     Attendance[]"
+    },
+    {
+      "from": "Class",
+      "field": "examSchedules",
+      "to": "ExamSchedule",
+      "kind": "many",
+      "raw": "examSchedules   ExamSchedule[]"
+    },
+    {
+      "from": "Class",
+      "field": "lmsContents",
+      "to": "LmsContent",
+      "kind": "many",
+      "raw": "lmsContents     LmsContent[]"
+    },
+    {
+      "from": "Class",
+      "field": "promotionsFrom",
+      "to": "StudentPromotion",
+      "kind": "many",
+      "raw": "promotionsFrom  StudentPromotion[] @relation(\"FromClassPromotion\")"
+    },
+    {
+      "from": "Class",
+      "field": "promotionsTo",
+      "to": "StudentPromotion",
+      "kind": "many",
+      "raw": "promotionsTo    StudentPromotion[] @relation(\"ToClassPromotion\")"
+    },
+    {
+      "from": "Class",
+      "field": "transfersFrom",
+      "to": "StudentTransfer",
+      "kind": "many",
+      "raw": "transfersFrom   StudentTransfer[]  @relation(\"FromClassTransfer\")"
+    },
+    {
+      "from": "Class",
+      "field": "transfersTo",
+      "to": "StudentTransfer",
+      "kind": "many",
+      "raw": "transfersTo     StudentTransfer[]  @relation(\"ToClassTransfer\")"
+    },
+    {
+      "from": "Subject",
+      "field": "class",
+      "to": "Class",
+      "kind": "one",
+      "raw": "class         Class     @relation(fields: [classId], references: [id])"
+    },
+    {
+      "from": "Subject",
+      "field": "teacher",
+      "to": "Staff",
+      "kind": "zero-or-one",
+      "raw": "teacher       Staff?    @relation(fields: [teacherId], references: [id])"
+    },
+    {
+      "from": "Subject",
+      "field": "timetables",
+      "to": "Timetable",
+      "kind": "many",
+      "raw": "timetables    Timetable[]"
+    },
+    {
+      "from": "Subject",
+      "field": "examResults",
+      "to": "ExamResult",
+      "kind": "many",
+      "raw": "examResults   ExamResult[]"
+    },
+    {
+      "from": "Subject",
+      "field": "lmsContents",
+      "to": "LmsContent",
+      "kind": "many",
+      "raw": "lmsContents   LmsContent[]"
+    },
+    {
+      "from": "Student",
+      "field": "user",
+      "to": "User",
+      "kind": "one",
+      "raw": "user              User      @relation(fields: [userId], references: [id])"
+    },
+    {
+      "from": "Student",
+      "field": "parent",
+      "to": "Parent",
+      "kind": "zero-or-one",
+      "raw": "parent            Parent?   @relation(fields: [parentId], references: [id])"
+    },
+    {
+      "from": "Student",
+      "field": "class",
+      "to": "Class",
+      "kind": "one",
+      "raw": "class             Class     @relation(fields: [classId], references: [id])"
+    },
+    {
+      "from": "Student",
+      "field": "attendances",
+      "to": "Attendance",
+      "kind": "many",
+      "raw": "attendances       Attendance[]"
+    },
+    {
+      "from": "Student",
+      "field": "feePayments",
+      "to": "FeePayment",
+      "kind": "many",
+      "raw": "feePayments       FeePayment[]"
+    },
+    {
+      "from": "Student",
+      "field": "examResults",
+      "to": "ExamResult",
+      "kind": "many",
+      "raw": "examResults       ExamResult[]"
+    },
+    {
+      "from": "Student",
+      "field": "lmsSubmissions",
+      "to": "LmsSubmission",
+      "kind": "many",
+      "raw": "lmsSubmissions    LmsSubmission[]"
+    },
+    {
+      "from": "Student",
+      "field": "promotions",
+      "to": "StudentPromotion",
+      "kind": "many",
+      "raw": "promotions        StudentPromotion[]"
+    },
+    {
+      "from": "Student",
+      "field": "transfers",
+      "to": "StudentTransfer",
+      "kind": "many",
+      "raw": "transfers         StudentTransfer[]"
+    },
+    {
+      "from": "Permission",
+      "field": "rolePermissions",
+      "to": "RolePermission",
+      "kind": "many",
+      "raw": "rolePermissions RolePermission[]"
+    },
+    {
+      "from": "Permission",
+      "field": "userPermissions",
+      "to": "UserPermission",
+      "kind": "many",
+      "raw": "userPermissions UserPermission[]"
+    },
+    {
+      "from": "RolePermission",
+      "field": "permission",
+      "to": "Permission",
+      "kind": "one",
+      "raw": "permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "UserPermission",
+      "field": "user",
+      "to": "User",
+      "kind": "one",
+      "raw": "user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "UserPermission",
+      "field": "permission",
+      "to": "Permission",
+      "kind": "one",
+      "raw": "permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "StudentPromotion",
+      "field": "student",
+      "to": "Student",
+      "kind": "one",
+      "raw": "student       Student         @relation(fields: [studentId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "StudentPromotion",
+      "field": "fromClass",
+      "to": "Class",
+      "kind": "one",
+      "raw": "fromClass     Class           @relation(\"FromClassPromotion\", fields: [fromClassId], references: [id])"
+    },
+    {
+      "from": "StudentPromotion",
+      "field": "toClass",
+      "to": "Class",
+      "kind": "zero-or-one",
+      "raw": "toClass       Class?          @relation(\"ToClassPromotion\", fields: [toClassId], references: [id])"
+    },
+    {
+      "from": "StudentTransfer",
+      "field": "student",
+      "to": "Student",
+      "kind": "one",
+      "raw": "student          Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "StudentTransfer",
+      "field": "fromClass",
+      "to": "Class",
+      "kind": "one",
+      "raw": "fromClass        Class        @relation(\"FromClassTransfer\", fields: [fromClassId], references: [id])"
+    },
+    {
+      "from": "StudentTransfer",
+      "field": "toClass",
+      "to": "Class",
+      "kind": "zero-or-one",
+      "raw": "toClass          Class?       @relation(\"ToClassTransfer\", fields: [toClassId], references: [id])"
+    },
+    {
+      "from": "Parent",
+      "field": "user",
+      "to": "User",
+      "kind": "one",
+      "raw": "user          User      @relation(fields: [userId], references: [id])"
+    },
+    {
+      "from": "Parent",
+      "field": "students",
+      "to": "Student",
+      "kind": "many",
+      "raw": "students      Student[]"
+    },
+    {
+      "from": "Staff",
+      "field": "user",
+      "to": "User",
+      "kind": "one",
+      "raw": "user              User      @relation(fields: [userId], references: [id])"
+    },
+    {
+      "from": "Staff",
+      "field": "subjects",
+      "to": "Subject",
+      "kind": "many",
+      "raw": "subjects          Subject[]"
+    },
+    {
+      "from": "Staff",
+      "field": "timetables",
+      "to": "Timetable",
+      "kind": "many",
+      "raw": "timetables        Timetable[]"
+    },
+    {
+      "from": "Staff",
+      "field": "classesAsTeacher",
+      "to": "Class",
+      "kind": "many",
+      "raw": "classesAsTeacher  Class[]   @relation(\"ClassTeacher\")"
+    },
+    {
+      "from": "Staff",
+      "field": "leaves",
+      "to": "Leave",
+      "kind": "many",
+      "raw": "leaves            Leave[]"
+    },
+    {
+      "from": "Staff",
+      "field": "salaryPayments",
+      "to": "SalaryPayment",
+      "kind": "many",
+      "raw": "salaryPayments    SalaryPayment[]"
+    },
+    {
+      "from": "Staff",
+      "field": "lmsContents",
+      "to": "LmsContent",
+      "kind": "many",
+      "raw": "lmsContents        LmsContent[]"
+    },
+    {
+      "from": "Staff",
+      "field": "vehiclesAsDriver",
+      "to": "Vehicle",
+      "kind": "many",
+      "raw": "vehiclesAsDriver  Vehicle[] @relation(\"VehicleDriver\")"
+    },
+    {
+      "from": "Staff",
+      "field": "vehiclesAsConductor",
+      "to": "Vehicle",
+      "kind": "many",
+      "raw": "vehiclesAsConductor Vehicle[] @relation(\"VehicleConductor\")"
+    },
+    {
+      "from": "Staff",
+      "field": "hostelsAsWarden",
+      "to": "Hostel",
+      "kind": "many",
+      "raw": "hostelsAsWarden   Hostel[]  @relation(\"HostelWarden\")"
+    },
+    {
+      "from": "Attendance",
+      "field": "student",
+      "to": "Student",
+      "kind": "one",
+      "raw": "student       Student           @relation(fields: [studentId], references: [id])"
+    },
+    {
+      "from": "Attendance",
+      "field": "class",
+      "to": "Class",
+      "kind": "one",
+      "raw": "class         Class             @relation(fields: [classId], references: [id])"
+    },
+    {
+      "from": "Leave",
+      "field": "staff",
+      "to": "Staff",
+      "kind": "one",
+      "raw": "staff         Staff       @relation(fields: [staffId], references: [id])"
+    },
+    {
+      "from": "FeeStructure",
+      "field": "academicYear",
+      "to": "AcademicYear",
+      "kind": "one",
+      "raw": "academicYear    AcademicYear @relation(fields: [academicYearId], references: [id])"
+    },
+    {
+      "from": "FeeStructure",
+      "field": "payments",
+      "to": "FeePayment",
+      "kind": "many",
+      "raw": "payments        FeePayment[]"
+    },
+    {
+      "from": "FeePayment",
+      "field": "student",
+      "to": "Student",
+      "kind": "one",
+      "raw": "student           Student     @relation(fields: [studentId], references: [id])"
+    },
+    {
+      "from": "FeePayment",
+      "field": "feeStructure",
+      "to": "FeeStructure",
+      "kind": "one",
+      "raw": "feeStructure      FeeStructure @relation(fields: [feeStructureId], references: [id])"
+    },
+    {
+      "from": "SalaryPayment",
+      "field": "staff",
+      "to": "Staff",
+      "kind": "one",
+      "raw": "staff         Staff       @relation(fields: [staffId], references: [id])"
+    },
+    {
+      "from": "Timetable",
+      "field": "class",
+      "to": "Class",
+      "kind": "one",
+      "raw": "class         Class     @relation(fields: [classId], references: [id])"
+    },
+    {
+      "from": "Timetable",
+      "field": "subject",
+      "to": "Subject",
+      "kind": "one",
+      "raw": "subject       Subject   @relation(fields: [subjectId], references: [id])"
+    },
+    {
+      "from": "Timetable",
+      "field": "teacher",
+      "to": "Staff",
+      "kind": "one",
+      "raw": "teacher       Staff     @relation(fields: [teacherId], references: [id])"
+    },
+    {
+      "from": "ExamSchedule",
+      "field": "class",
+      "to": "Class",
+      "kind": "one",
+      "raw": "class           Class     @relation(fields: [classId], references: [id])"
+    },
+    {
+      "from": "ExamSchedule",
+      "field": "academicYear",
+      "to": "AcademicYear",
+      "kind": "one",
+      "raw": "academicYear    AcademicYear @relation(fields: [academicYearId], references: [id])"
+    },
+    {
+      "from": "ExamSchedule",
+      "field": "results",
+      "to": "ExamResult",
+      "kind": "many",
+      "raw": "results         ExamResult[]"
+    },
+    {
+      "from": "ExamResult",
+      "field": "student",
+      "to": "Student",
+      "kind": "one",
+      "raw": "student         Student   @relation(fields: [studentId], references: [id])"
+    },
+    {
+      "from": "ExamResult",
+      "field": "examSchedule",
+      "to": "ExamSchedule",
+      "kind": "one",
+      "raw": "examSchedule    ExamSchedule @relation(fields: [examScheduleId], references: [id])"
+    },
+    {
+      "from": "ExamResult",
+      "field": "subject",
+      "to": "Subject",
+      "kind": "one",
+      "raw": "subject         Subject   @relation(fields: [subjectId], references: [id])"
+    },
+    {
+      "from": "Book",
+      "field": "copies",
+      "to": "BookCopy",
+      "kind": "many",
+      "raw": "copies        BookCopy[]"
+    },
+    {
+      "from": "Book",
+      "field": "borrowRecords",
+      "to": "BorrowRecord",
+      "kind": "many",
+      "raw": "borrowRecords BorrowRecord[]"
+    },
+    {
+      "from": "Book",
+      "field": "holdRequests",
+      "to": "BookHoldRequest",
+      "kind": "many",
+      "raw": "holdRequests  BookHoldRequest[]"
+    },
+    {
+      "from": "BookCopy",
+      "field": "book",
+      "to": "Book",
+      "kind": "one",
+      "raw": "book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "BorrowRecord",
+      "field": "book",
+      "to": "Book",
+      "kind": "one",
+      "raw": "book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "BookHoldRequest",
+      "field": "book",
+      "to": "Book",
+      "kind": "one",
+      "raw": "book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "LmsContent",
+      "field": "class",
+      "to": "Class",
+      "kind": "one",
+      "raw": "class         Class          @relation(fields: [classId], references: [id])"
+    },
+    {
+      "from": "LmsContent",
+      "field": "subject",
+      "to": "Subject",
+      "kind": "one",
+      "raw": "subject       Subject        @relation(fields: [subjectId], references: [id])"
+    },
+    {
+      "from": "LmsContent",
+      "field": "teacher",
+      "to": "Staff",
+      "kind": "one",
+      "raw": "teacher       Staff          @relation(fields: [teacherId], references: [id])"
+    },
+    {
+      "from": "LmsContent",
+      "field": "attachments",
+      "to": "LmsContentFile",
+      "kind": "many",
+      "raw": "attachments   LmsContentFile[]"
+    },
+    {
+      "from": "LmsContent",
+      "field": "submissions",
+      "to": "LmsSubmission",
+      "kind": "many",
+      "raw": "submissions   LmsSubmission[]"
+    },
+    {
+      "from": "LmsContentFile",
+      "field": "content",
+      "to": "LmsContent",
+      "kind": "one",
+      "raw": "content       LmsContent @relation(fields: [contentId], references: [id])"
+    },
+    {
+      "from": "LmsSubmission",
+      "field": "content",
+      "to": "LmsContent",
+      "kind": "one",
+      "raw": "content       LmsContent          @relation(fields: [contentId], references: [id])"
+    },
+    {
+      "from": "LmsSubmission",
+      "field": "student",
+      "to": "Student",
+      "kind": "one",
+      "raw": "student       Student             @relation(fields: [studentId], references: [id])"
+    },
+    {
+      "from": "LmsSubmission",
+      "field": "attachments",
+      "to": "LmsSubmissionFile",
+      "kind": "many",
+      "raw": "attachments   LmsSubmissionFile[]"
+    },
+    {
+      "from": "LmsSubmissionFile",
+      "field": "submission",
+      "to": "LmsSubmission",
+      "kind": "one",
+      "raw": "submission    LmsSubmission @relation(fields: [submissionId], references: [id])"
+    },
+    {
+      "from": "Vehicle",
+      "field": "driver",
+      "to": "Staff",
+      "kind": "zero-or-one",
+      "raw": "driver            Staff?            @relation(\"VehicleDriver\", fields: [driverId], references: [id])"
+    },
+    {
+      "from": "Vehicle",
+      "field": "conductor",
+      "to": "Staff",
+      "kind": "zero-or-one",
+      "raw": "conductor         Staff?            @relation(\"VehicleConductor\", fields: [conductorId], references: [id])"
+    },
+    {
+      "from": "Vehicle",
+      "field": "route",
+      "to": "Route",
+      "kind": "zero-or-one",
+      "raw": "route             Route?"
+    },
+    {
+      "from": "Vehicle",
+      "field": "maintenanceRecords",
+      "to": "MaintenanceRecord",
+      "kind": "many",
+      "raw": "maintenanceRecords MaintenanceRecord[]"
+    },
+    {
+      "from": "Vehicle",
+      "field": "boardingRecords",
+      "to": "VehicleBoarding",
+      "kind": "many",
+      "raw": "boardingRecords   VehicleBoarding[]"
+    },
+    {
+      "from": "Route",
+      "field": "vehicle",
+      "to": "Vehicle",
+      "kind": "one",
+      "raw": "vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "Route",
+      "field": "stops",
+      "to": "BusStop",
+      "kind": "many",
+      "raw": "stops       BusStop[]"
+    },
+    {
+      "from": "Route",
+      "field": "students",
+      "to": "StudentTransport",
+      "kind": "many",
+      "raw": "students    StudentTransport[]"
+    },
+    {
+      "from": "BusStop",
+      "field": "route",
+      "to": "Route",
+      "kind": "one",
+      "raw": "route     Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "StudentTransport",
+      "field": "route",
+      "to": "Route",
+      "kind": "one",
+      "raw": "route         Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "MaintenanceRecord",
+      "field": "vehicle",
+      "to": "Vehicle",
+      "kind": "one",
+      "raw": "vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "VehicleBoarding",
+      "field": "vehicle",
+      "to": "Vehicle",
+      "kind": "one",
+      "raw": "vehicle       Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "Hostel",
+      "field": "warden",
+      "to": "Staff",
+      "kind": "zero-or-one",
+      "raw": "warden      Staff?    @relation(\"HostelWarden\", fields: [wardenId], references: [id])"
+    },
+    {
+      "from": "Hostel",
+      "field": "rooms",
+      "to": "HostelRoom",
+      "kind": "many",
+      "raw": "rooms       HostelRoom[]"
+    },
+    {
+      "from": "Hostel",
+      "field": "students",
+      "to": "HostelStudent",
+      "kind": "many",
+      "raw": "students    HostelStudent[]"
+    },
+    {
+      "from": "Hostel",
+      "field": "notices",
+      "to": "HostelNotice",
+      "kind": "many",
+      "raw": "notices     HostelNotice[]"
+    },
+    {
+      "from": "HostelRoom",
+      "field": "hostel",
+      "to": "Hostel",
+      "kind": "one",
+      "raw": "hostel      Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "HostelRoom",
+      "field": "beds",
+      "to": "HostelBed",
+      "kind": "many",
+      "raw": "beds        HostelBed[]"
+    },
+    {
+      "from": "HostelBed",
+      "field": "room",
+      "to": "HostelRoom",
+      "kind": "one",
+      "raw": "room      HostelRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "HostelStudent",
+      "field": "hostel",
+      "to": "Hostel",
+      "kind": "one",
+      "raw": "hostel          Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)"
+    },
+    {
+      "from": "HostelNotice",
+      "field": "hostel",
+      "to": "Hostel",
+      "kind": "one",
+      "raw": "hostel    Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)"
+    }
+  ]
+}

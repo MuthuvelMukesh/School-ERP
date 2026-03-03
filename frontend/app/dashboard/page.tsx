@@ -144,10 +144,10 @@ export default function DashboardPage() {
             </button>
 
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {user?.profile?.firstName || 'User'}</span>
+              <span className="text-sm text-gray-600">Welcome, {user?.profile?.firstName || user?.name || 'User'}</span>
               <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
                 <span className="text-primary-600 font-medium">
-                  {user?.profile?.firstName?.charAt(0) || 'U'}
+                  {user?.profile?.firstName?.charAt(0) || user?.name?.charAt(0) || 'U'}
                 </span>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm">Total Students</p>
-                  <h3 className="text-3xl font-bold mt-2">{stats?.totalStudents || 0}</h3>
+                  <h3 className="text-3xl font-bold mt-2">{stats?.students?.total || 0}</h3>
                 </div>
                 <Users className="w-12 h-12 text-blue-200" />
               </div>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm">Total Staff</p>
-                  <h3 className="text-3xl font-bold mt-2">{stats?.totalStaff || 0}</h3>
+                  <h3 className="text-3xl font-bold mt-2">{stats?.staff?.total || 0}</h3>
                 </div>
                 <UserCog className="w-12 h-12 text-green-200" />
               </div>
@@ -184,7 +184,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm">Total Classes</p>
-                  <h3 className="text-3xl font-bold mt-2">{stats?.totalClasses || 0}</h3>
+                  <h3 className="text-3xl font-bold mt-2">{stats?.classes?.total || 0}</h3>
                 </div>
                 <GraduationCap className="w-12 h-12 text-purple-200" />
               </div>
@@ -193,8 +193,8 @@ export default function DashboardPage() {
             <div className="card bg-gradient-to-br from-orange-500 to-orange-600 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-orange-100 text-sm">Recent Payments</p>
-                  <h3 className="text-3xl font-bold mt-2">{stats?.recentPayments || 0}</h3>
+                  <p className="text-orange-100 text-sm">Fee Collected</p>
+                  <h3 className="text-3xl font-bold mt-2">₹{stats?.finance?.collected?.toLocaleString() || 0}</h3>
                 </div>
                 <DollarSign className="w-12 h-12 text-orange-200" />
               </div>

@@ -1,0 +1,587 @@
+erDiagram
+    User {
+        uuid id PK
+        string name
+        string email UK
+        string password
+        UserRole role
+        UserStatus status
+        datetime lastLogin
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    AcademicYear {
+        uuid id PK
+        string year UK
+        datetime startDate
+        datetime endDate
+        boolean isCurrent
+    }
+
+    Class {
+        uuid id PK
+        string name
+        string section
+        uuid academicYearId FK
+        uuid classTeacherId FK
+        int capacity
+    }
+
+    Subject {
+        uuid id PK
+        string name
+        string code UK
+        uuid classId FK
+        uuid teacherId FK
+        int credits
+    }
+
+    Student {
+        uuid id PK
+        uuid userId FK
+        string admissionNo UK
+        string firstName
+        string lastName
+        datetime dateOfBirth
+        Gender gender
+        BloodGroup bloodGroup
+        string address
+        string phone
+        uuid parentId FK
+        uuid classId FK
+        datetime admissionDate
+        string profilePhoto
+        json documents
+        string medicalInfo
+        boolean isActive
+    }
+
+    Parent {
+        uuid id PK
+        uuid userId FK
+        string firstName
+        string lastName
+        string phone
+        string email
+        string occupation
+        string address
+    }
+
+    Staff {
+        uuid id PK
+        uuid userId FK
+        string employeeId UK
+        string firstName
+        string lastName
+        datetime dateOfBirth
+        Gender gender
+        BloodGroup bloodGroup
+        string phone
+        string email
+        string address
+        string designation
+        string department
+        datetime joiningDate
+        float salary
+        string qualification
+        int experience
+        boolean isActive
+    }
+
+    Permission {
+        uuid id PK
+        string key UK
+        string name
+        string module
+        string description
+        boolean isSystem
+    }
+
+    RolePermission {
+        uuid id PK
+        UserRole role
+        uuid permissionId FK
+        boolean allowed
+    }
+
+    UserPermission {
+        uuid id PK
+        uuid userId FK
+        uuid permissionId FK
+        boolean allowed
+    }
+
+    RoleHierarchy {
+        uuid id PK
+        UserRole parentRole
+        UserRole childRole
+    }
+
+    StudentPromotion {
+        uuid id PK
+        uuid studentId FK
+        uuid fromClassId FK
+        uuid toClassId FK
+        PromotionStatus status
+        string reason
+        string performedBy
+        datetime performedAt
+    }
+
+    StudentTransfer {
+        uuid id PK
+        uuid studentId FK
+        uuid fromClassId FK
+        uuid toClassId FK
+        TransferType transferType
+        string toSchoolName
+        datetime transferDate
+        string performedBy
+    }
+
+    Attendance {
+        uuid id PK
+        uuid studentId FK
+        uuid classId FK
+        datetime date
+        AttendanceStatus status
+        string remarks
+        string markedBy
+    }
+
+    Leave {
+        uuid id PK
+        uuid staffId FK
+        datetime startDate
+        datetime endDate
+        string reason
+        LeaveStatus status
+        string approvedBy
+    }
+
+    FeeStructure {
+        uuid id PK
+        uuid academicYearId FK
+        string name
+        float amount
+        datetime dueDate
+        boolean isOptional
+    }
+
+    FeePayment {
+        uuid id PK
+        uuid studentId FK
+        uuid feeStructureId FK
+        float amount
+        datetime paymentDate
+        PaymentMode paymentMode
+        string transactionId
+        string receiptNo UK
+        FeeStatus status
+        string collectedBy
+    }
+
+    SalaryPayment {
+        uuid id PK
+        uuid staffId FK
+        string month
+        float amount
+        datetime paymentDate
+        PaymentMode paymentMode
+        string transactionId
+    }
+
+    Timetable {
+        uuid id PK
+        uuid classId FK
+        uuid subjectId FK
+        uuid teacherId FK
+        int dayOfWeek
+        string startTime
+        string endTime
+        string room
+    }
+
+    ExamSchedule {
+        uuid id PK
+        string name
+        ExamType examType
+        uuid classId FK
+        uuid academicYearId FK
+        datetime startDate
+        datetime endDate
+        int totalMarks
+        int passingMarks
+    }
+
+    ExamResult {
+        uuid id PK
+        uuid studentId FK
+        uuid examScheduleId FK
+        uuid subjectId FK
+        float marksObtained
+        string remarks
+    }
+
+    Notification {
+        uuid id PK
+        string title
+        string message
+        string type
+        json recipients
+        datetime sentAt
+        string sentBy
+        string status
+    }
+
+    Activity {
+        uuid id PK
+        string userId
+        ActivityAction action
+        ActivityType actionType
+        string module
+        string description
+        string ipAddress
+        string resourceId
+        string resourceType
+        json changes
+        string status
+    }
+
+    Book {
+        uuid id PK
+        string title
+        string author
+        string isbn UK
+        string publisher
+        string category
+        int totalCopies
+        float costPrice
+    }
+
+    BookCopy {
+        uuid id PK
+        uuid bookId FK
+        string barcode UK
+        string status
+        string condition
+        string issuedTo
+    }
+
+    BorrowRecord {
+        uuid id PK
+        uuid bookId FK
+        string memberId
+        datetime issueDate
+        datetime dueDate
+        datetime returnDate
+        float fineAmount
+        boolean finePaid
+        int renewalCount
+    }
+
+    BookHoldRequest {
+        uuid id PK
+        uuid bookId FK
+        string memberId
+        datetime requestDate
+        string status
+        datetime expiryDate
+    }
+
+    LibrarySettings {
+        uuid id PK
+        int issueLimit
+        int issuePeriodDays
+        float finePerDay
+        float maxFineLimit
+        int holdRequestExpiryDays
+    }
+
+    LmsContent {
+        uuid id PK
+        string title
+        LmsContentType type
+        LmsVisibility visibility
+        uuid classId FK
+        uuid subjectId FK
+        uuid teacherId FK
+        datetime dueDate
+        int totalMarks
+    }
+
+    LmsContentFile {
+        uuid id PK
+        uuid contentId FK
+        string originalName
+        string filename
+        string path
+        int size
+        string mimetype
+    }
+
+    LmsSubmission {
+        uuid id PK
+        uuid contentId FK
+        uuid studentId FK
+        LmsSubmissionStatus status
+        datetime submittedAt
+        float grade
+        string feedback
+        string gradedBy
+    }
+
+    LmsSubmissionFile {
+        uuid id PK
+        uuid submissionId FK
+        string originalName
+        string filename
+        string path
+        int size
+        string mimetype
+    }
+
+    Vehicle {
+        uuid id PK
+        string registrationNo UK
+        string model
+        int capacity
+        uuid driverId FK
+        uuid conductorId FK
+        FuelType fuelType
+        VehicleCondition condition
+        datetime insuranceExpiry
+    }
+
+    Route {
+        uuid id PK
+        string name
+        uuid vehicleId FK
+        float monthlyFee
+        int totalStops
+        int estimatedDuration
+    }
+
+    BusStop {
+        uuid id PK
+        uuid routeId FK
+        string stopName
+        string location
+        float latitude
+        float longitude
+        int stopOrder
+        string arrivalTime
+    }
+
+    StudentTransport {
+        uuid id PK
+        string studentId
+        uuid routeId FK
+        string pickupStop
+        string dropoffStop
+        float monthlyFee
+        boolean feePaid
+    }
+
+    MaintenanceRecord {
+        uuid id PK
+        uuid vehicleId FK
+        string description
+        float cost
+        datetime date
+        datetime nextServiceDate
+        string mechanic
+    }
+
+    VehicleBoarding {
+        uuid id PK
+        uuid vehicleId FK
+        datetime date
+        int studentCount
+        int capacity
+    }
+
+    TransportSettings {
+        uuid id PK
+        float defaultMonthlyFee
+        float lateFeePercentage
+        int maxStudentsPerVehicle
+        int maintenanceCheckInterval
+    }
+
+    Hostel {
+        uuid id PK
+        string name
+        HostelType type
+        int capacity
+        uuid wardenId FK
+        string address
+        string contactNo
+        string facilities
+    }
+
+    HostelRoom {
+        uuid id PK
+        uuid hostelId FK
+        string roomNumber
+        int floor
+        int capacity
+        RoomType type
+        float rentAmount
+        string status
+    }
+
+    HostelBed {
+        uuid id PK
+        uuid roomId FK
+        int bedNo
+        BedStatus status
+        string studentId
+    }
+
+    HostelStudent {
+        uuid id PK
+        string studentId
+        uuid hostelId FK
+        string roomId
+        string bedId
+        datetime checkInDate
+        datetime checkOutDate
+        float depositAmount
+        float monthlyFee
+        boolean feePaid
+    }
+
+    HostelVisitor {
+        uuid id PK
+        string studentId
+        string visitorName
+        string relation
+        string purpose
+        datetime visitDate
+        boolean approved
+    }
+
+    HostelComplaint {
+        uuid id PK
+        string studentId
+        string hostelId
+        string category
+        string subject
+        string description
+        string priority
+        ComplaintStatus status
+    }
+
+    HostelLeave {
+        uuid id PK
+        string studentId
+        string hostelId
+        datetime leaveFrom
+        datetime leaveTo
+        string reason
+        LeaveStatus status
+        string approvedBy
+    }
+
+    HostelNotice {
+        uuid id PK
+        uuid hostelId FK
+        string title
+        string content
+        string priority
+        boolean isActive
+        string createdBy
+    }
+
+    HostelAttendance {
+        uuid id PK
+        string studentId
+        string hostelId
+        datetime date
+        boolean isPresent
+        string recordedBy
+    }
+
+    HostelSettings {
+        uuid id PK
+        float defaultMonthlyFee
+        float defaultDepositAmount
+        string visitorTimeFrom
+        string visitorTimeTo
+        boolean leaveApprovalRequired
+        boolean attendanceRequired
+    }
+
+    User ||--o| Student : "has"
+    User ||--o| Staff : "has"
+    User ||--o| Parent : "has"
+    User ||--o{ UserPermission : "has"
+
+    Permission ||--o{ RolePermission : "has"
+    Permission ||--o{ UserPermission : "has"
+
+    AcademicYear ||--o{ Class : "contains"
+    AcademicYear ||--o{ ExamSchedule : "has"
+    AcademicYear ||--o{ FeeStructure : "has"
+
+    Class ||--o{ Student : "enrolls"
+    Class ||--o{ Subject : "has"
+    Class ||--o{ Timetable : "has"
+    Class ||--o{ Attendance : "tracks"
+    Class ||--o{ ExamSchedule : "has"
+    Class ||--o{ LmsContent : "has"
+    Class ||--o{ StudentPromotion : "promotesFrom"
+    Class ||--o{ StudentPromotion : "promotesTo"
+    Class ||--o{ StudentTransfer : "transfersFrom"
+    Class ||--o{ StudentTransfer : "transfersTo"
+
+    Staff ||--o{ Class : "teaches"
+    Staff ||--o{ Subject : "teaches"
+    Staff ||--o{ Timetable : "scheduled"
+    Staff ||--o{ Leave : "requests"
+    Staff ||--o{ SalaryPayment : "receives"
+    Staff ||--o{ LmsContent : "creates"
+    Staff ||--o{ Vehicle : "drives"
+    Staff ||--o{ Vehicle : "conducts"
+    Staff ||--o{ Hostel : "wardens"
+
+    Parent ||--o{ Student : "has"
+
+    Student ||--o{ Attendance : "has"
+    Student ||--o{ FeePayment : "pays"
+    Student ||--o{ ExamResult : "has"
+    Student ||--o{ LmsSubmission : "submits"
+    Student ||--o{ StudentPromotion : "promoted"
+    Student ||--o{ StudentTransfer : "transferred"
+
+    FeeStructure ||--o{ FeePayment : "paid_via"
+
+    Subject ||--o{ Timetable : "scheduled"
+    Subject ||--o{ ExamResult : "examined"
+    Subject ||--o{ LmsContent : "has"
+
+    ExamSchedule ||--o{ ExamResult : "has"
+
+    Book ||--o{ BookCopy : "has"
+    Book ||--o{ BorrowRecord : "borrowed"
+    Book ||--o{ BookHoldRequest : "held"
+
+    LmsContent ||--o{ LmsContentFile : "has"
+    LmsContent ||--o{ LmsSubmission : "receives"
+
+    LmsSubmission ||--o{ LmsSubmissionFile : "has"
+
+    Vehicle ||--o| Route : "assigned"
+    Vehicle ||--o{ MaintenanceRecord : "has"
+    Vehicle ||--o{ VehicleBoarding : "logs"
+
+    Route ||--o{ BusStop : "has"
+    Route ||--o{ StudentTransport : "serves"
+
+    Hostel ||--o{ HostelRoom : "has"
+    Hostel ||--o{ HostelStudent : "houses"
+    Hostel ||--o{ HostelNotice : "has"
+
+    HostelRoom ||--o{ HostelBed : "has"

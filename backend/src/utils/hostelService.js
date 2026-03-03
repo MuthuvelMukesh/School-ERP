@@ -140,9 +140,24 @@ async function getHostelDetails(hostelId) {
         },
         students: {
           include: {
-            hostel: {
+            student: {
               select: {
-                name: true
+                id: true,
+                firstName: true,
+                lastName: true,
+                admissionNo: true,
+                class: { select: { name: true } }
+              }
+            },
+            room: {
+              select: {
+                roomNumber: true,
+                floor: true
+              }
+            },
+            bed: {
+              select: {
+                bedNo: true
               }
             }
           },
@@ -613,6 +628,15 @@ async function getStudentAllocation(studentId) {
         checkOutDate: null
       },
       include: {
+        student: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            admissionNo: true,
+            class: { select: { name: true } }
+          }
+        },
         hostel: {
           select: {
             id: true,
@@ -627,36 +651,23 @@ async function getStudentAllocation(studentId) {
               }
             }
           }
+        },
+        room: {
+          select: {
+            roomNumber: true,
+            type: true,
+            floor: true
+          }
+        },
+        bed: {
+          select: {
+            bedNo: true
+          }
         }
       }
     });
     
-    if (!allocation) {
-      return null;
-    }
-    
-    // Get room and bed details
-    const room = await prisma.hostelRoom.findUnique({
-      where: { id: allocation.roomId },
-      select: {
-        roomNumber: true,
-        type: true,
-        floor: true
-      }
-    });
-    
-    const bed = await prisma.hostelBed.findUnique({
-      where: { id: allocation.bedId },
-      select: {
-        bedNo: true
-      }
-    });
-    
-    return {
-      ...allocation,
-      room,
-      bed
-    };
+    return allocation || null;
   } catch (error) {
     logger.error('Error fetching student allocation:', error);
     throw error;
@@ -676,9 +687,30 @@ async function getHostelStudents(hostelId, includeCheckedOut = false) {
     const students = await prisma.hostelStudent.findMany({
       where,
       include: {
+        student: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            admissionNo: true,
+            phone: true,
+            class: { select: { name: true } }
+          }
+        },
         hostel: {
           select: {
             name: true
+          }
+        },
+        room: {
+          select: {
+            roomNumber: true,
+            floor: true
+          }
+        },
+        bed: {
+          select: {
+            bedNo: true
           }
         }
       },

@@ -4,6 +4,14 @@ All notable changes to the School ERP project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Full database Chen-notation ER artifact for academic submission:
+   - `frontend/public/er-diagram-full-chen.html` (print/export-ready full-schema diagram)
+   - `frontend/public/full-chen-data.json` (schema-derived entities and relationships dataset)
+   - `frontend/public/full-chen-data.js` (local file-compatible data bundle for direct HTML open)
+   - Embedded JSON fallback inside `er-diagram-full-chen.html` for environments where external local files are blocked
+
 ---
 
 ## [v1.2.0] - March 2, 2026

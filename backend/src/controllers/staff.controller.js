@@ -29,7 +29,7 @@ exports.getAllStaff = async (req, res) => {
             select: {
               email: true,
               role: true,
-              isActive: true
+              status: true
             }
           }
         },
@@ -70,7 +70,7 @@ exports.getStaffById = async (req, res) => {
           select: {
             email: true,
             role: true,
-            isActive: true
+            status: true
           }
         },
         subjects: true,

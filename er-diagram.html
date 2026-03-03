@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School ERP - Chen ER Diagram</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #fff; font-family: "Times New Roman", serif; color: #000; }
+        h1 { text-align: center; color: #000; margin-bottom: 4px; }
+        .subtitle { text-align: center; margin: 0 0 16px; font-size: 14px; }
+        .controls { text-align: center; margin: 15px 0; }
+        .controls button {
+            padding: 10px 24px; margin: 0 8px; font-size: 14px;
+            border: none; border-radius: 6px; cursor: pointer;
+            background: #111; color: #fff; font-weight: 600;
+        }
+        .controls button:hover { background: #000; }
+        #diagram { text-align: center; overflow: auto; border: 1px solid #000; padding: 12px; }
+        #diagram svg { max-width: 100%; height: auto; }
+        .note { text-align: center; margin-top: 10px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <h1>School ERP &mdash; Chen Notation ER Diagram</h1>
+    <p class="subtitle">Academic black-and-white layout (Entities=Rectangles, Relationships=Diamonds, Attributes=Ovals)</p>
+    <div class="controls">
+        <button onclick="downloadSVG()">Download SVG</button>
+        <button onclick="downloadPNG()">Download PNG</button>
+    </div>
+    <div id="diagram">
+        <svg id="diagramSvg" viewBox="0 0 2400 1500" xmlns="http://www.w3.org/2000/svg" aria-label="School ERP Chen ER Diagram">
+            <defs>
+                <style>
+                    .entity { fill: #fff; stroke: #000; stroke-width: 2; }
+                    .weak-entity-inner { fill: none; stroke: #000; stroke-width: 2; }
+                    .relationship { fill: #fff; stroke: #000; stroke-width: 2; }
+                    .identifying-inner { fill: none; stroke: #000; stroke-width: 2; }
+                    .attribute { fill: #fff; stroke: #000; stroke-width: 2; }
+                    .attribute-dashed { fill: #fff; stroke: #000; stroke-width: 2; stroke-dasharray: 6 4; }
+                    .line { stroke: #000; stroke-width: 2; fill: none; }
+                    .line-thin { stroke: #000; stroke-width: 1.5; fill: none; }
+                    .text-entity { font-size: 24px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+                    .text-rel { font-size: 18px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+                    .text-attr { font-size: 17px; text-anchor: middle; dominant-baseline: middle; }
+                    .text-card { font-size: 18px; font-weight: bold; text-anchor: middle; }
+                    .pk { text-decoration: underline; font-weight: bold; }
+                    .footnote { font-size: 15px; }
+                </style>
+            </defs>
+
+            <!-- ===== ENTITIES ===== -->
+            <rect class="entity" x="180" y="180" width="220" height="90" />
+            <text class="text-entity" x="290" y="225">STUDENT</text>
+
+            <rect class="entity" x="180" y="520" width="220" height="90" />
+            <text class="text-entity" x="290" y="565">PARENT</text>
+
+            <rect class="entity" x="660" y="180" width="220" height="90" />
+            <text class="text-entity" x="770" y="225">CLASS</text>
+
+            <rect class="entity" x="1140" y="180" width="220" height="90" />
+            <text class="text-entity" x="1250" y="225">SUBJECT</text>
+
+            <rect class="entity" x="1140" y="520" width="220" height="90" />
+            <text class="text-entity" x="1250" y="565">STAFF</text>
+
+            <rect class="entity" x="660" y="520" width="220" height="90" />
+            <text class="text-entity" x="770" y="565">FEE_STRUCTURE</text>
+
+            <rect class="entity" x="660" y="900" width="220" height="90" />
+            <text class="text-entity" x="770" y="945">PAYMENT</text>
+
+            <rect class="entity" x="1480" y="840" width="240" height="90" />
+            <text class="text-entity" x="1600" y="885">HOSTEL_ROOM</text>
+
+            <!-- Weak entity: double rectangle -->
+            <rect class="entity" x="1960" y="840" width="220" height="90" />
+            <rect class="weak-entity-inner" x="1968" y="848" width="204" height="74" />
+            <text class="text-entity" x="2070" y="885">HOSTEL_BED</text>
+
+            <!-- ===== RELATIONSHIPS (Diamonds) ===== -->
+            <polygon class="relationship" points="500,205 560,245 500,285 440,245" />
+            <text class="text-rel" x="500" y="245">ENROLLS</text>
+
+            <polygon class="relationship" points="500,485 560,525 500,565 440,525" />
+            <text class="text-rel" x="500" y="525">GUARDS</text>
+
+            <polygon class="relationship" points="980,205 1040,245 980,285 920,245" />
+            <text class="text-rel" x="980" y="245">OFFERS</text>
+
+            <polygon class="relationship" points="1248,365 1308,405 1248,445 1188,405" />
+            <text class="text-rel" x="1248" y="405">TEACHES</text>
+
+            <polygon class="relationship" points="770,705 830,745 770,785 710,745" />
+            <text class="text-rel" x="770" y="745">FOR</text>
+
+            <polygon class="relationship" points="500,915 560,955 500,995 440,955" />
+            <text class="text-rel" x="500" y="955">PAYS</text>
+
+            <!-- Identifying relationship: double diamond -->
+            <polygon class="relationship" points="1820,845 1890,885 1820,925 1750,885" />
+            <polygon class="identifying-inner" points="1820,855 1880,885 1820,915 1760,885" />
+            <text class="text-rel" x="1820" y="885">CONTAINS_BED</text>
+
+            <!-- ===== ATTRIBUTE OVALS ===== -->
+            <!-- STUDENT attributes -->
+            <ellipse class="attribute" cx="120" cy="90" rx="92" ry="34" />
+            <text class="text-attr pk" x="120" y="90">StudentID</text>
+            <line class="line" x1="160" y1="118" x2="240" y2="180" />
+
+            <ellipse class="attribute" cx="290" cy="90" rx="102" ry="34" />
+            <text class="text-attr" x="290" y="90">AdmissionNo</text>
+            <line class="line" x1="290" y1="124" x2="290" y2="180" />
+
+            <ellipse class="attribute" cx="40" cy="230" rx="74" ry="30" />
+            <text class="text-attr" x="40" y="230">DOB</text>
+            <line class="line" x1="114" y1="230" x2="180" y2="225" />
+
+            <ellipse class="attribute-dashed" cx="40" cy="310" rx="74" ry="30" />
+            <text class="text-attr" x="40" y="310">Age</text>
+            <line class="line" x1="114" y1="300" x2="180" y2="245" />
+
+            <!-- Composite attribute Name -->
+            <ellipse class="attribute" cx="290" cy="360" rx="82" ry="30" />
+            <text class="text-attr" x="290" y="360">Name</text>
+            <line class="line" x1="290" y1="330" x2="290" y2="270" />
+
+            <ellipse class="attribute" cx="180" cy="430" rx="92" ry="28" />
+            <text class="text-attr" x="180" y="430">FirstName</text>
+            <line class="line-thin" x1="230" y1="382" x2="210" y2="406" />
+
+            <ellipse class="attribute" cx="400" cy="430" rx="92" ry="28" />
+            <text class="text-attr" x="400" y="430">LastName</text>
+            <line class="line-thin" x1="350" y1="382" x2="370" y2="406" />
+
+            <!-- PARENT attributes with multivalued phone (double oval) -->
+            <ellipse class="attribute" cx="70" cy="565" rx="90" ry="32" />
+            <text class="text-attr pk" x="70" y="565">ParentID</text>
+            <line class="line" x1="160" y1="565" x2="180" y2="565" />
+
+            <ellipse class="attribute" cx="290" cy="680" rx="82" ry="30" />
+            <text class="text-attr" x="290" y="680">Name</text>
+            <line class="line" x1="290" y1="650" x2="290" y2="610" />
+
+            <ellipse class="attribute" cx="175" cy="750" rx="92" ry="28" />
+            <text class="text-attr" x="175" y="750">FirstName</text>
+            <line class="line-thin" x1="232" y1="702" x2="204" y2="728" />
+
+            <ellipse class="attribute" cx="405" cy="750" rx="92" ry="28" />
+            <text class="text-attr" x="405" y="750">LastName</text>
+            <line class="line-thin" x1="348" y1="702" x2="376" y2="728" />
+
+            <ellipse class="attribute" cx="70" cy="650" rx="98" ry="34" />
+            <ellipse class="attribute" cx="70" cy="650" rx="88" ry="24" />
+            <text class="text-attr" x="70" y="650">PhoneNo</text>
+            <line class="line" x1="152" y1="640" x2="180" y2="590" />
+
+            <!-- CLASS attributes -->
+            <ellipse class="attribute" cx="770" cy="90" rx="80" ry="32" />
+            <text class="text-attr pk" x="770" y="90">ClassID</text>
+            <line class="line" x1="770" y1="122" x2="770" y2="180" />
+
+            <ellipse class="attribute" cx="620" cy="330" rx="82" ry="30" />
+            <text class="text-attr" x="620" y="330">ClassName</text>
+            <line class="line" x1="660" y1="280" x2="640" y2="304" />
+
+            <ellipse class="attribute" cx="920" cy="330" rx="74" ry="30" />
+            <text class="text-attr" x="920" y="330">Section</text>
+            <line class="line" x1="880" y1="280" x2="900" y2="304" />
+
+            <!-- SUBJECT attributes -->
+            <ellipse class="attribute" cx="1250" cy="90" rx="88" ry="32" />
+            <text class="text-attr pk" x="1250" y="90">SubjectID</text>
+            <line class="line" x1="1250" y1="122" x2="1250" y2="180" />
+
+            <ellipse class="attribute" cx="1080" cy="330" rx="70" ry="28" />
+            <text class="text-attr" x="1080" y="330">Code</text>
+            <line class="line" x1="1140" y1="275" x2="1102" y2="306" />
+
+            <ellipse class="attribute" cx="1420" cy="330" rx="76" ry="28" />
+            <text class="text-attr" x="1420" y="330">Credits</text>
+            <line class="line" x1="1360" y1="275" x2="1398" y2="306" />
+
+            <!-- STAFF attributes -->
+            <ellipse class="attribute" cx="1080" cy="565" rx="76" ry="32" />
+            <text class="text-attr pk" x="1080" y="565">StaffID</text>
+            <line class="line" x1="1140" y1="565" x2="1160" y2="565" />
+
+            <ellipse class="attribute" cx="1425" cy="565" rx="98" ry="30" />
+            <text class="text-attr" x="1425" y="565">EmployeeNo</text>
+            <line class="line" x1="1360" y1="565" x2="1328" y2="565" />
+
+            <!-- FEE_STRUCTURE attributes -->
+            <ellipse class="attribute" cx="620" cy="565" rx="88" ry="32" />
+            <text class="text-attr pk" x="620" y="565">FeeStructID</text>
+            <line class="line" x1="660" y1="565" x2="620" y2="565" />
+
+            <ellipse class="attribute" cx="570" cy="690" rx="76" ry="28" />
+            <text class="text-attr" x="570" y="690">Amount</text>
+            <line class="line" x1="650" y1="610" x2="595" y2="668" />
+
+            <ellipse class="attribute" cx="920" cy="690" rx="82" ry="28" />
+            <text class="text-attr" x="920" y="690">DueDate</text>
+            <line class="line" x1="840" y1="610" x2="895" y2="668" />
+
+            <!-- PAYMENT attributes -->
+            <ellipse class="attribute" cx="620" cy="1055" rx="88" ry="32" />
+            <text class="text-attr pk" x="620" y="1055">PaymentID</text>
+            <line class="line" x1="680" y1="990" x2="640" y2="1028" />
+
+            <ellipse class="attribute" cx="920" cy="960" rx="90" ry="30" />
+            <text class="text-attr" x="920" y="960">ReceiptNo</text>
+            <line class="line" x1="880" y1="950" x2="860" y2="946" />
+
+            <ellipse class="attribute" cx="920" cy="1040" rx="76" ry="28" />
+            <text class="text-attr" x="920" y="1040">Amount</text>
+            <line class="line" x1="860" y1="962" x2="895" y2="1018" />
+
+            <!-- HOSTEL_ROOM attributes -->
+            <ellipse class="attribute" cx="1450" cy="760" rx="80" ry="30" />
+            <text class="text-attr pk" x="1450" y="760">RoomID</text>
+            <line class="line" x1="1490" y1="790" x2="1540" y2="840" />
+
+            <ellipse class="attribute" cx="1600" cy="740" rx="86" ry="28" />
+            <text class="text-attr" x="1600" y="740">RoomNumber</text>
+            <line class="line" x1="1600" y1="768" x2="1600" y2="840" />
+
+            <!-- HOSTEL_BED attributes (partial key shown) -->
+            <ellipse class="attribute" cx="2210" cy="760" rx="76" ry="30" />
+            <text class="text-attr pk" x="2210" y="760">BedNo</text>
+            <line class="line" x1="2160" y1="790" x2="2100" y2="840" />
+
+            <ellipse class="attribute" cx="2210" cy="910" rx="76" ry="30" />
+            <text class="text-attr" x="2210" y="910">Status</text>
+            <line class="line" x1="2140" y1="902" x2="2180" y2="898" />
+
+            <!-- ===== CONNECT ENTITY-RELATIONSHIP ===== -->
+            <line class="line" x1="400" y1="225" x2="440" y2="245" />
+            <line class="line" x1="560" y1="245" x2="660" y2="225" />
+
+            <line class="line" x1="400" y1="545" x2="440" y2="525" />
+            <!-- total participation of STUDENT in GUARDS (double line) -->
+            <line class="line" x1="288" y1="270" x2="470" y2="485" />
+            <line class="line" x1="300" y1="262" x2="482" y2="477" />
+
+            <line class="line" x1="880" y1="225" x2="920" y2="245" />
+            <line class="line" x1="1040" y1="245" x2="1140" y2="225" />
+
+            <line class="line" x1="1250" y1="270" x2="1248" y2="365" />
+            <line class="line" x1="1250" y1="520" x2="1248" y2="445" />
+
+            <line class="line" x1="770" y1="610" x2="770" y2="705" />
+            <line class="line" x1="770" y1="785" x2="770" y2="900" />
+
+            <line class="line" x1="400" y1="955" x2="440" y2="955" />
+            <line class="line" x1="560" y1="955" x2="660" y2="955" />
+
+            <line class="line" x1="1720" y1="885" x2="1750" y2="885" />
+            <!-- total participation of weak entity in identifying relationship (double lines) -->
+            <line class="line" x1="1890" y1="885" x2="1960" y2="882" />
+            <line class="line" x1="1890" y1="892" x2="1960" y2="889" />
+
+            <!-- ===== CARDINALITIES ===== -->
+            <text class="text-card" x="420" y="208">N</text>
+            <text class="text-card" x="610" y="208">1</text>
+
+            <text class="text-card" x="420" y="500">N</text>
+            <text class="text-card" x="350" y="430">1</text>
+
+            <text class="text-card" x="900" y="208">1</text>
+            <text class="text-card" x="1065" y="208">N</text>
+
+            <text class="text-card" x="1265" y="345">N</text>
+            <text class="text-card" x="1265" y="470">1</text>
+
+            <text class="text-card" x="790" y="690">N</text>
+            <text class="text-card" x="790" y="815">1</text>
+
+            <text class="text-card" x="420" y="940">1</text>
+            <text class="text-card" x="610" y="940">N</text>
+
+            <text class="text-card" x="1738" y="868">1</text>
+            <text class="text-card" x="1940" y="868">N</text>
+
+            <!-- ===== LEGEND ===== -->
+            <rect x="1460" y="1040" width="860" height="370" class="entity" />
+            <text x="1890" y="1080" class="text-entity">CHEN NOTATION LEGEND</text>
+
+            <rect x="1510" y="1110" width="130" height="44" class="entity" />
+            <text x="1575" y="1132" class="text-attr">Entity</text>
+
+            <polygon class="relationship" points="1720,1110 1770,1132 1720,1154 1670,1132" />
+            <text x="1720" y="1132" class="text-attr">Rel.</text>
+
+            <ellipse class="attribute" cx="1870" cy="1132" rx="72" ry="24" />
+            <text x="1870" y="1132" class="text-attr">Attribute</text>
+
+            <ellipse class="attribute" cx="2070" cy="1132" rx="72" ry="24" />
+            <ellipse class="attribute" cx="2070" cy="1132" rx="63" ry="16" />
+            <text x="2070" y="1132" class="text-attr">Multivalued</text>
+
+            <ellipse class="attribute-dashed" cx="2240" cy="1132" rx="62" ry="24" />
+            <text x="2240" y="1132" class="text-attr">Derived</text>
+
+            <text x="1520" y="1198" class="footnote">- Primary keys are underlined in attribute ovals.</text>
+            <text x="1520" y="1234" class="footnote">- Composite attributes are decomposed into connected sub-attributes (e.g., Name).</text>
+            <text x="1520" y="1270" class="footnote">- Weak entity uses double rectangle; identifying relationship uses double diamond.</text>
+            <text x="1520" y="1306" class="footnote">- Double lines indicate total participation where required.</text>
+            <text x="1520" y="1342" class="footnote">- Cardinalities (1, N) are shown near relationship endpoints.</text>
+        </svg>
+    </div>
+    <p class="note">Prepared in strict Chen style for academic submission (black &amp; white, aligned, notation-compliant).</p>
+
+    <script>
+        function downloadSVG() {
+            const svgEl = document.getElementById('diagramSvg');
+            const svgData = new XMLSerializer().serializeToString(svgEl);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'school-erp-er-diagram.svg';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadPNG() {
+            const svgEl = document.getElementById('diagramSvg');
+            const svgData = new XMLSerializer().serializeToString(svgEl);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = function () {
+                canvas.width = img.width * 2;
+                canvas.height = img.height * 2;
+                ctx.scale(2, 2);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL('image/png');
+                a.download = 'school-erp-er-diagram.png';
+                a.click();
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        }
+    </script>
+</body>
+</html>

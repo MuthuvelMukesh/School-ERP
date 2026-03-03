@@ -40,7 +40,7 @@ exports.getAllStudents = async (req, res) => {
           user: {
             select: {
               email: true,
-              isActive: true
+              status: true
             }
           }
         },
@@ -83,7 +83,7 @@ exports.getStudentById = async (req, res) => {
         user: {
           select: {
             email: true,
-            isActive: true,
+            status: true,
             lastLogin: true
           }
         }
@@ -211,7 +211,7 @@ exports.getStudentsByClass = async (req, res) => {
         user: {
           select: {
             email: true,
-            isActive: true
+            status: true
           }
         }
       },
@@ -530,7 +530,7 @@ exports.transferStudent = async (req, res) => {
 
         await tx.user.update({
           where: { id: student.userId },
-          data: { isActive: false }
+          data: { status: 'INACTIVE' }
         });
       }
 

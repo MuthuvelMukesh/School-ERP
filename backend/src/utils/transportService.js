@@ -483,7 +483,16 @@ async function getRouteStudents(routeId) {
         pickupStop: true,
         dropoffStop: true,
         feePaid: true,
-        feePaymentDate: true
+        feePaymentDate: true,
+        student: {
+          select: {
+            firstName: true,
+            lastName: true,
+            admissionNo: true,
+            phone: true,
+            class: { select: { name: true } }
+          }
+        }
       }
     });
   } catch (error) {

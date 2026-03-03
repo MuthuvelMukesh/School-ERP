@@ -19,6 +19,10 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 - Added frontend management screens for all core dashboard modules
 - Added admin frontend screens for Permission Matrix and Student Promotion/Transfer operations
 
+## ER Diagrams (Chen Notation)
+- Full database diagram (schema-derived): [frontend/public/er-diagram-full-chen.html](frontend/public/er-diagram-full-chen.html)
+- Simplified academic diagram: [er-diagram.html](er-diagram.html)
+
 ## Core Objectives
 - Digitize school administration
 - Reduce manual paperwork

@@ -32,9 +32,13 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/auth/login';
+        // Don't redirect if already on the login page (login failure should show error, not reload)
+        const isLoginPage = window.location.pathname.includes('/auth/login');
+        if (!isLoginPage) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/auth/login';
+        }
       }
     }
     return Promise.reject(error);

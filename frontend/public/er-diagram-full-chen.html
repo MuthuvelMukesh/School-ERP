@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School ERP - Full Database Chen ER Diagram</title>
+  <style>
+    body { margin: 0; padding: 18px; background: #fff; color: #000; font-family: "Times New Roman", serif; }
+    h1 { text-align: center; margin: 0; font-size: 30px; }
+    .subtitle { text-align: center; margin: 6px 0 14px; font-size: 14px; }
+    .controls { text-align: center; margin: 12px 0 14px; }
+    .controls button { border: 1px solid #000; background: #000; color: #fff; font-size: 14px; padding: 8px 16px; margin: 0 6px; cursor: pointer; }
+    .controls button:hover { background: #222; }
+    #diagramWrap { border: 1px solid #000; overflow: auto; padding: 8px; }
+    #diagram svg { max-width: 100%; height: auto; background: #fff; }
+    .note { font-size: 13px; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>School ERP — Full Database Chen ER Diagram</h1>
+  <p class="subtitle">Entities = Rectangles, Relationships = Diamonds, Attributes = Ovals, PK = Underlined, Total Participation = Double Lines</p>
+
+  <div class="controls">
+    <button onclick="downloadSVG()">Download SVG</button>
+    <button onclick="downloadPNG()">Download PNG</button>
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  <div id="diagramWrap"><div id="diagram"></div></div>
+  <p class="note">Source: Prisma schema-derived full model set. Use landscape print / A2 or A1 for best readability.</p>
+
+  <script src="./full-chen-data.js"></script>
+
+  <script id="embedded-chen-data" type="application/json">{"entities":[{"name":"User","pk":["id"],"attrs":["name","email"]},{"name":"AcademicYear","pk":["id"],"attrs":["year","startDate"]},{"name":"Class","pk":["id"],"attrs":["name","section"]},{"name":"Subject","pk":["id"],"attrs":["name","code"]},{"name":"Student","pk":["id"],"attrs":["admissionNo","firstName"]},{"name":"Permission","pk":["id"],"attrs":["key","name"]},{"name":"RolePermission","pk":["id"],"attrs":["role","allowed"]},{"name":"UserPermission","pk":["id"],"attrs":["allowed"]},{"name":"RoleHierarchy","pk":["id"],"attrs":["parentRole","childRole"]},{"name":"StudentPromotion","pk":["id"],"attrs":["status","reason"]},{"name":"StudentTransfer","pk":["id"],"attrs":["transferType","toSchoolName"]},{"name":"Parent","pk":["id"],"attrs":["firstName","lastName"]},{"name":"Staff","pk":["id"],"attrs":["firstName","lastName"]},{"name":"Attendance","pk":["id"],"attrs":["date","status"]},{"name":"Leave","pk":["id"],"attrs":["startDate","endDate"]},{"name":"FeeStructure","pk":["id"],"attrs":["name","amount"]},{"name":"FeePayment","pk":["id"],"attrs":["amount","paymentDate"]},{"name":"SalaryPayment","pk":["id"],"attrs":["month","amount"]},{"name":"Timetable","pk":["id"],"attrs":["dayOfWeek","startTime"]},{"name":"ExamSchedule","pk":["id"],"attrs":["name","examType"]},{"name":"ExamResult","pk":["id"],"attrs":["marksObtained","remarks"]},{"name":"Notification","pk":["id"],"attrs":["title","message"]},{"name":"Activity","pk":["id"],"attrs":["action","actionType"]},{"name":"Book","pk":["id"],"attrs":["title","author"]},{"name":"BookCopy","pk":["id"],"attrs":["barcode","status"]},{"name":"BorrowRecord","pk":["id"],"attrs":["issueDate","dueDate"]},{"name":"BookHoldRequest","pk":["id"],"attrs":["requestDate","fulfillmentDate"]},{"name":"LibrarySettings","pk":["id"],"attrs":["issueLimit","issuePeriodDays"]},{"name":"LmsContent","pk":["id"],"attrs":["title","description"]},{"name":"LmsContentFile","pk":["id"],"attrs":["originalName","filename"]},{"name":"LmsSubmission","pk":["id"],"attrs":["status","submittedAt"]},{"name":"LmsSubmissionFile","pk":["id"],"attrs":["originalName","filename"]},{"name":"Vehicle","pk":["id"],"attrs":["registrationNo","model"]},{"name":"Route","pk":["id"],"attrs":["name","monthlyFee"]},{"name":"BusStop","pk":["id"],"attrs":["stopName","location"]},{"name":"StudentTransport","pk":["id"],"attrs":["pickupStop","dropoffStop"]},{"name":"MaintenanceRecord","pk":["id"],"attrs":["description","cost"]},{"name":"VehicleBoarding","pk":["id"],"attrs":["date","studentCount"]},{"name":"TransportSettings","pk":["id"],"attrs":["defaultMonthlyFee","lateFeePercentage"]},{"name":"Hostel","pk":["id"],"attrs":["name","type"]},{"name":"HostelRoom","pk":["id"],"attrs":["roomNumber","floor"]},{"name":"HostelBed","pk":["id"],"attrs":["bedNo","status"]},{"name":"HostelStudent","pk":["id"],"attrs":["checkInDate","checkOutDate"]},{"name":"HostelVisitor","pk":["id"],"attrs":["visitorName","relation"]},{"name":"HostelComplaint","pk":["id"],"attrs":["category","subject"]},{"name":"HostelLeave","pk":["id"],"attrs":["leaveFrom","leaveTo"]},{"name":"HostelNotice","pk":["id"],"attrs":["title","content"]},{"name":"HostelAttendance","pk":["id"],"attrs":["date","isPresent"]},{"name":"HostelSettings","pk":["id"],"attrs":["defaultMonthlyFee","defaultDepositAmount"]}],"relationships":[{"from":"Class","to":"AcademicYear","name":"ACADEMIC_YEAR","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Subject","to":"Class","name":"CLASS","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Subject","to":"Staff","name":"TEACHER","fromCard":"N","toCard":"1","totalFrom":false,"totalTo":false,"identifying":false},{"from":"Student","to":"User","name":"USER","fromCard":"1","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Student","to":"Parent","name":"PARENT","fromCard":"N","toCard":"1","totalFrom":false,"totalTo":false,"identifying":false},{"from":"Student","to":"Class","name":"CLASS","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"RolePermission","to":"Permission","name":"PERMISSION","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"UserPermission","to":"User","name":"USER","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"UserPermission","to":"Permission","name":"PERMISSION","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"StudentPromotion","to":"Student","name":"STUDENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"StudentTransfer","to":"Student","name":"STUDENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Parent","to":"User","name":"USER","fromCard":"1","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Staff","to":"User","name":"USER","fromCard":"1","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Attendance","to":"Student","name":"STUDENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Attendance","to":"Class","name":"CLASS","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Leave","to":"Staff","name":"STAFF","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"FeeStructure","to":"AcademicYear","name":"ACADEMIC_YEAR","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"FeePayment","to":"Student","name":"STUDENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"FeePayment","to":"FeeStructure","name":"FEE_STRUCTURE","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"SalaryPayment","to":"Staff","name":"STAFF","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Timetable","to":"Class","name":"CLASS","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Timetable","to":"Subject","name":"SUBJECT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Timetable","to":"Staff","name":"TEACHER","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"ExamSchedule","to":"Class","name":"CLASS","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"ExamSchedule","to":"AcademicYear","name":"ACADEMIC_YEAR","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"ExamResult","to":"Student","name":"STUDENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"ExamResult","to":"ExamSchedule","name":"EXAM_SCHEDULE","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"ExamResult","to":"Subject","name":"SUBJECT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"BookCopy","to":"Book","name":"BOOK","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"BorrowRecord","to":"Book","name":"BOOK","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"BookHoldRequest","to":"Book","name":"BOOK","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsContent","to":"Class","name":"CLASS","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsContent","to":"Subject","name":"SUBJECT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsContent","to":"Staff","name":"TEACHER","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsContentFile","to":"LmsContent","name":"CONTENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsSubmission","to":"LmsContent","name":"CONTENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsSubmission","to":"Student","name":"STUDENT","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"LmsSubmissionFile","to":"LmsSubmission","name":"SUBMISSION","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"Route","to":"Vehicle","name":"VEHICLE","fromCard":"1","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"BusStop","to":"Route","name":"ROUTE","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"StudentTransport","to":"Route","name":"ROUTE","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"MaintenanceRecord","to":"Vehicle","name":"VEHICLE","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"VehicleBoarding","to":"Vehicle","name":"VEHICLE","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"HostelRoom","to":"Hostel","name":"HOSTEL","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"HostelBed","to":"HostelRoom","name":"ROOM","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"HostelStudent","to":"Hostel","name":"HOSTEL","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false},{"from":"HostelNotice","to":"Hostel","name":"HOSTEL","fromCard":"N","toCard":"1","totalFrom":true,"totalTo":false,"identifying":false}]}</script>
+  <script>
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const MODULES = {
+      Core: ['User','AcademicYear','Class','Subject','Student','Parent','Staff','Permission','RolePermission','UserPermission','RoleHierarchy','StudentPromotion','StudentTransfer'],
+      Academic: ['Attendance','Leave','Timetable','ExamSchedule','ExamResult'],
+      Finance: ['FeeStructure','FeePayment','SalaryPayment'],
+      Communication: ['Notification','Activity'],
+      Library: ['Book','BookCopy','BorrowRecord','BookHoldRequest','LibrarySettings'],
+      LMS: ['LmsContent','LmsContentFile','LmsSubmission','LmsSubmissionFile'],
+      Transport: ['Vehicle','Route','BusStop','StudentTransport','MaintenanceRecord','VehicleBoarding','TransportSettings'],
+      Hostel: ['Hostel','HostelRoom','HostelBed','HostelStudent','HostelVisitor','HostelComplaint','HostelLeave','HostelNotice','HostelAttendance','HostelSettings']
+    };
+
+    function el(tag, attrs = {}, text = '') {
+      const node = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+      if (text) node.textContent = text;
+      return node;
+    }
+
+    function text(svg, x, y, value, size = 13, weight = 'normal', anchor = 'middle', cls = '') {
+      const t = el('text', { x, y, 'font-size': size, 'font-weight': weight, 'text-anchor': anchor, 'dominant-baseline': 'middle', class: cls });
+      t.textContent = value;
+      svg.appendChild(t);
+      return t;
+    }
+
+    function toTitle(v) {
+      return v.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').toUpperCase();
+    }
+
+    function line(svg, x1, y1, x2, y2, w = 1.7, dash = '') {
+      svg.appendChild(el('line', { x1, y1, x2, y2, stroke: '#000', 'stroke-width': w, 'stroke-dasharray': dash, fill: 'none' }));
+    }
+
+    function rect(svg, x, y, w, h, strokeWidth = 2) {
+      svg.appendChild(el('rect', { x, y, width: w, height: h, fill: '#fff', stroke: '#000', 'stroke-width': strokeWidth }));
+    }
+
+    function ellipse(svg, cx, cy, rx, ry, dashed = false, double = false) {
+      svg.appendChild(el('ellipse', { cx, cy, rx, ry, fill: '#fff', stroke: '#000', 'stroke-width': 1.8, 'stroke-dasharray': dashed ? '5 4' : '' }));
+      if (double) svg.appendChild(el('ellipse', { cx, cy, rx: rx - 6, ry: ry - 6, fill: 'none', stroke: '#000', 'stroke-width': 1.5 }));
+    }
+
+    function diamond(svg, cx, cy, size = 18, double = false) {
+      const p = `${cx},${cy - size} ${cx + size},${cy} ${cx},${cy + size} ${cx - size},${cy}`;
+      svg.appendChild(el('polygon', { points: p, fill: '#fff', stroke: '#000', 'stroke-width': 1.8 }));
+      if (double) {
+        const s = size - 5;
+        const p2 = `${cx},${cy - s} ${cx + s},${cy} ${cx},${cy + s} ${cx - s},${cy}`;
+        svg.appendChild(el('polygon', { points: p2, fill: 'none', stroke: '#000', 'stroke-width': 1.6 }));
+      }
+    }
+
+    function anchorPoint(a, b, w, h) {
+      const cx = a.x + w / 2;
+      const cy = a.y + h / 2;
+      const tx = b.x + w / 2;
+      const ty = b.y + h / 2;
+      const dx = tx - cx;
+      const dy = ty - cy;
+      const m = Math.max(Math.abs(dx), Math.abs(dy), 1);
+      return { x: cx + (dx / m) * (w / 2), y: cy + (dy / m) * (h / 2), dx, dy };
+    }
+
+    function cardinalityText(svg, x, y, value) {
+      text(svg, x, y, value, 13, 'bold');
+    }
+
+    function layoutPositions(entities) {
+      const positions = {};
+      const moduleOrder = ['Core','Academic','Finance','Communication','Library','LMS','Transport','Hostel'];
+      const startX = 80;
+      const startY = 90;
+      const colGap = 260;
+      const rowGap = 210;
+      const moduleGapY = 120;
+
+      let y = startY;
+      for (const mod of moduleOrder) {
+        const list = MODULES[mod].filter(name => entities.some(e => e.name === name));
+        textLayer.push({ x: startX, y: y - 30, value: `[${mod.toUpperCase()} MODULE]`, size: 15, weight: 'bold', anchor: 'start' });
+        list.forEach((name, i) => {
+          const col = i % 6;
+          const row = Math.floor(i / 6);
+          positions[name] = { x: startX + col * colGap, y: y + row * rowGap };
+        });
+        const rows = Math.ceil(Math.max(list.length, 1) / 6);
+        y += rows * rowGap + moduleGapY;
+      }
+      return { positions, width: 1700, height: y + 220 };
+    }
+
+    const textLayer = [];
+
+    async function loadData() {
+      const embedded = document.getElementById('embedded-chen-data');
+      if (embedded && embedded.textContent) {
+        try {
+          const parsed = JSON.parse(embedded.textContent);
+          if (parsed && parsed.entities && parsed.relationships) return parsed;
+        } catch (error) {}
+      }
+      if (window.FULL_CHEN_DATA && window.FULL_CHEN_DATA.entities && window.FULL_CHEN_DATA.relationships) {
+        return window.FULL_CHEN_DATA;
+      }
+      const response = await fetch('./full-chen-data.json');
+      return response.json();
+    }
+
+    async function render() {
+      const data = await loadData();
+      const entities = data.entities;
+      const relationships = data.relationships;
+
+      const E_W = 190;
+      const E_H = 64;
+
+      const { positions, width, height } = layoutPositions(entities);
+      const svg = el('svg', { id: 'diagramSvg', xmlns: NS, viewBox: `0 0 ${width} ${height}`, width, height });
+
+      // Draw module labels
+      textLayer.forEach(item => text(svg, item.x, item.y, item.value, item.size, item.weight, item.anchor));
+
+      // Draw relationships behind entities
+      relationships.forEach((r, idx) => {
+        const from = positions[r.from];
+        const to = positions[r.to];
+        if (!from || !to) return;
+
+        const a = anchorPoint(from, to, E_W, E_H);
+        const b = anchorPoint(to, from, E_W, E_H);
+        const cx = (a.x + b.x) / 2 + ((idx % 3) - 1) * 6;
+        const cy = (a.y + b.y) / 2 + ((idx % 2) ? 8 : -8);
+
+        const nx = b.y - a.y;
+        const ny = -(b.x - a.x);
+        const nl = Math.hypot(nx, ny) || 1;
+        const ox = (nx / nl) * 3;
+        const oy = (ny / nl) * 3;
+
+        if (r.totalFrom) {
+          line(svg, a.x + ox, a.y + oy, cx + ox, cy + oy, 1.7);
+          line(svg, a.x - ox, a.y - oy, cx - ox, cy - oy, 1.7);
+        } else {
+          line(svg, a.x, a.y, cx, cy, 1.7);
+        }
+
+        if (r.totalTo) {
+          line(svg, cx + ox, cy + oy, b.x + ox, b.y + oy, 1.7);
+          line(svg, cx - ox, cy - oy, b.x - ox, b.y - oy, 1.7);
+        } else {
+          line(svg, cx, cy, b.x, b.y, 1.7);
+        }
+
+        diamond(svg, cx, cy, 16, !!r.identifying);
+        text(svg, cx, cy - 21, toTitle(r.name), 9.5, 'bold');
+
+        const fvx = cx - a.x;
+        const fvy = cy - a.y;
+        const fl = Math.hypot(fvx, fvy) || 1;
+        cardinalityText(svg, a.x + (fvx / fl) * 14, a.y + (fvy / fl) * 14, r.fromCard || 'N');
+
+        const tvx = cx - b.x;
+        const tvy = cy - b.y;
+        const tl = Math.hypot(tvx, tvy) || 1;
+        cardinalityText(svg, b.x + (tvx / tl) * 14, b.y + (tvy / tl) * 14, r.toCard || '1');
+      });
+
+      // Draw entities and minimal attributes
+      entities.forEach((e) => {
+        const p = positions[e.name];
+        if (!p) return;
+
+        rect(svg, p.x, p.y, E_W, E_H, 2);
+        text(svg, p.x + E_W / 2, p.y + E_H / 2, toTitle(e.name), 11.5, 'bold');
+
+        // PK attribute (underlined)
+        const pk = (e.pk && e.pk[0]) ? e.pk[0] : 'id';
+        ellipse(svg, p.x + E_W / 2, p.y - 34, 56, 20, false, false);
+        const pkText = text(svg, p.x + E_W / 2, p.y - 34, pk, 10.5, 'bold');
+        pkText.style.textDecoration = 'underline';
+        line(svg, p.x + E_W / 2, p.y - 14, p.x + E_W / 2, p.y, 1.4);
+
+        // Two non-key attributes max to keep full diagram readable
+        (e.attrs || []).slice(0, 2).forEach((a, i) => {
+          const side = i === 0 ? -1 : 1;
+          const ax = p.x + (side < 0 ? -78 : E_W + 78);
+          const ay = p.y + E_H / 2 + (i === 0 ? -8 : 8);
+          ellipse(svg, ax, ay, 54, 18, false, false);
+          text(svg, ax, ay, a, 9.5);
+          line(svg, side < 0 ? ax + 54 : ax - 54, ay, side < 0 ? p.x : p.x + E_W, p.y + E_H / 2, 1.2);
+        });
+
+        // Composite attribute example from actual schema columns
+        if (e.name === 'Student') {
+          ellipse(svg, p.x + E_W / 2, p.y + E_H + 42, 52, 18, false, false);
+          text(svg, p.x + E_W / 2, p.y + E_H + 42, 'name', 9.5);
+          line(svg, p.x + E_W / 2, p.y + E_H, p.x + E_W / 2, p.y + E_H + 24, 1.2);
+
+          ellipse(svg, p.x + E_W / 2 - 66, p.y + E_H + 92, 46, 16, false, false);
+          text(svg, p.x + E_W / 2 - 66, p.y + E_H + 92, 'firstName', 9);
+          line(svg, p.x + E_W / 2 - 30, p.y + E_H + 55, p.x + E_W / 2 - 46, p.y + E_H + 78, 1.1);
+
+          ellipse(svg, p.x + E_W / 2 + 66, p.y + E_H + 92, 46, 16, false, false);
+          text(svg, p.x + E_W / 2 + 66, p.y + E_H + 92, 'lastName', 9);
+          line(svg, p.x + E_W / 2 + 30, p.y + E_H + 55, p.x + E_W / 2 + 46, p.y + E_H + 78, 1.1);
+
+          // Derived attribute (age)
+          ellipse(svg, p.x - 86, p.y + E_H + 24, 36, 14, true, false);
+          text(svg, p.x - 86, p.y + E_H + 24, 'age', 9);
+          line(svg, p.x - 50, p.y + E_H + 24, p.x, p.y + E_H / 2, 1.1);
+        }
+
+        // Multivalued attribute example from Notification recipients list
+        if (e.name === 'Notification') {
+          ellipse(svg, p.x + E_W + 88, p.y - 12, 50, 16, false, true);
+          text(svg, p.x + E_W + 88, p.y - 12, 'recipients', 8.5);
+          line(svg, p.x + E_W, p.y + 10, p.x + E_W + 40, p.y - 4, 1.1);
+        }
+      });
+
+      // Legend
+      const lx = width - 470;
+      const ly = height - 220;
+      rect(svg, lx, ly, 430, 170, 1.8);
+      text(svg, lx + 215, ly + 18, 'CHEN LEGEND', 12, 'bold');
+
+      rect(svg, lx + 16, ly + 34, 80, 30, 1.4);
+      text(svg, lx + 56, ly + 49, 'ENTITY', 8.5, 'bold');
+
+      diamond(svg, lx + 146, ly + 49, 14, false);
+      text(svg, lx + 146, ly + 72, 'RELATIONSHIP', 8.2, 'bold');
+
+      ellipse(svg, lx + 240, ly + 49, 42, 14, false, false);
+      text(svg, lx + 240, ly + 49, 'ATTRIBUTE', 8.2);
+
+      ellipse(svg, lx + 340, ly + 49, 42, 14, false, true);
+      text(svg, lx + 340, ly + 49, 'MULTI', 8.2);
+
+      ellipse(svg, lx + 392, ly + 94, 28, 12, true, false);
+      text(svg, lx + 392, ly + 94, 'DERIVED', 7.6);
+
+      text(svg, lx + 14, ly + 94, 'PK is underlined; cardinalities shown as 1/N near relationship edges.', 9, 'normal', 'start');
+      text(svg, lx + 14, ly + 114, 'Double lines denote total participation on mandatory side.', 9, 'normal', 'start');
+      text(svg, lx + 14, ly + 134, 'No weak entities detected in current physical Prisma schema.', 9, 'normal', 'start');
+
+      document.getElementById('diagram').innerHTML = '';
+      document.getElementById('diagram').appendChild(svg);
+    }
+
+    function downloadSVG() {
+      const svgEl = document.getElementById('diagramSvg');
+      if (!svgEl) return;
+      const data = new XMLSerializer().serializeToString(svgEl);
+      const blob = new Blob([data], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'school-erp-full-chen-er-diagram.svg';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadPNG() {
+      const svgEl = document.getElementById('diagramSvg');
+      if (!svgEl) return;
+      const data = new XMLSerializer().serializeToString(svgEl);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width * 2;
+        canvas.height = img.height * 2;
+        ctx.scale(2, 2);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'school-erp-full-chen-er-diagram.png';
+        a.click();
+      };
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)));
+    }
+
+    render().catch(err => {
+      document.getElementById('diagram').innerHTML = `<p style="padding:12px; border:1px solid #000;">Unable to load full schema dataset: ${err.message}. Ensure <code>full-chen-data.js</code> exists in the same folder, or run the frontend server and open <code>/er-diagram-full-chen.html</code>.</p>`;
+    });
+  </script>
+</body>
+</html>
