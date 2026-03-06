@@ -27,7 +27,7 @@ exports.addVehicle = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'transport',
         description: `Added vehicle: ${vehicle.registrationNo}`,
@@ -88,7 +88,7 @@ exports.updateVehicle = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'transport',
         description: `Updated vehicle: ${vehicle.registrationNo}`,
@@ -122,7 +122,7 @@ exports.assignDriver = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'transport',
         description: `Assigned driver to vehicle: ${vehicle.registrationNo}`,
@@ -155,7 +155,7 @@ exports.assignConductor = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'transport',
         description: `Assigned conductor to vehicle: ${vehicle.registrationNo}`,
@@ -190,7 +190,7 @@ exports.createRoute = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'transport',
         description: `Created route: ${route.name}`,
@@ -247,7 +247,7 @@ exports.updateRoute = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'transport',
         description: `Updated route: ${route.name}`,
@@ -285,7 +285,7 @@ exports.addBusStop = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'transport',
         description: `Added bus stop: ${stop.stopName}`,
@@ -341,7 +341,7 @@ exports.deleteBusStop = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'DELETE',
+        action: 'OTHER',
         actionType: 'DELETE',
         module: 'transport',
         description: `Deleted bus stop: ${stop.stopName}`,
@@ -378,7 +378,7 @@ exports.enrollStudent = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'transport',
         description: `Enrolled student in transport: ${studentId}`,
@@ -451,7 +451,7 @@ exports.markTransportFeePaid = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'PAYMENT',
         module: 'transport',
         description: `Marked transport fee as paid: ${enrollment.studentId}`,
@@ -488,7 +488,7 @@ exports.addMaintenanceRecord = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'transport',
         description: `Added maintenance record for vehicle`,
@@ -600,7 +600,7 @@ exports.getFeeCollectionReport = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'EXPORT',
+        action: 'EXPORT_DATA',
         actionType: 'EXPORT',
         module: 'transport',
         description: 'Exported fee collection report',

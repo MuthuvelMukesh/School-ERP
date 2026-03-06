@@ -27,7 +27,8 @@ exports.addHostel = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Created hostel: ${name}`,
         resourceId: hostel.id,
@@ -90,7 +91,8 @@ exports.updateHostel = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated hostel: ${hostel.name}`,
         resourceId: hostelId,
@@ -118,7 +120,8 @@ exports.deleteHostel = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'DELETE',
+        action: 'OTHER',
+        actionType: 'DELETE',
         module: 'hostel',
         description: `Deleted hostel: ${hostelId}`,
         resourceId: hostelId,
@@ -157,7 +160,8 @@ exports.addRoom = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Added room ${roomNumber} to hostel`,
         resourceId: room.id,
@@ -200,7 +204,8 @@ exports.updateRoom = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated room ${room.roomNumber}`,
         resourceId: roomId,
@@ -228,7 +233,8 @@ exports.deleteRoom = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'DELETE',
+        action: 'OTHER',
+        actionType: 'DELETE',
         module: 'hostel',
         description: `Deleted room ${roomId}`,
         resourceId: roomId,
@@ -287,7 +293,8 @@ exports.updateBedStatus = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated bed ${bedId} status to ${status}`,
         resourceId: bedId,
@@ -331,7 +338,8 @@ exports.allocateStudent = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Allocated student ${studentId} to hostel`,
         resourceId: allocation.id,
@@ -368,7 +376,8 @@ exports.deallocateStudent = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Deallocated student from hostel`,
         resourceId: allocationId,
@@ -431,7 +440,8 @@ exports.updateStudentAllocation = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated student allocation`,
         resourceId: allocationId,
@@ -459,7 +469,8 @@ exports.markHostelFeePaid = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Marked hostel fee as paid`,
         resourceId: allocationId,
@@ -502,7 +513,8 @@ exports.registerVisitor = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Registered visitor ${visitorName} for student ${studentId}`,
         resourceId: visitor.id,
@@ -576,7 +588,8 @@ exports.approveVisitor = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'APPROVE',
+        action: 'APPROVE_REQUEST',
+        actionType: 'APPROVE',
         module: 'hostel',
         description: `Approved visitor ${visitorId}`,
         resourceId: visitorId,
@@ -617,7 +630,8 @@ exports.registerComplaint = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Registered complaint: ${subject}`,
         resourceId: complaint.id,
@@ -671,7 +685,8 @@ exports.updateComplaintStatus = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated complaint ${complaintId} status to ${status}`,
         resourceId: complaintId,
@@ -704,7 +719,8 @@ exports.resolveComplaint = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Resolved complaint ${complaintId}`,
         resourceId: complaintId,
@@ -746,7 +762,8 @@ exports.applyLeave = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Applied for hostel leave`,
         resourceId: leave.id,
@@ -795,7 +812,8 @@ exports.approveLeave = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'APPROVE',
+        action: 'APPROVE_REQUEST',
+        actionType: 'APPROVE',
         module: 'hostel',
         description: `Approved hostel leave ${leaveId}`,
         resourceId: leaveId,
@@ -829,7 +847,8 @@ exports.rejectLeave = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'REJECT',
+        action: 'REJECT_REQUEST',
+        actionType: 'REJECT',
         module: 'hostel',
         description: `Rejected hostel leave ${leaveId}`,
         resourceId: leaveId,
@@ -871,7 +890,8 @@ exports.createNotice = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
+        actionType: 'CREATE',
         module: 'hostel',
         description: `Created notice: ${title}`,
         resourceId: notice.id,
@@ -917,7 +937,8 @@ exports.updateNotice = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated notice ${noticeId}`,
         resourceId: noticeId,
@@ -945,7 +966,8 @@ exports.deleteNotice = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'DELETE',
+        action: 'OTHER',
+        actionType: 'DELETE',
         module: 'hostel',
         description: `Deleted notice ${noticeId}`,
         resourceId: noticeId,
@@ -1088,7 +1110,8 @@ exports.updateHostelSettings = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
+        actionType: 'UPDATE',
         module: 'hostel',
         description: `Updated hostel settings`,
         ipAddress: req.ip

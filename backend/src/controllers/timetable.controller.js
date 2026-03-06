@@ -116,6 +116,12 @@ exports.createTimetable = async (req, res) => {
     });
   } catch (error) {
     logger.error('Create timetable error:', error);
+    if (error.code === 'P2002') {
+      return res.status(409).json({
+        status: 'error',
+        message: 'A timetable entry already exists for this class, day, and time slot'
+      });
+    }
     res.status(500).json({
       status: 'error',
       message: 'Failed to create timetable'

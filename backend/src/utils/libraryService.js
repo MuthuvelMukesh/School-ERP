@@ -497,8 +497,8 @@ async function getMostBorrowedBooks(limit = 10) {
   try {
     const result = await prisma.borrowRecord.groupBy({
       by: ['bookId'],
-      _count: true,
-      orderBy: { _count: 'desc' },
+      _count: { bookId: true },
+      orderBy: { _count: { bookId: 'desc' } },
       take: limit
     });
 
@@ -509,7 +509,7 @@ async function getMostBorrowedBooks(limit = 10) {
 
     return result.map(r => ({
       ...books.find(b => b.id === r.bookId),
-      borrowCount: r._count
+      borrowCount: r._count?.bookId ?? r._count
     }));
   } catch (error) {
     logger.error('Error fetching most borrowed books:', error);

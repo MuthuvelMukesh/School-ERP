@@ -37,7 +37,7 @@ exports.addBook = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'library',
         description: `Added book: ${book.title}`,
@@ -87,7 +87,7 @@ exports.getBookDetails = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'VIEW',
+        action: 'OTHER',
         actionType: 'VIEW',
         module: 'library',
         description: `Viewed book: ${book.title}`,
@@ -116,7 +116,7 @@ exports.updateBook = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'library',
         description: `Updated book: ${book.title}`,
@@ -149,7 +149,7 @@ exports.deleteBook = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'DELETE',
+        action: 'OTHER',
         actionType: 'DELETE',
         module: 'library',
         description: `Deleted book: ${book.title}`,
@@ -190,7 +190,7 @@ exports.addBookCopy = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'library',
         description: `Added book copy: ${barcode}`,
@@ -225,7 +225,7 @@ exports.updateCopyStatus = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'library',
         description: `Updated copy status: ${copy.barcode} -> ${status}`,
@@ -266,7 +266,7 @@ exports.issueBook = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'library',
         description: `Issued book to member ${memberId}`,
@@ -304,7 +304,7 @@ exports.returnBook = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'library',
         description: `Returned book, Fine: ${returnRecord.fineAmount}`,
@@ -343,7 +343,7 @@ exports.renewBook = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'library',
         description: `Renewed book, New due date: ${renewed.dueDate}`,
@@ -412,7 +412,7 @@ exports.createHoldRequest = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'CREATE',
+        action: 'OTHER',
         actionType: 'CREATE',
         module: 'library',
         description: `Created hold request for member ${memberId}`,
@@ -457,7 +457,7 @@ exports.getOverdueBooks = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'EXPORT',
+        action: 'EXPORT_DATA',
         actionType: 'EXPORT',
         module: 'library',
         description: `Exported overdue books report (${overdue.length} items)`,
@@ -499,7 +499,7 @@ exports.getMemberHistory = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'VIEW',
+        action: 'OTHER',
         actionType: 'VIEW',
         module: 'library',
         description: `Viewed member borrowing history`,
@@ -569,7 +569,7 @@ exports.updateLibrarySettings = async (req, res) => {
     await prisma.activity.create({
       data: {
         userId: req.user.id,
-        action: 'UPDATE',
+        action: 'OTHER',
         actionType: 'UPDATE',
         module: 'library',
         description: 'Updated library settings',
