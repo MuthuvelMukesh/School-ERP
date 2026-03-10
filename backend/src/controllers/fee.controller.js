@@ -98,13 +98,14 @@ exports.deleteFeeStructure = async (req, res) => {
 
 exports.getAllPayments = async (req, res) => {
   try {
-    const { page = 1, limit = 10, status } = req.query;
+    const { page = 1, limit = 10, status, studentId } = req.query;
     const parsedPage = parseInt(page);
     const parsedLimit = parseInt(limit);
     const skip = (parsedPage - 1) * parsedLimit;
 
     const where = {};
     if (status) where.status = status;
+    if (studentId) where.studentId = studentId;
 
     const [payments, total] = await Promise.all([
       prisma.feePayment.findMany({
@@ -198,7 +199,7 @@ exports.createPayment = async (req, res) => {
         feeStructure: true
       }
     });
-
+    logger.info(`Fee payment created: ${payment.id} by user ${req.user.id}`);
     res.status(201).json({
       status: 'success',
       message: 'Payment recorded successfully',
@@ -210,6 +211,29 @@ exports.createPayment = async (req, res) => {
       status: 'error',
       message: 'Failed to record payment'
     });
+  }
+};
+
+exports.deletePayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const payment = await prisma.feePayment.findUnique({ where: { id } });
+    if (!payment) {
+      return res.status(404).json({ status: 'error', message: 'Payment not found' });
+    }
+
+    await prisma.feePayment.delete({ where: { id } });
+
+    logger.info(`Fee payment ${id} deleted (voided) by user ${req.user.id}`);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Payment voided successfully'
+    });
+  } catch (error) {
+    logger.error('Delete payment error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to void payment' });
   }
 };
 

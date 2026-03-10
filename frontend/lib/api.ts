@@ -53,8 +53,15 @@ export const authAPI = {
     api.post('/auth/login', credentials),
   register: (data: any) => api.post('/auth/register', data),
   getMe: () => api.get('/auth/me'),
+  updateProfile: (data: { name?: string; firstName?: string; lastName?: string; phone?: string; address?: string }) =>
+    api.put('/auth/profile', data),
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     api.post('/auth/change-password', data),
+  logout: () => api.post('/auth/logout'),
+  forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token: string, newPassword: string) =>
+    api.post('/auth/reset-password', { token, newPassword }),
+  verifyResetToken: (token: string) => api.get(`/auth/verify-reset-token/${token}`),
 };
 
 // Student API
@@ -97,6 +104,12 @@ export const staffAPI = {
   applyLeave: (id: string, data: any) => api.post(`/staff/${id}/leaves`, data),
   updateLeaveStatus: (leaveId: string, data: any) =>
     api.put(`/staff/leaves/${leaveId}`, data),
+  getSalaryPayments: (staffId: string, params?: any) =>
+    api.get(`/staff/${staffId}/salary-payments`, { params }),
+  createSalaryPayment: (staffId: string, data: any) =>
+    api.post(`/staff/${staffId}/salary-payments`, data),
+  getAllSalaryPayments: (params?: any) =>
+    api.get('/staff/salary-payments', { params }),
 };
 
 // Fee API
@@ -109,6 +122,7 @@ export const feeAPI = {
   getAllPayments: (params?: any) => api.get('/fees/payments', { params }),
   getPaymentById: (id: string) => api.get(`/fees/payments/${id}`),
   createPayment: (data: any) => api.post('/fees/payments', data),
+  deletePayment: (id: string) => api.delete(`/fees/payments/${id}`),
   getDefaulters: () => api.get('/fees/defaulters'),
   getStudentFees: (studentId: string) => api.get(`/fees/student/${studentId}`),
 };
@@ -146,7 +160,7 @@ export const examAPI = {
   updateSchedule: (id: string, data: any) =>
     api.put(`/exams/schedules/${id}`, data),
   deleteSchedule: (id: string) => api.delete(`/exams/schedules/${id}`),
-  getAllResults: () => api.get('/exams/results'),
+  getAllResults: (params?: any) => api.get('/exams/results', { params }),
   getExamResults: (examId: string) => api.get(`/exams/results/exam/${examId}`),
   getStudentResults: (studentId: string) =>
     api.get(`/exams/results/student/${studentId}`),
@@ -160,6 +174,10 @@ export const examAPI = {
 export const dashboardAPI = {
   getStats: () => api.get('/dashboard/stats'),
   getRecentActivities: () => api.get('/dashboard/recent-activities'),
+  getAttendanceTrends: (params?: any) => api.get('/dashboard/analytics/attendance-trends', { params }),
+  getGradeDistribution: (params?: any) => api.get('/dashboard/analytics/grade-distribution', { params }),
+  getFinancialAnalytics: (params?: any) => api.get('/dashboard/analytics/financial', { params }),
+  getClassPerformance: (params?: any) => api.get('/dashboard/analytics/class-performance', { params }),
 };
 
 // Notification API
@@ -197,7 +215,8 @@ export const lmsAPI = {
 // Metadata API
 export const metadataAPI = {
   getClasses: () => api.get('/metadata/classes'),
-  getSubjects: (params?: any) => api.get('/metadata/subjects', { params })
+  getSubjects: (params?: any) => api.get('/metadata/subjects', { params }),
+  getAcademicYears: () => api.get('/metadata/academic-years'),
 };
 
 // Permission API

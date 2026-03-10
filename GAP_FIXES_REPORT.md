@@ -1,6 +1,71 @@
 # School ERP - Gap Fixes Implementation Report
 
-**Completion Date**: February 2, 2026  
+**Last Updated**: March 10, 2026  
+**Status**: ✅ ALL GAPS FIXED (Phases 1–3 Complete)
+
+---
+
+## Phase 3 — End-User UX Fixes (March 10, 2026)
+
+These fixes address issues identified during an end-user perspective review. Seven UX problems were found and resolved.
+
+### Summary
+
+| # | Problem | Fix | Status |
+|---|---------|-----|--------|
+| 1 | No student detail page | Created `/students/[id]/page.tsx` with 4 tabs | ✅ FIXED |
+| 2 | Student names not clickable | Wrapped names in `<Link href="/students/[id]">` | ✅ FIXED |
+| 3 | Parent sees school-wide data | "My Children" banner + child links on key pages | ✅ FIXED |
+| 4 | No user profile page | Created `/profile/page.tsx` with edit + change-password | ✅ FIXED |
+| 5 | Academic year is free-text | Replaced input with dropdown from `GET /metadata/academic-years` | ✅ FIXED |
+| 6 | No way to void wrong payments | Added Void button (ADMIN/ACCOUNTANT) → `DELETE /fees/payments/:id` | ✅ FIXED |
+| 7 | No profile link in dashboard header | Avatar circle is now a `<Link href="/profile">` | ✅ FIXED |
+
+### Files Created
+- `frontend/app/students/[id]/page.tsx` — Student detail page (Overview / Attendance / Exams / Fees tabs)
+- `frontend/app/profile/page.tsx` — User profile & change password page
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `frontend/app/students/page.tsx` | Student names → clickable links |
+| `frontend/app/fees/page.tsx` | Academic year dropdown, Void button, parent banner, user state |
+| `frontend/app/attendance/page.tsx` | Parent children banner, user state |
+| `frontend/app/exams/page.tsx` | Parent children banner, user state |
+| `frontend/app/dashboard/page.tsx` | Avatar → `<Link href="/profile">` |
+| `frontend/lib/api.ts` | Added `updateProfile`, `deletePayment`, `getAcademicYears` |
+| `backend/src/controllers/auth.controller.js` | Added `updateProfile()` function |
+| `backend/src/routes/auth.routes.js` | Added `PUT /profile` route |
+| `backend/src/controllers/attendance.controller.js` | Added `?studentId=` filter to `getAttendance` |
+| `backend/src/routes/attendance.routes.js` | Added PARENT + STUDENT to `GET /` route |
+| `backend/src/controllers/fee.controller.js` | Added `deletePayment()` function |
+| `backend/src/routes/fee.routes.js` | Added `DELETE /payments/:id` route; PARENT to student fees route |
+| `backend/src/routes/student.routes.js` | Added PARENT to all student GET routes |
+| `backend/src/controllers/student.controller.js` | Added `parentId`/`parentUserId` query filter |
+
+---
+
+## Phase 2 — Role Authorization & Backend Gap Fixes (March 2026)
+
+### Summary
+
+| # | Gap | Status |
+|---|-----|--------|
+| 1 | LIBRARIAN role had no authorized routes | ✅ FIXED |
+| 2 | TRANSPORT_STAFF role had no authorized routes | ✅ FIXED |
+| 3 | Register didn't create Staff profiles for ADMIN/LIBRARIAN/TRANSPORT_STAFF | ✅ FIXED |
+| 4 | Missing `authAPI` functions (logout, forgot/reset password, verify token) | ✅ FIXED |
+| 5 | Missing `dashboardAPI` analytics functions (4 endpoints) | ✅ FIXED |
+| 6 | `AcademicYear` model had no CRUD API | ✅ FIXED |
+| 7 | `SalaryPayment` model had no CRUD API | ✅ FIXED |
+| 8 | Dashboard Recent Activities widget was hardcoded empty | ✅ FIXED |
+| 9 | PARENT role saw empty sidebar navigation | ✅ FIXED |
+| 10 | No password reset frontend page | ✅ FIXED |
+
+---
+
+## Phase 1 — Original Gap Fixes (February 2, 2026)
+
 **Status**: ✅ ALL 10 GAPS FIXED (100% Complete)
 
 ---

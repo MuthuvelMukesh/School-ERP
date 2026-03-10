@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.get('/', authorize('ADMIN', 'PRINCIPAL', 'TEACHER'), attendanceController.getAttendance);
+router.get('/', authorize('ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'), attendanceController.getAttendance);
 router.post('/', authorize('ADMIN', 'TEACHER'), attendanceController.markAttendance);
 router.post('/bulk', authorize('ADMIN', 'TEACHER'), attendanceController.bulkMarkAttendance);
 router.get('/class/:classId', authorize('ADMIN', 'PRINCIPAL', 'TEACHER'), attendanceController.getClassAttendance);

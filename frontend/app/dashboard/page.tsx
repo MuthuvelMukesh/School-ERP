@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
+  const [recentActivities, setRecentActivities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
@@ -42,8 +43,12 @@ export default function DashboardPage() {
       return
     }
 
-    setUser(JSON.parse(userData))
+    const parsed = JSON.parse(userData)
+    setUser(parsed)
     fetchStats()
+    if (['ADMIN', 'PRINCIPAL'].includes(parsed.role)) {
+      fetchRecentActivities()
+    }
   }, [router])
 
   const fetchStats = async () => {
@@ -57,6 +62,15 @@ export default function DashboardPage() {
     }
   }
 
+  const fetchRecentActivities = async () => {
+    try {
+      const response = await dashboardAPI.getRecentActivities()
+      setRecentActivities(response.data.data.activities || [])
+    } catch (error) {
+      // non-critical, silently ignore
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -64,19 +78,19 @@ export default function DashboardPage() {
   }
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT'] },
-    { icon: Users, label: 'Students', href: '/students', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT', 'PARENT', 'LIBRARIAN', 'TRANSPORT_STAFF'] },
+    { icon: Users, label: 'Students', href: '/students', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'] },
     { icon: UserCog, label: 'Staff', href: '/staff', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'] },
-    { icon: DollarSign, label: 'Fees', href: '/fees', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT'] },
-    { icon: CreditCard, label: 'Payments', href: '/payments', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT'] },
-    { icon: Calendar, label: 'Attendance', href: '/attendance', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
-    { icon: ClipboardList, label: 'Timetable', href: '/timetable', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
-    { icon: GraduationCap, label: 'Examinations', href: '/exams', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
+    { icon: DollarSign, label: 'Fees', href: '/fees', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT', 'PARENT'] },
+    { icon: CreditCard, label: 'Payments', href: '/payments', roles: ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT'] },
+    { icon: Calendar, label: 'Attendance', href: '/attendance', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'] },
+    { icon: ClipboardList, label: 'Timetable', href: '/timetable', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'] },
+    { icon: GraduationCap, label: 'Examinations', href: '/exams', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'] },
     { icon: BookOpen, label: 'LMS', href: '/lms', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
-    { icon: Library, label: 'Library', href: '/library', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
-    { icon: Bus, label: 'Transport', href: '/transport', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
-    { icon: Building2, label: 'Hostel', href: '/hostel', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT'] },
-    { icon: Bell, label: 'Notifications', href: '/notifications', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT'] },
+    { icon: Library, label: 'Library', href: '/library', roles: ['ADMIN', 'PRINCIPAL', 'LIBRARIAN', 'TEACHER', 'STUDENT'] },
+    { icon: Bus, label: 'Transport', href: '/transport', roles: ['ADMIN', 'PRINCIPAL', 'TRANSPORT_STAFF', 'TEACHER', 'STUDENT', 'PARENT'] },
+    { icon: Building2, label: 'Hostel', href: '/hostel', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'] },
+    { icon: Bell, label: 'Notifications', href: '/notifications', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'ACCOUNTANT', 'PARENT', 'LIBRARIAN', 'TRANSPORT_STAFF'] },
     { icon: Activity, label: 'Activity Logs', href: '/activities', roles: ['ADMIN', 'PRINCIPAL'] },
     { icon: FolderOpen, label: 'Files', href: '/files', roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'] },
     { icon: ArrowUpDown, label: 'Student Progression', href: '/students/progression', roles: ['ADMIN', 'PRINCIPAL'] },
@@ -145,11 +159,11 @@ export default function DashboardPage() {
 
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Welcome, {user?.profile?.firstName || user?.name || 'User'}</span>
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+              <Link href="/profile" title="My Profile" className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center hover:bg-primary-200 transition-colors">
                 <span className="text-primary-600 font-medium">
                   {user?.profile?.firstName?.charAt(0) || user?.name?.charAt(0) || 'U'}
                 </span>
-              </div>
+              </Link>
             </div>
           </div>
         </header>
@@ -158,7 +172,8 @@ export default function DashboardPage() {
         <main className="p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
 
-          {/* Stats Grid */}
+          {/* Stats Grid — admin/teacher/accountant view */}
+          {!['STUDENT', 'PARENT'].includes(user?.role) && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div className="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
               <div className="flex items-center justify-between">
@@ -200,8 +215,40 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+          )}
 
-          {/* Quick Actions */}
+          {/* Student / Parent — simple card navigation grid */}
+          {['STUDENT', 'PARENT'].includes(user?.role) && (
+            <div className="mb-6">
+              <p className="text-sm text-gray-500 mb-4">
+                {user?.role === 'PARENT' ? 'What would you like to check today?' : 'What would you like to do today?'}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  { href: '/attendance', icon: Calendar, label: 'My Attendance', color: 'from-blue-500 to-blue-600', desc: 'View your attendance records' },
+                  { href: '/timetable', icon: ClipboardList, label: 'Timetable', color: 'from-purple-500 to-purple-600', desc: 'Check your class schedule' },
+                  { href: '/exams', icon: GraduationCap, label: 'Exam Results', color: 'from-green-500 to-green-600', desc: 'See your marks & grades' },
+                  { href: '/fees', icon: DollarSign, label: 'Fees', color: 'from-orange-500 to-orange-600', desc: 'Check your fee status' },
+                  ...(user?.role === 'STUDENT' ? [{ href: '/lms', icon: BookOpen, label: 'Lessons & Notes', color: 'from-teal-500 to-teal-600', desc: 'Study materials & assignments' }] : []),
+                  ...(user?.role === 'STUDENT' ? [{ href: '/library', icon: Library, label: 'Library', color: 'from-indigo-500 to-indigo-600', desc: 'Browse books & catalog' }] : []),
+                  { href: '/notifications', icon: Bell, label: 'Notifications', color: 'from-pink-500 to-pink-600', desc: 'School announcements' },
+                ].map(({ href, icon: Icon, label, color, desc }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`card bg-gradient-to-br ${color} text-white hover:scale-[1.02] transition-transform cursor-pointer`}
+                  >
+                    <Icon className="w-8 h-8 mb-3 opacity-90" />
+                    <p className="font-semibold text-base">{label}</p>
+                    <p className="text-xs mt-1 opacity-75">{desc}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quick Actions + Recent Activities — admin/teacher/accountant only */}
+          {!['STUDENT', 'PARENT'].includes(user?.role) && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
@@ -244,10 +291,26 @@ export default function DashboardPage() {
             <div className="card">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activities</h2>
               <div className="space-y-3">
-                <p className="text-gray-600 text-sm">No recent activities</p>
+                {recentActivities.length === 0 ? (
+                  <p className="text-gray-500 text-sm">No recent activities</p>
+                ) : (
+                  recentActivities.slice(0, 8).map((activity: any) => (
+                    <div key={activity.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                      <div className="w-2 h-2 rounded-full bg-primary-400 mt-2 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-700 truncate">{activity.description || activity.action}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {activity.module || 'System'} &middot;{' '}
+                          {new Date(activity.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
+          )}
         </main>
       </div>
     </div>

@@ -15,6 +15,8 @@ export default function FeesPage() {
   const [defaulters, setDefaulters] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
   const [students, setStudents] = useState<any[]>([])
+  const [academicYears, setAcademicYears] = useState<any[]>([])
+  const [user, setUser] = useState<any>(null)
 
   // Structure modal
   const [showStructureModal, setShowStructureModal] = useState(false)
@@ -35,24 +37,32 @@ export default function FeesPage() {
   useEffect(() => {
     const userData = localStorage.getItem('user')
     if (!userData) { router.push('/auth/login'); return }
-    fetchAll()
+    const parsedUser = JSON.parse(userData)
+    setUser(parsedUser)
+    fetchAll(parsedUser)
   }, [router])
 
-  const fetchAll = async () => {
+  const fetchAll = async (currentUser?: any) => {
     setLoading(true)
+    const u = currentUser ?? user
+    const paymentFilter = u?.role === 'STUDENT' && u?.profile?.id
+      ? { page: 1, limit: 100, studentId: u.profile.id }
+      : { page: 1, limit: 100 }
     try {
-      const [structuresRes, paymentsRes, defaultersRes, classesRes, studentsRes] = await Promise.all([
+      const [structuresRes, paymentsRes, defaultersRes, classesRes, studentsRes, ayRes] = await Promise.all([
         feeAPI.getAllStructures(),
-        feeAPI.getAllPayments({ page: 1, limit: 100 }),
+        feeAPI.getAllPayments(paymentFilter),
         feeAPI.getDefaulters(),
         metadataAPI.getClasses(),
         studentAPI.getAll({ page: 1, limit: 200 }),
+        metadataAPI.getAcademicYears(),
       ])
       setStructures(structuresRes.data?.data?.structures || [])
       setPayments(paymentsRes.data?.data?.payments || [])
       setDefaulters(defaultersRes.data?.data?.defaulters || [])
       setClasses(classesRes.data?.data?.classes || classesRes.data?.classes || [])
       setStudents(studentsRes.data?.data?.students || [])
+      setAcademicYears(ayRes.data?.data?.academicYears || [])
     } catch {
       toast.error('Failed to load fee data')
     } finally {
@@ -73,6 +83,17 @@ export default function FeesPage() {
       toast.error(err?.response?.data?.message || 'Failed to create fee structure')
     } finally {
       setSubmittingStructure(false)
+    }
+  }
+
+  const handleVoidPayment = async (paymentId: string) => {
+    if (!window.confirm('Void this payment? This will permanently remove the record.')) return
+    try {
+      await feeAPI.deletePayment(paymentId)
+      toast.success('Payment voided successfully')
+      fetchAll()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to void payment')
     }
   }
 
@@ -114,6 +135,28 @@ export default function FeesPage() {
           </Link>
         </div>
 
+        {/* Parent: My Children Banner */}
+        {user?.role === 'PARENT' && (
+          <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+            <p className="text-sm font-semibold text-blue-800 mb-2">My Children's Fees</p>
+            <div className="flex flex-wrap gap-2">
+              {students.filter((s: any) => s.parent?.userId === user.id).map((child: any) => (
+                <Link
+                  key={child.id}
+                  href={`/students/${child.id}`}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-sm text-blue-700 hover:bg-blue-100 transition-colors"
+                >
+                  <span className="font-medium">{child.firstName} {child.lastName}</span>
+                  <span className="text-xs text-blue-500">→ View Fee Details</span>
+                </Link>
+              ))}
+              {students.filter((s: any) => s.parent?.userId === user.id).length === 0 && (
+                <p className="text-sm text-blue-600">No children linked. Check with the school administrator.</p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="card text-center">
@@ -136,7 +179,9 @@ export default function FeesPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 border-b border-gray-200">
-          {(['structures', 'payments', 'defaulters'] as const).map(tab => (
+          {(['structures', 'payments', 'defaulters'] as const)
+            .filter(tab => tab !== 'defaulters' || !['STUDENT', 'PARENT'].includes(user?.role))
+            .map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -159,7 +204,9 @@ export default function FeesPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Fee Structures</h2>
-              <button onClick={() => setShowStructureModal(true)} className="btn-primary text-sm">+ Add Structure</button>
+              {!['STUDENT', 'PARENT'].includes(user?.role) && (
+                <button onClick={() => setShowStructureModal(true)} className="btn-primary text-sm">+ Add Structure</button>
+              )}
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-12">
@@ -207,7 +254,9 @@ export default function FeesPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Payment Records</h2>
-              <button onClick={() => setShowPaymentModal(true)} className="btn-primary text-sm">+ Record Payment</button>
+              {!['STUDENT', 'PARENT'].includes(user?.role) && (
+                <button onClick={() => setShowPaymentModal(true)} className="btn-primary text-sm">+ Record Payment</button>
+              )}
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-12">
@@ -226,6 +275,7 @@ export default function FeesPage() {
                       <th className="px-4 py-3">Mode</th>
                       <th className="px-4 py-3">Date</th>
                       <th className="px-4 py-3">Transaction ID</th>
+                      {['ADMIN', 'ACCOUNTANT'].includes(user?.role) && <th className="px-4 py-3">Actions</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -244,6 +294,16 @@ export default function FeesPage() {
                         </td>
                         <td className="px-4 py-3 text-gray-600">{p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : '-'}</td>
                         <td className="px-4 py-3 text-gray-500 text-xs">{p.transactionId || '-'}</td>
+                        {['ADMIN', 'ACCOUNTANT'].includes(user?.role) && (
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => handleVoidPayment(p.id)}
+                              className="text-xs text-red-600 hover:text-red-800 font-medium border border-red-200 rounded px-2 py-0.5 hover:bg-red-50"
+                            >
+                              Void
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -339,7 +399,16 @@ export default function FeesPage() {
                 </div>
                 <div>
                   <label className="label">Academic Year</label>
-                  <input className="input" placeholder="2025-2026" value={structureForm.academicYear} onChange={e => setStructureForm(f => ({ ...f, academicYear: e.target.value }))} />
+                  {academicYears.length > 0 ? (
+                    <select className="input" value={structureForm.academicYear} onChange={e => setStructureForm(f => ({ ...f, academicYear: e.target.value }))}>
+                      <option value="">Select Year</option>
+                      {academicYears.map((ay: any) => (
+                        <option key={ay.id} value={ay.year}>{ay.year}{ay.isCurrent ? ' (Current)' : ''}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input className="input" placeholder="e.g. 2025-2026" value={structureForm.academicYear} onChange={e => setStructureForm(f => ({ ...f, academicYear: e.target.value }))} />
+                  )}
                 </div>
                 <div>
                   <label className="label">Term</label>

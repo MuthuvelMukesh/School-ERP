@@ -1,25 +1,26 @@
 # School ERP System - Architecture Overview
 
 **System Status**: Production-Ready  
-**Last Updated**: February 10, 2026  
-**Version**: 2.0.0  
+**Last Updated**: March 10, 2026  
+**Version**: 2.1.0  
 
 ---
 
 ## Executive Summary
 
-The School ERP System is a comprehensive, enterprise-grade web application designed to manage all aspects of school operations. The system has grown from an MVP with 10 identified gaps to a full-featured platform with 17 integrated modules, 43 database models, and 200+ API endpoints.
+The School ERP System is a comprehensive, enterprise-grade web application designed to manage all aspects of school operations. The system has grown from an MVP with 10 identified gaps to a full-featured platform with 17 integrated modules, 43 database models, and 210+ API endpoints.
 
 **Key Metrics:**
 - **Total Database Models**: 43
-- **Total API Endpoints**: 200+
+- **Total API Endpoints**: 210+
 - **Total Enums**: 19
-- **Backend Controllers**: 17
-- **API Routes**: 17
+- **Backend Controllers**: 18
+- **API Routes**: 18
 - **Service Layers**: 7
 - **Middleware**: 4
-- **Total Lines of Code**: ~15,000+
-- **Documentation Files**: 9
+- **Frontend Pages**: 22
+- **Total Lines of Code**: ~17,000+
+- **Documentation Files**: 13
 
 ---
 
@@ -174,15 +175,18 @@ The School ERP System is a comprehensive, enterprise-grade web application desig
 
 #### 1. Authentication & Authorization
 - **Routes**: `/api/auth`
-- **Features**: Login, register, password reset, token refresh, role-based access
+- **Features**: Login, register, password reset, token refresh, role-based access, profile update
 - **Models**: User (with role-based relations)
 - **Security**: JWT tokens, bcrypt password hashing
+- **New**: `PUT /auth/profile` — authenticated users update their own profile fields
+- **Frontend**: `/auth/login`, `/auth/forgot-password`, `/auth/reset-password`, `/profile`
 
 #### 2. Student Management
 - **Routes**: `/api/students`
-- **Features**: CRUD operations, profile management, document storage, parent linking
+- **Features**: CRUD operations, profile management, document storage, parent linking, parentUserId filtering
 - **Models**: Student, Parent
 - **Key Features**: Admission tracking, document management, class enrollment
+- **Frontend**: Student list (clickable names → detail page), `/students/[id]` detail page with 4 tabs (Overview / Attendance / Exams / Fees)
 
 #### 3. Staff Management
 - **Routes**: `/api/staff`
@@ -196,15 +200,17 @@ The School ERP System is a comprehensive, enterprise-grade web application desig
 
 #### 5. Attendance System
 - **Routes**: `/api/attendance`
-- **Features**: Daily attendance marking, bulk entry, reports, status tracking
+- **Features**: Daily attendance marking, bulk entry, reports, status tracking, per-student filtering
 - **Models**: Attendance
 - **Statuses**: PRESENT, ABSENT, LATE, HALF_DAY, SICK_LEAVE, APPROVED_LEAVE
+- **New**: `?studentId=` query param; PARENT + STUDENT roles authorized on `GET /`
 
 #### 6. Fee Management
 - **Routes**: `/api/fees`
-- **Features**: Fee structure, payment collection, receipt generation, defaulter tracking
+- **Features**: Fee structure, payment collection, receipt generation, defaulter tracking, payment voiding
 - **Models**: FeeStructure, FeePayment
 - **Statuses**: PAID, PENDING, PARTIAL, OVERDUE
+- **New**: `DELETE /fees/payments/:id` (ADMIN/ACCOUNTANT) — void wrong payments; academic year dropdown in UI
 
 #### 7. Exam Management
 - **Routes**: `/api/exams`

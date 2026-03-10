@@ -8,6 +8,15 @@ A comprehensive, full-stack School Management System built with **Next.js 14** a
 
 ## Changelog
 
+### Mar 10, 2026 — UX Polish & Role Completeness
+- **Student Detail Page**: Click any student name to open a full profile page with 4 tabs — Overview, Attendance, Exams, Fees
+- **User Profile Page**: Every role now has `/profile` — view, edit, and change password
+- **Fee Void**: ADMIN / ACCOUNTANT can void wrong payment entries with a single click
+- **Academic Year Dropdown**: Fee structure form now pulls years from the database instead of free-text
+- **Parent Views**: PARENT users see a "My Children" banner on Attendance, Exams, and Fees pages with links to each child's profile
+- **Dashboard Avatar** is now a profile link
+- Backend: `PUT /auth/profile`, `DELETE /fees/payments/:id`, `?studentId=` filter on attendance, PARENT added to all student read routes
+
 ### Mar 2026 — All Modules Complete
 - **Attendance**: Full mark-attendance workflow — class/date picker, load students, per-student PRESENT/ABSENT/LATE/EXCUSED toggles, bulk submit, filter by class/date/status
 - **Examinations**: Exam schedule management (create with type, date, marks, venue) + result recording (marks, grade, pass/fail), tabbed view
@@ -114,9 +123,10 @@ School-ERP/
 │
 └── frontend/
     ├── app/
-    │   ├── auth/                  # Login, forgot password
+    │   ├── auth/                  # Login, forgot-password, reset-password
     │   ├── dashboard/             # Dashboard
-    │   ├── students/              # Student list + progression
+    │   ├── profile/               # User profile + change password
+    │   ├── students/              # Student list + [id] detail page + progression
     │   ├── staff/                 # Staff list + leaves
     │   ├── attendance/            # Attendance view + mark
     │   ├── timetable/             # Grid + list timetable

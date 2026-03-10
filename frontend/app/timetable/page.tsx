@@ -40,10 +40,16 @@ export default function TimetablePage() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
     if (!userData) { router.push('/auth/login'); return }
+    const parsedUser = JSON.parse(userData)
+    setUser(parsedUser)
+    if (parsedUser.role === 'STUDENT' && parsedUser.profile?.classId) {
+      setSelectedClass(parsedUser.profile.classId)
+    }
     fetchAll()
   }, [router])
 
@@ -116,6 +122,8 @@ export default function TimetablePage() {
   const classCount = new Set(timetables.map(t => t.classId || t.class?.id).filter(Boolean)).size
   const subjectCount = new Set(timetables.map(t => t.subjectId || t.subject?.id).filter(Boolean)).size
 
+  const canEdit = ['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role)
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <Toaster position="top-right" />
@@ -176,9 +184,11 @@ export default function TimetablePage() {
                 </button>
               </div>
             </div>
-            <button onClick={() => setShowAddModal(true)} className="btn-primary text-sm whitespace-nowrap">
-              + Add Period
-            </button>
+            {canEdit && (
+              <button onClick={() => setShowAddModal(true)} className="btn-primary text-sm whitespace-nowrap">
+                + Add Period
+              </button>
+            )}
           </div>
         </div>
 
@@ -190,7 +200,7 @@ export default function TimetablePage() {
         ) : filtered.length === 0 ? (
           <div className="card text-center py-16">
             <p className="text-gray-500">No timetable entries found.</p>
-            <button onClick={() => setShowAddModal(true)} className="btn-primary text-sm mt-4">Add First Period</button>
+            {canEdit && <button onClick={() => setShowAddModal(true)} className="btn-primary text-sm mt-4">Add First Period</button>}
           </div>
         ) : viewMode === 'grid' ? (
           /* Grid View */
@@ -215,13 +225,15 @@ export default function TimetablePage() {
                           {slot.teacher ? `${slot.teacher.firstName || ''} ${slot.teacher.lastName || ''}`.trim() : '-'}
                         </p>
                         {slot.room && <p className="text-xs opacity-50">Room: {slot.room}</p>}
-                        <button
-                          onClick={() => handleDelete(slot.id)}
-                          disabled={deletingId === slot.id}
-                          className="mt-1 text-xs text-red-500 hover:text-red-700 disabled:opacity-40"
-                        >
-                          {deletingId === slot.id ? '...' : '✕ Remove'}
-                        </button>
+                        {canEdit && (
+                          <button
+                            onClick={() => handleDelete(slot.id)}
+                            disabled={deletingId === slot.id}
+                            className="mt-1 text-xs text-red-500 hover:text-red-700 disabled:opacity-40"
+                          >
+                            {deletingId === slot.id ? '...' : '✕ Remove'}
+                          </button>
+                        )}
                       </div>
                     ))
                   )}
@@ -242,7 +254,7 @@ export default function TimetablePage() {
                     <th className="px-4 py-3">Teacher</th>
                     <th className="px-4 py-3">Time</th>
                     <th className="px-4 py-3">Room</th>
-                    <th className="px-4 py-3">Actions</th>
+                    {canEdit && <th className="px-4 py-3">Actions</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -266,15 +278,17 @@ export default function TimetablePage() {
                         {entry.startTime && entry.endTime ? `${entry.startTime} – ${entry.endTime}` : '-'}
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{entry.room || '-'}</td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => handleDelete(entry.id)}
-                          disabled={deletingId === entry.id}
-                          className="text-xs text-red-600 hover:text-red-800 disabled:opacity-40"
-                        >
-                          {deletingId === entry.id ? 'Deleting...' : 'Delete'}
-                        </button>
-                      </td>
+                      {canEdit && (
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => handleDelete(entry.id)}
+                            disabled={deletingId === entry.id}
+                            className="text-xs text-red-600 hover:text-red-800 disabled:opacity-40"
+                          >
+                            {deletingId === entry.id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

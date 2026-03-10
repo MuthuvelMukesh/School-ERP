@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { config } from '@/lib/config'
+import { authAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
 
@@ -17,18 +17,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${config.api.baseURL}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to send reset email')
-      }
-
+      await authAPI.forgotPassword(email)
       setSubmitted(true)
       toast.success('Password reset link sent to your email')
 
@@ -37,7 +26,8 @@ export default function ForgotPasswordPage() {
         router.push('/auth/login')
       }, 3000)
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset email')
+      const message = error.response?.data?.message || 'Failed to send reset email'
+      toast.error(message)
     } finally {
       setLoading(false)
     }

@@ -169,7 +169,9 @@ export default function LibraryPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 border-b pb-2">
-          {(['books', 'overdue', 'stats', 'settings'] as const).map(t => (
+          {(['books', 'overdue', 'stats', 'settings'] as const)
+            .filter(t => t === 'books' || isAdmin)
+            .map(t => (
             <button key={t} onClick={() => handleTabChange(t)}
               className={`px-4 py-2 rounded-t-lg text-sm font-medium capitalize ${tab === t ? 'bg-white border border-b-0 text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}>
               {t === 'overdue' ? 'Overdue' : t === 'stats' ? 'Reports' : t}

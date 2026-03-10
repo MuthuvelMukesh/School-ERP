@@ -42,6 +42,7 @@ const changePasswordValidation = [
 router.post('/register', registerValidation, validate, authController.register);
 router.post('/login', loginValidation, validate, authController.login);
 router.get('/me', authenticate, authController.getMe);
+router.put('/profile', authenticate, authController.updateProfile);
 router.post('/logout', authenticate, authController.logout);
 router.post('/change-password', authenticate, changePasswordValidation, validate, authController.changePassword);
 

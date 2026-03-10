@@ -2,6 +2,53 @@
 
 All notable changes to the School ERP project are documented in this file.
 
+## [v1.4.0] - March 10, 2026
+
+### Added
+
+#### 🎨 UX — Student Detail Page
+- New page `/students/[id]/page.tsx` — full student profile with 4 lazy-loaded tabs:
+  - **Overview**: personal info, guardian/parent details, quick-stat cards
+  - **Attendance**: summary stats, progress bar (warns if < 75%), full records table
+  - **Exams**: results table with colour-coded marks and grade badges
+  - **Fees**: paid/outstanding totals, full fee-record history
+- Student names in the students list are now clickable `<Link>` elements leading to the detail page
+
+#### 👤 User Profile Page
+- New page `/profile/page.tsx` accessible to every role
+- Displays role badge, display name, email, and role-specific profile fields (firstName, lastName, phone, address, designation, class, admissionNo)
+- **Edit mode** calls `PUT /api/auth/profile` to update profile fields
+- **Change Password** section calls the existing `POST /api/auth/change-password` endpoint
+- Avatar in the dashboard top-right header is now a `<Link href="/profile">` with hover effect
+
+#### 💰 Fee Management UX Improvements
+- **Academic Year dropdown**: Fee Structure modal now loads years from `GET /api/metadata/academic-years` and renders a `<select>` (falls back to free-text if no years are configured)
+- **Void Payment**: ADMIN and ACCOUNTANT see a red **Void** button per payment row; calls `DELETE /api/fees/payments/:id` with a confirmation dialog, then refreshes
+
+#### 👨‍👩‍👧 Parent-Scoped Views
+- **Attendance, Exams, and Fees pages** now detect PARENT role from `localStorage` and render a "My Children" banner with pill-links to each child's student detail page
+- Parents can click through to their child's Attendance / Exams / Fees tabs without seeing other students' data
+
+#### 🔧 Backend Additions
+- `GET /api/attendance` now accepts `?studentId=` query param for per-student filtering
+- PARENT and STUDENT roles added to `GET /api/attendance` authorization
+- `DELETE /api/fees/payments/:id` endpoint — restricted to ADMIN and ACCOUNTANT
+- `PUT /api/auth/profile` endpoint — authenticated, updates display name and role-specific profile sub-record
+- `GET /api/metadata/academic-years` — returns all academic year records (used by fee structure dropdown)
+- PARENT role added to fee student-details route, all student GET routes, and student-attendance route
+
+#### 📦 Frontend API Client (`lib/api.ts`)
+- `authAPI.updateProfile(data)` — `PUT /auth/profile`
+- `feeAPI.deletePayment(id)` — `DELETE /fees/payments/:id`
+- `metadataAPI.getAcademicYears()` — `GET /metadata/academic-years`
+
+### Fixed
+
+- PARENT users could not load their children's data from any page — fixed with correct `authorize()` additions and `parentUserId` query filter
+- Students list page had no navigation to individual student records — fixed with clickable name links
+
+---
+
 ## [Unreleased]
 
 ### Added

@@ -70,7 +70,7 @@ exports.register = async (req, res) => {
             classId: otherData.classId
           }
         });
-      } else if (role === 'TEACHER' || role === 'PRINCIPAL' || role === 'ACCOUNTANT') {
+      } else if (['TEACHER', 'PRINCIPAL', 'ACCOUNTANT', 'ADMIN', 'LIBRARIAN', 'TRANSPORT_STAFF'].includes(role)) {
         profile = await tx.staff.create({
           data: {
             userId: user.id,
@@ -204,6 +204,44 @@ exports.login = async (req, res) => {
       status: 'error',
       message: 'Login failed'
     });
+  }
+};
+
+// Update profile (name, phone, address)
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, firstName, lastName, phone, address } = req.body;
+
+    // Update user display name
+    if (name) {
+      await prisma.user.update({
+        where: { id: req.user.id },
+        data: { name }
+      });
+    }
+
+    // Update role-specific profile
+    const role = req.user.role;
+    const profileData = {};
+    if (firstName !== undefined) profileData.firstName = firstName;
+    if (lastName !== undefined) profileData.lastName = lastName;
+    if (phone !== undefined) profileData.phone = phone;
+    if (address !== undefined) profileData.address = address;
+
+    if (Object.keys(profileData).length > 0) {
+      if (role === 'STUDENT') {
+        await prisma.student.updateMany({ where: { userId: req.user.id }, data: profileData });
+      } else if (['TEACHER', 'PRINCIPAL', 'ACCOUNTANT', 'ADMIN', 'LIBRARIAN', 'TRANSPORT_STAFF'].includes(role)) {
+        await prisma.staff.updateMany({ where: { userId: req.user.id }, data: profileData });
+      } else if (role === 'PARENT') {
+        await prisma.parent.updateMany({ where: { userId: req.user.id }, data: profileData });
+      }
+    }
+
+    res.status(200).json({ status: 'success', message: 'Profile updated successfully' });
+  } catch (error) {
+    logger.error('Update profile error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to update profile' });
   }
 };
 

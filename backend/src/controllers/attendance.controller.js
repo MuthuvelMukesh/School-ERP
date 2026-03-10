@@ -4,7 +4,7 @@ const prisma = require('../utils/prisma');
 
 exports.getAttendance = async (req, res) => {
   try {
-    const { date, classId, page = 1, limit = 50 } = req.query;
+    const { date, classId, studentId, page = 1, limit = 50 } = req.query;
     const parsedPage = parseInt(page);
     const parsedLimit = Math.min(parseInt(limit), 200); // cap at 200
     const skip = (parsedPage - 1) * parsedLimit;
@@ -12,6 +12,7 @@ exports.getAttendance = async (req, res) => {
     const where = {};
     if (date) where.date = new Date(date);
     if (classId) where.classId = classId;
+    if (studentId) where.studentId = studentId;
 
     const [attendance, total] = await Promise.all([
       prisma.attendance.findMany({

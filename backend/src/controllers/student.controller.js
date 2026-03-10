@@ -5,7 +5,7 @@ const prisma = require('../utils/prisma');
 // Get all students
 exports.getAllStudents = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, classId } = req.query;
+    const { page = 1, limit = 10, search, classId, parentId, parentUserId } = req.query;
     const skip = (page - 1) * limit;
 
     const where = {};
@@ -18,9 +18,9 @@ exports.getAllStudents = async (req, res) => {
       ];
     }
 
-    if (classId) {
-      where.classId = classId;
-    }
+    if (classId) where.classId = classId;
+    if (parentId) where.parentId = parentId;
+    if (parentUserId) where.parent = { userId: parentUserId };
 
     const [students, total] = await Promise.all([
       prisma.student.findMany({

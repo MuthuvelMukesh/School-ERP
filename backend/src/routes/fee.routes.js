@@ -13,10 +13,11 @@ router.put('/structures/:id', authorize('ADMIN', 'ACCOUNTANT'), feeController.up
 router.delete('/structures/:id', authorize('ADMIN'), feeController.deleteFeeStructure);
 
 // Fee payments
-router.get('/payments', authorize('ADMIN', 'ACCOUNTANT'), feeController.getAllPayments);
+router.get('/payments', authorize('ADMIN', 'ACCOUNTANT', 'PRINCIPAL'), feeController.getAllPayments);
 router.get('/payments/:id', authorize('ADMIN', 'PRINCIPAL', 'ACCOUNTANT'), feeController.getPaymentById);
 router.post('/payments', authorize('ADMIN', 'ACCOUNTANT'), feeController.createPayment);
-router.get('/defaulters', authorize('ADMIN', 'ACCOUNTANT'), feeController.getDefaulters);
-router.get('/student/:studentId', requireOwnership('studentId', ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT']), feeController.getStudentFeeDetails);
+router.delete('/payments/:id', authorize('ADMIN', 'ACCOUNTANT'), feeController.deletePayment);
+router.get('/defaulters', authorize('ADMIN', 'ACCOUNTANT', 'PRINCIPAL'), feeController.getDefaulters);
+router.get('/student/:studentId', requireOwnership('studentId', ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'PARENT', 'STUDENT']), feeController.getStudentFeeDetails);
 
 module.exports = router;

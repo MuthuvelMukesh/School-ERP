@@ -34,11 +34,24 @@ export default function AttendancePage() {
   const [studentStatuses, setStudentStatuses] = useState<Record<string, AttendanceStatus>>({})
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [myChildren, setMyChildren] = useState<any[]>([])
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
     if (!userData) { router.push('/auth/login'); return }
-    fetchAttendance()
+    const parsedUser = JSON.parse(userData)
+    setUser(parsedUser)
+    if (parsedUser.role === 'PARENT') {
+      studentAPI.getAll({ parentUserId: parsedUser.id, limit: 20 }).then(res => {
+        setMyChildren(res.data?.data?.students || [])
+      }).catch(() => {})
+    }
+    fetchAttendance(
+      parsedUser.role === 'STUDENT' && parsedUser.profile?.id
+        ? { studentId: parsedUser.profile.id }
+        : {}
+    )
     fetchClasses()
   }, [router])
 
@@ -132,6 +145,31 @@ export default function AttendancePage() {
           </Link>
         </div>
 
+        {/* Parent: My Children Banner */}
+        {user?.role === 'PARENT' && (
+          <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+            <p className="text-sm font-semibold text-blue-800 mb-2">My Children</p>
+            {myChildren.length === 0 ? (
+              <p className="text-sm text-blue-600">No children linked to your account yet.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {myChildren.map((child: any) => (
+                  <Link
+                    key={child.id}
+                    href={`/students/${child.id}`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-sm text-blue-700 hover:bg-blue-100 transition-colors"
+                  >
+                    <span className="font-medium">{child.firstName} {child.lastName}</span>
+                    <span className="text-xs text-blue-400">{child.class?.name}</span>
+                    <span className="text-xs text-blue-500">→ View Profile</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-blue-500 mt-2">Click a child to view their full attendance, results and fees.</p>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="card text-center">
@@ -154,7 +192,9 @@ export default function AttendancePage() {
 
         {/* Tabs */}
         <div className="flex gap-2 border-b border-gray-200">
-          {(['view', 'mark'] as const).map(tab => (
+          {(['view', 'mark'] as const)
+            .filter(tab => tab !== 'mark' || !['STUDENT', 'PARENT'].includes(user?.role))
+            .map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -254,7 +294,7 @@ export default function AttendancePage() {
         )}
 
         {/* Mark Attendance Tab */}
-        {activeTab === 'mark' && (
+        {activeTab === 'mark' && !['STUDENT', 'PARENT'].includes(user?.role) && (
           <div className="space-y-4">
             <div className="card">
               <h2 className="text-lg font-semibold mb-4">Select Class & Date</h2>

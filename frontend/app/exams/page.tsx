@@ -15,6 +15,8 @@ export default function ExamsPage() {
   const [classes, setClasses] = useState<any[]>([])
   const [subjects, setSubjects] = useState<any[]>([])
   const [students, setStudents] = useState<any[]>([])
+  const [user, setUser] = useState<any>(null)
+  const [myChildren, setMyChildren] = useState<any[]>([])
 
   // Schedule modal
   const [showScheduleModal, setShowScheduleModal] = useState(false)
@@ -35,15 +37,24 @@ export default function ExamsPage() {
   useEffect(() => {
     const userData = localStorage.getItem('user')
     if (!userData) { router.push('/auth/login'); return }
-    fetchAll()
+    const parsedUser = JSON.parse(userData)
+    setUser(parsedUser)
+    if (parsedUser.role === 'PARENT') {
+      studentAPI.getAll({ parentUserId: parsedUser.id, limit: 20 }).then(res => {
+        setMyChildren(res.data?.data?.students || [])
+      }).catch(() => {})
+    }
+    fetchAll(parsedUser)
   }, [router])
 
-  const fetchAll = async () => {
+  const fetchAll = async (currentUser?: any) => {
     setLoading(true)
+    const u = currentUser ?? user
+    const studentFilter = u?.role === 'STUDENT' && u?.profile?.id ? { studentId: u.profile.id } : {}
     try {
       const [schedulesRes, resultsRes, classesRes, subjectsRes, studentsRes] = await Promise.all([
         examAPI.getAllSchedules(),
-        examAPI.getAllResults(),
+        examAPI.getAllResults(studentFilter),
         metadataAPI.getClasses(),
         metadataAPI.getSubjects(),
         studentAPI.getAll({ page: 1, limit: 200 }),
@@ -115,6 +126,31 @@ export default function ExamsPage() {
           </Link>
         </div>
 
+        {/* Parent: My Children Banner */}
+        {user?.role === 'PARENT' && (
+          <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+            <p className="text-sm font-semibold text-blue-800 mb-2">My Children</p>
+            {myChildren.length === 0 ? (
+              <p className="text-sm text-blue-600">No children linked to your account yet.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {myChildren.map((child: any) => (
+                  <Link
+                    key={child.id}
+                    href={`/students/${child.id}`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-sm text-blue-700 hover:bg-blue-100 transition-colors"
+                  >
+                    <span className="font-medium">{child.firstName} {child.lastName}</span>
+                    <span className="text-xs text-blue-400">{child.class?.name}</span>
+                    <span className="text-xs text-blue-500">→ View Results</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-blue-500 mt-2">Click a child to view their exam results and full profile.</p>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="card text-center">
@@ -153,9 +189,11 @@ export default function ExamsPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Exam Schedules</h2>
-              <button onClick={() => setShowScheduleModal(true)} className="btn-primary text-sm">
-                + Add Schedule
-              </button>
+              {!['STUDENT', 'PARENT'].includes(user?.role) && (
+                <button onClick={() => setShowScheduleModal(true)} className="btn-primary text-sm">
+                  + Add Schedule
+                </button>
+              )}
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-12">
@@ -212,9 +250,11 @@ export default function ExamsPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Exam Results</h2>
-              <button onClick={() => setShowResultModal(true)} className="btn-primary text-sm">
-                + Record Result
-              </button>
+              {!['STUDENT', 'PARENT'].includes(user?.role) && (
+                <button onClick={() => setShowResultModal(true)} className="btn-primary text-sm">
+                  + Record Result
+                </button>
+              )}
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-12">

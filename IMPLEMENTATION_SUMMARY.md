@@ -1,10 +1,93 @@
-# School ERP - Gap Fixes Implementation Summary
+# School ERP - Implementation Summary
 
-This document provides a comprehensive summary of all the functional, logical, and security gaps that have been addressed in the School ERP system.
+**Last Updated**: March 10, 2026  
+This document provides a comprehensive summary of all functional, logical, security, and UX gaps that have been addressed in the School ERP system across all phases.
 
 ---
 
-## ✅ Completed Fixes
+## Phase 3 — End-User UX Fixes (March 10, 2026) ✅
+
+### 1. Student Detail Page ✅
+**Issue**: Clicking a student name in the list had no destination; no way to view full student profile.  
+**Solution**: Created `/frontend/app/students/[id]/page.tsx` with 4 lazy-loaded tabs.
+
+**Files Created**:
+- `frontend/app/students/[id]/page.tsx`
+
+**Features**:
+- **Overview tab**: Personal info (name, admission no, class, DOB, blood group, gender, address), guardian/parent info
+- **Attendance tab**: Present/Absent/Late/Excused summary cards, percentage progress bar (warns below 75%), full date-by-date records table
+- **Exams tab**: Results table with colour-coded marks (green ≥ 90%, blue ≥ 75%, yellow ≥ 60%, red < 60%) and grade badges
+- **Fees tab**: Paid/outstanding totals, full payment history with mode and receipt number
+
+### 2. Clickable Student Names ✅
+**Issue**: Student names in the students list were plain text with no navigation.  
+**Solution**: Wrapped student name cell in `<Link href="/students/[id]">` with primary-colour hover-underline.
+
+**Files Modified**: `frontend/app/students/page.tsx`
+
+### 3. User Profile Page ✅
+**Issue**: No profile or account page for any role.  
+**Solution**: Created `/frontend/app/profile/page.tsx`.
+
+**Files Created**:
+- `frontend/app/profile/page.tsx`
+
+**Features**:
+- Role badge prominently displayed (colour-coded per role)
+- Profile detail view (read-only)
+- Edit mode form: display name, first/last name, phone, address → calls `PUT /api/auth/profile`
+- Change Password section → calls `POST /api/auth/change-password`
+- Accessible to all roles
+
+### 4. Profile Link in Dashboard Header ✅
+**Issue**: The avatar circle in the top-right of the dashboard had no action.  
+**Solution**: Wrapped avatar in `<Link href="/profile">` with hover effect.
+
+**Files Modified**: `frontend/app/dashboard/page.tsx`
+
+### 5. Academic Year Dropdown in Fee Structures ✅
+**Issue**: Academic year field in the fee structure modal was a free-text input — easy to enter inconsistent values.  
+**Solution**: Replaced the `<input>` with a `<select>` populated from `GET /api/metadata/academic-years`. Falls back to text input if no years have been configured.
+
+**Files Modified**: `frontend/app/fees/page.tsx`
+
+### 6. Void Payment Button ✅
+**Issue**: No way to correct or remove a wrongly-recorded fee payment.  
+**Solution**: Added a red **Void** button to each row in the Payments tab, visible only to ADMIN and ACCOUNTANT roles. Calls `DELETE /api/fees/payments/:id` after a confirmation dialog, then refreshes the list.
+
+**Backend**:
+- `fee.controller.js`: Added `deletePayment()` function
+- `fee.routes.js`: Added `DELETE /payments/:id` (authorize ADMIN, ACCOUNTANT)
+
+**Frontend**:
+- `frontend/app/fees/page.tsx`: `handleVoidPayment()` + Void column header + button per row
+
+### 7. Parent-Scoped Views ✅
+**Issue**: PARENT role users saw the entire school's data with no way to filter to their own children.  
+**Solution**: Attendance, Exams, and Fees pages now detect `user.role === 'PARENT'` and render a "My Children" banner with pill-links to each child's student detail page (which contains per-child Attendance, Exams, Fees tabs).
+
+**Backend changes**:
+- `attendance.controller.js`: `getAttendance` now accepts `?studentId=` query param
+- `attendance.routes.js`: Added PARENT + STUDENT to `GET /` route authorization
+- `student.controller.js`: Added `parentId`/`parentUserId` query filter to `getAllStudents`
+- `student.routes.js`: Added PARENT to all student read routes
+
+**Frontend changes**:
+- `attendance/page.tsx`, `exams/page.tsx`, `fees/page.tsx`: Added `user` + `myChildren` state; fetches children via `studentAPI.getAll({ parentUserId: user.id })`
+
+### 8. Auth: updateProfile Endpoint ✅
+**Issue**: No API endpoint to update profile information.  
+**Solution**: Added `updateProfile()` to `auth.controller.js` and `PUT /auth/profile` route.
+
+**Files Modified**:
+- `backend/src/controllers/auth.controller.js`
+- `backend/src/routes/auth.routes.js`
+- `frontend/lib/api.ts` (added `authAPI.updateProfile`)
+
+---
+
+## ✅ Completed Fixes — Phase 1 & 2
 
 ### 1. Input Sanitization & XSS Protection ✅
 **Issue**: No global input sanitization; vulnerable to XSS attacks

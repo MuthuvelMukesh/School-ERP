@@ -150,13 +150,17 @@ exports.deleteExamSchedule = async (req, res) => {
 
 exports.getAllResults = async (req, res) => {
   try {
-    const { page = 1, limit = 50 } = req.query;
+    const { page = 1, limit = 50, studentId } = req.query;
     const parsedPage = parseInt(page);
     const parsedLimit = Math.min(parseInt(limit), 200);
     const skip = (parsedPage - 1) * parsedLimit;
 
+    const where = {};
+    if (studentId) where.studentId = studentId;
+
     const [results, total] = await Promise.all([
       prisma.examResult.findMany({
+        where,
         include: {
           student: {
             select: {
@@ -173,7 +177,7 @@ exports.getAllResults = async (req, res) => {
         skip,
         take: parsedLimit
       }),
-      prisma.examResult.count()
+      prisma.examResult.count({ where })
     ]);
 
     res.status(200).json({
