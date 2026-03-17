@@ -10,9 +10,38 @@ exports.getAttendance = async (req, res) => {
     const skip = (parsedPage - 1) * parsedLimit;
 
     const where = {};
+
+    // Ownership enforcement for Student/Parent
+    if (req.user?.role === 'STUDENT') {
+      const studentProfile = await prisma.student.findUnique({
+        where: { userId: req.user.id },
+        select: { id: true }
+      });
+      where.studentId = studentProfile?.id || '__NO_STUDENT__';
+    }
+
+    if (req.user?.role === 'PARENT') {
+      const parentProfile = await prisma.parent.findUnique({
+        where: { userId: req.user.id },
+        include: { students: { select: { id: true } } }
+      });
+
+      const childIds = parentProfile?.students?.map(s => s.id) || [];
+      if (studentId) {
+        if (!childIds.includes(studentId)) {
+          return res.status(403).json({
+            status: 'error',
+            message: 'Access denied. You can only access your own data.'
+          });
+        }
+        where.studentId = studentId;
+      } else {
+        where.studentId = { in: childIds.length > 0 ? childIds : ['__NO_CHILDREN__'] };
+      }
+    }
     if (date) where.date = new Date(date);
     if (classId) where.classId = classId;
-    if (studentId) where.studentId = studentId;
+    if (studentId && !['STUDENT', 'PARENT'].includes(req.user?.role)) where.studentId = studentId;
 
     const [attendance, total] = await Promise.all([
       prisma.attendance.findMany({

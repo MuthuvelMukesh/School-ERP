@@ -67,7 +67,7 @@ router.post('/vehicles/:vehicleId/conductor', authorize(...TRANSPORT_MANAGERS), 
  * Create a new transport route
  * Body: { name, vehicleId, monthlyFee, [estimatedDuration, notes] }
  */
-router.post('/routes', validateToken, transportController.createRoute);
+router.post('/routes', authorize(...TRANSPORT_MANAGERS), transportController.createRoute);
 
 /**
  * GET /api/transport/routes

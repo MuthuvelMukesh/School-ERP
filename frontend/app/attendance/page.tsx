@@ -6,13 +6,15 @@ import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { attendanceAPI, metadataAPI, studentAPI } from '@/lib/api'
 
-type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED'
+type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'HALF_DAY' | 'SICK_LEAVE' | 'APPROVED_LEAVE'
 
 const statusColors: Record<string, string> = {
   PRESENT: 'bg-green-100 text-green-800',
   ABSENT: 'bg-red-100 text-red-800',
   LATE: 'bg-yellow-100 text-yellow-800',
-  EXCUSED: 'bg-blue-100 text-blue-800',
+  HALF_DAY: 'bg-purple-100 text-purple-800',
+  SICK_LEAVE: 'bg-blue-100 text-blue-800',
+  APPROVED_LEAVE: 'bg-indigo-100 text-indigo-800',
 }
 
 export default function AttendancePage() {
@@ -36,6 +38,7 @@ export default function AttendancePage() {
   const [submitting, setSubmitting] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [myChildren, setMyChildren] = useState<any[]>([])
+  const [selectedChildId, setSelectedChildId] = useState('')
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
@@ -44,16 +47,24 @@ export default function AttendancePage() {
     setUser(parsedUser)
     if (parsedUser.role === 'PARENT') {
       studentAPI.getAll({ parentUserId: parsedUser.id, limit: 20 }).then(res => {
-        setMyChildren(res.data?.data?.students || [])
+        const kids = res.data?.data?.students || []
+        setMyChildren(kids)
+        if (!selectedChildId && kids.length > 0) setSelectedChildId(kids[0].id)
       }).catch(() => {})
     }
-    fetchAttendance(
-      parsedUser.role === 'STUDENT' && parsedUser.profile?.id
-        ? { studentId: parsedUser.profile.id }
-        : {}
-    )
+    if (parsedUser.role === 'STUDENT' && parsedUser.profile?.id) {
+      fetchAttendance({ studentId: parsedUser.profile.id })
+    } else if (!['PARENT'].includes(parsedUser.role)) {
+      fetchAttendance({})
+    }
     fetchClasses()
   }, [router])
+
+  useEffect(() => {
+    if (user?.role === 'PARENT' && selectedChildId) {
+      fetchAttendance({ studentId: selectedChildId })
+    }
+  }, [user?.role, selectedChildId])
 
   const fetchAttendance = async (params?: any) => {
     setLoading(true)
@@ -76,6 +87,8 @@ export default function AttendancePage() {
 
   const handleFilterApply = () => {
     const params: any = {}
+    if (user?.role === 'STUDENT' && user?.profile?.id) params.studentId = user.profile.id
+    if (user?.role === 'PARENT' && selectedChildId) params.studentId = selectedChildId
     if (filterClass) params.classId = filterClass
     if (filterDate) params.date = filterDate
     if (filterStatus) params.status = filterStatus
@@ -108,11 +121,9 @@ export default function AttendancePage() {
     try {
       const records = classStudents.map((s: any) => ({
         studentId: s.id,
-        classId: markClass,
-        date: markDate,
         status: studentStatuses[s.id] || 'PRESENT',
       }))
-      await attendanceAPI.bulkMarkAttendance({ records })
+      await attendanceAPI.bulkMarkAttendance({ classId: markClass, date: markDate, attendanceData: records })
       toast.success('Attendance marked successfully')
       setClassStudents([])
       setStudentStatuses({})
@@ -193,7 +204,7 @@ export default function AttendancePage() {
         {/* Tabs */}
         <div className="flex gap-2 border-b border-gray-200">
           {(['view', 'mark'] as const)
-            .filter(tab => tab !== 'mark' || !['STUDENT', 'PARENT'].includes(user?.role))
+            .filter(tab => tab !== 'mark' || ['ADMIN', 'TEACHER'].includes(user?.role))
             .map(tab => (
             <button
               key={tab}
@@ -215,7 +226,20 @@ export default function AttendancePage() {
             {/* Filters */}
             <div className="card">
               <h2 className="text-sm font-semibold text-gray-700 mb-3">Filter Records</h2>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className={`grid grid-cols-1 gap-3 ${user?.role === 'PARENT' ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
+                {user?.role === 'PARENT' && (
+                  <div>
+                    <label className="label">Child</label>
+                    <select className="input" value={selectedChildId} onChange={e => setSelectedChildId(e.target.value)}>
+                      <option value="">Select Child</option>
+                      {myChildren.map((child: any) => (
+                        <option key={child.id} value={child.id}>
+                          {child.firstName} {child.lastName} {child.class?.name ? `(${child.class.name})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div>
                   <label className="label">Class</label>
                   <select className="input" value={filterClass} onChange={e => setFilterClass(e.target.value)}>
@@ -236,12 +260,26 @@ export default function AttendancePage() {
                     <option value="PRESENT">Present</option>
                     <option value="ABSENT">Absent</option>
                     <option value="LATE">Late</option>
-                    <option value="EXCUSED">Excused</option>
+                    <option value="HALF_DAY">Half Day</option>
+                    <option value="SICK_LEAVE">Sick Leave</option>
+                    <option value="APPROVED_LEAVE">Approved Leave</option>
                   </select>
                 </div>
                 <div className="flex items-end gap-2">
                   <button onClick={handleFilterApply} className="btn-primary flex-1">Apply</button>
-                  <button onClick={() => { setFilterClass(''); setFilterDate(''); setFilterStatus(''); fetchAttendance() }} className="btn-secondary">Reset</button>
+                  <button
+                    onClick={() => {
+                      setFilterClass('')
+                      setFilterDate('')
+                      setFilterStatus('')
+                      if (user?.role === 'STUDENT' && user?.profile?.id) fetchAttendance({ studentId: user.profile.id })
+                      else if (user?.role === 'PARENT' && selectedChildId) fetchAttendance({ studentId: selectedChildId })
+                      else fetchAttendance({})
+                    }}
+                    className="btn-secondary"
+                  >
+                    Reset
+                  </button>
                 </div>
               </div>
             </div>
@@ -294,7 +332,7 @@ export default function AttendancePage() {
         )}
 
         {/* Mark Attendance Tab */}
-        {activeTab === 'mark' && !['STUDENT', 'PARENT'].includes(user?.role) && (
+        {activeTab === 'mark' && ['ADMIN', 'TEACHER'].includes(user?.role) && (
           <div className="space-y-4">
             <div className="card">
               <h2 className="text-lg font-semibold mb-4">Select Class & Date</h2>
@@ -367,7 +405,7 @@ export default function AttendancePage() {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex gap-2 flex-wrap">
-                              {(['PRESENT', 'ABSENT', 'LATE', 'EXCUSED'] as AttendanceStatus[]).map(s => (
+                              {(['PRESENT', 'ABSENT', 'LATE', 'HALF_DAY', 'SICK_LEAVE', 'APPROVED_LEAVE'] as AttendanceStatus[]).map(s => (
                                 <button
                                   key={s}
                                   onClick={() => setStudentStatuses(prev => ({ ...prev, [student.id]: s }))}

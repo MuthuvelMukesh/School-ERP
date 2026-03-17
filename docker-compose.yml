@@ -1,7 +1,5 @@
 # School ERP System - Docker Setup
 
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -12,7 +10,7 @@ services:
       POSTGRES_PASSWORD: school_password_123
       POSTGRES_DB: school_erp
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

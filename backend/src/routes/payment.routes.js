@@ -1,7 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const paymentController = require('../controllers/payment.controller');
-const { authenticate } = require('../middleware/auth.middleware');
+const { authenticate, authorize, requireOwnership, requireBodyOwnership } = require('../middleware/auth.middleware');
 const { validate, sanitizeNumber } = require('../middleware/validation.middleware');
 
 const router = express.Router();
@@ -44,6 +44,8 @@ router.get('/status', paymentController.getPaymentStatus);
  */
 router.post(
   '/create-order',
+  authorize('ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT', 'PARENT'),
+  requireBodyOwnership('studentId', ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT']),
   createOrderValidation,
   validate,
   paymentController.createPaymentOrder
@@ -55,6 +57,7 @@ router.post(
  */
 router.post(
   '/verify',
+  authorize('ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'STUDENT', 'PARENT'),
   verifyPaymentValidation,
   validate,
   paymentController.verifyPayment
@@ -66,6 +69,7 @@ router.post(
  */
 router.get(
   '/history/:studentId',
+  requireOwnership('studentId', ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT']),
   paymentController.getPaymentHistory
 );
 
@@ -75,6 +79,7 @@ router.get(
  */
 router.post(
   '/refund',
+  authorize('ADMIN', 'ACCOUNTANT'),
   refundValidation,
   validate,
   paymentController.refundPayment
@@ -86,6 +91,7 @@ router.post(
  */
 router.get(
   '/report',
+  authorize('ADMIN', 'PRINCIPAL', 'ACCOUNTANT'),
   paymentController.getPaymentReport
 );
 

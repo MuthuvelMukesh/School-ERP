@@ -150,6 +150,115 @@ exports.requireOwnership = (resourceIdParam = 'id', bypassRoles = ['ADMIN', 'PRI
   };
 };
 
+// Enforce ownership for IDs passed in request body (e.g., { studentId })
+exports.requireBodyOwnership = (bodyField = 'id', bypassRoles = ['ADMIN', 'PRINCIPAL']) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ status: 'error', message: 'Not authenticated' });
+      }
+
+      if (bypassRoles.includes(req.user.role)) {
+        return next();
+      }
+
+      const resourceId = req.body?.[bodyField];
+      if (!resourceId) return next();
+
+      if (req.user.role === 'STUDENT') {
+        const studentProfile = await prisma.student.findUnique({
+          where: { userId: req.user.id }
+        });
+        if (studentProfile && studentProfile.id === resourceId) {
+          return next();
+        }
+      } else if (req.user.role === 'PARENT') {
+        const parentProfile = await prisma.parent.findUnique({
+          where: { userId: req.user.id },
+          include: { students: true }
+        });
+        if (parentProfile && parentProfile.students.some(s => s.id === resourceId)) {
+          return next();
+        }
+      } else if (['TEACHER', 'ACCOUNTANT', 'LIBRARIAN', 'TRANSPORT_STAFF'].includes(req.user.role)) {
+        const staffProfile = await prisma.staff.findUnique({
+          where: { userId: req.user.id }
+        });
+        if (staffProfile && staffProfile.id === resourceId) {
+          return next();
+        }
+      }
+
+      return res.status(403).json({
+        status: 'error',
+        message: 'Access denied. You can only access your own data.'
+      });
+    } catch (error) {
+      logger.error('Body ownership check error:', error);
+      res.status(500).json({ status: 'error', message: 'Authorization verification failed' });
+    }
+  };
+};
+
+// Enforce ownership for IDs passed in query params (e.g., ?studentId=...)
+exports.requireQueryOwnership = (queryField = 'id', bypassRoles = ['ADMIN', 'PRINCIPAL']) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ status: 'error', message: 'Not authenticated' });
+      }
+
+      if (bypassRoles.includes(req.user.role)) {
+        return next();
+      }
+
+      const resourceId = req.query?.[queryField];
+      if (!resourceId) {
+        if (req.user.role === 'STUDENT' || req.user.role === 'PARENT') {
+          return res.status(400).json({
+            status: 'error',
+            message: `${queryField} is required`
+          });
+        }
+
+        return next();
+      }
+
+      if (req.user.role === 'STUDENT') {
+        const studentProfile = await prisma.student.findUnique({
+          where: { userId: req.user.id }
+        });
+        if (studentProfile && studentProfile.id === resourceId) {
+          return next();
+        }
+      } else if (req.user.role === 'PARENT') {
+        const parentProfile = await prisma.parent.findUnique({
+          where: { userId: req.user.id },
+          include: { students: true }
+        });
+        if (parentProfile && parentProfile.students.some(s => s.id === resourceId)) {
+          return next();
+        }
+      } else if (['TEACHER', 'ACCOUNTANT', 'LIBRARIAN', 'TRANSPORT_STAFF'].includes(req.user.role)) {
+        const staffProfile = await prisma.staff.findUnique({
+          where: { userId: req.user.id }
+        });
+        if (staffProfile && staffProfile.id === resourceId) {
+          return next();
+        }
+      }
+
+      return res.status(403).json({
+        status: 'error',
+        message: 'Access denied. You can only access your own data.'
+      });
+    } catch (error) {
+      logger.error('Query ownership check error:', error);
+      res.status(500).json({ status: 'error', message: 'Authorization verification failed' });
+    }
+  };
+};
+
 const getInheritedRoles = async (role) => {
   const visited = new Set([role]);
   const queue = [role];

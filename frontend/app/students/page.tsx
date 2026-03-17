@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { studentAPI, metadataAPI } from '@/lib/api'
+import { useAuth } from '@/lib/useAuth'
 
 export default function StudentsPage() {
   const router = useRouter()
+  const { ready } = useAuth({ roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'PARENT'] })
   const [loading, setLoading] = useState(true)
   const [students, setStudents] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
@@ -16,6 +18,7 @@ export default function StudentsPage() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalStudents, setTotalStudents] = useState(0)
+  const [user, setUser] = useState<any>(null)
   const pageSize = 20
 
   // Add Student Modal
@@ -29,11 +32,14 @@ export default function StudentsPage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
+    if (!ready) return
     const userData = localStorage.getItem('user')
     if (!userData) { router.push('/auth/login'); return }
+    const parsed = JSON.parse(userData)
+    setUser(parsed)
     fetchClasses()
-    fetchStudents(1)
-  }, [router])
+    fetchStudents(1, undefined, parsed)
+  }, [ready, router])
 
   const fetchClasses = async () => {
     try {
@@ -42,11 +48,13 @@ export default function StudentsPage() {
     } catch {}
   }
 
-  const fetchStudents = async (page: number, classId?: string) => {
+  const fetchStudents = async (page: number, classId?: string, currentUser?: any) => {
     setLoading(true)
     try {
+      const u = currentUser ?? user
       const params: any = { page, limit: pageSize }
       if (classId || filterClass) params.classId = classId || filterClass
+      if (u?.role === 'PARENT') params.parentUserId = u.id
       const response = await studentAPI.getAll(params)
       setStudents(response.data?.data?.students || [])
       setTotalStudents(response.data?.data?.total || response.data?.data?.students?.length || 0)
@@ -107,9 +115,11 @@ export default function StudentsPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Students</h1>
           <div className="flex items-center gap-4">
-            <Link href="/students/progression" className="text-sm text-primary-600 hover:text-primary-700">
-              Promotion & Transfer
-            </Link>
+            {['ADMIN', 'PRINCIPAL'].includes(user?.role) && (
+              <Link href="/students/progression" className="text-sm text-primary-600 hover:text-primary-700">
+                Promotion & Transfer
+              </Link>
+            )}
             <Link href="/dashboard" className="text-sm text-primary-600 hover:text-primary-700">
               ← Back to Dashboard
             </Link>
@@ -156,9 +166,11 @@ export default function StudentsPage() {
               <button onClick={handleFilterApply} className="btn-primary text-sm">Apply</button>
               <button onClick={() => { setFilterClass(''); setFilterStatus('all'); setSearchQuery(''); fetchStudents(1) }} className="btn-secondary text-sm">Reset</button>
             </div>
-            <button onClick={() => setShowAddModal(true)} className="btn-primary text-sm whitespace-nowrap">
-              + Add Student
-            </button>
+            {['ADMIN', 'PRINCIPAL'].includes(user?.role) && (
+              <button onClick={() => setShowAddModal(true)} className="btn-primary text-sm whitespace-nowrap">
+                + Add Student
+              </button>
+            )}
           </div>
         </div>
 

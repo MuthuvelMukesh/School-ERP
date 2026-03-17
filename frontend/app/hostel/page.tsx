@@ -448,7 +448,7 @@ export default function HostelPage() {
             <div className="card text-center"><p className="text-sm text-gray-500">Vacant Beds</p><p className="text-2xl font-bold text-green-600">{summary.vacantBeds ?? 0}</p></div>
             <div className="card text-center"><p className="text-sm text-gray-500">Open Complaints</p><p className="text-2xl font-bold text-orange-600">{summary.openComplaints ?? 0}</p></div>
             <div className="card text-center"><p className="text-sm text-gray-500">Pending Leaves</p><p className="text-2xl font-bold text-blue-600">{summary.pendingLeaves ?? 0}</p></div>
-            <div className="card text-center"><p className="text-sm text-gray-500">Today's Visitors</p><p className="text-2xl font-bold">{summary.todayVisitors ?? 0}</p></div>
+            <div className="card text-center"><p className="text-sm text-gray-500">Today&apos;s Visitors</p><p className="text-2xl font-bold">{summary.todayVisitors ?? 0}</p></div>
           </div>
         )}
 

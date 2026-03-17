@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { staffAPI } from '@/lib/api'
+import { useAuth } from '@/lib/useAuth'
 
 export default function StaffPage() {
   const router = useRouter()
+  const { ready } = useAuth({ roles: ['ADMIN', 'PRINCIPAL'] })
   const [activeTab, setActiveTab] = useState<'list' | 'leaves'>('list')
   const [loading, setLoading] = useState(true)
   const [staff, setStaff] = useState<any[]>([])
@@ -32,10 +34,9 @@ export default function StaffPage() {
   const [submittingLeave, setSubmittingLeave] = useState(false)
 
   useEffect(() => {
-    const userData = localStorage.getItem('user')
-    if (!userData) { router.push('/auth/login'); return }
+    if (!ready) return
     fetchStaff()
-  }, [router])
+  }, [ready])
 
   const fetchStaff = async () => {
     setLoading(true)

@@ -9,6 +9,11 @@ exports.getAllStudents = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const where = {};
+
+    // Enforce parent scoping (parents can only list their own children)
+    if (req.user?.role === 'PARENT') {
+      where.parent = { userId: req.user.id };
+    }
     
     if (search) {
       where.OR = [
@@ -20,7 +25,7 @@ exports.getAllStudents = async (req, res) => {
 
     if (classId) where.classId = classId;
     if (parentId) where.parentId = parentId;
-    if (parentUserId) where.parent = { userId: parentUserId };
+    if (parentUserId && req.user?.role !== 'PARENT') where.parent = { userId: parentUserId };
 
     const [students, total] = await Promise.all([
       prisma.student.findMany({

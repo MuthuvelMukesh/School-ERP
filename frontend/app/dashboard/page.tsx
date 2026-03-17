@@ -219,7 +219,7 @@ export default function DashboardPage() {
 
           {/* Student / Parent — simple card navigation grid */}
           {['STUDENT', 'PARENT'].includes(user?.role) && (
-            <div className="mb-6">
+            <div className="card">
               <p className="text-sm text-gray-500 mb-4">
                 {user?.role === 'PARENT' ? 'What would you like to check today?' : 'What would you like to do today?'}
               </p>
@@ -249,67 +249,67 @@ export default function DashboardPage() {
 
           {/* Quick Actions + Recent Activities — admin/teacher/accountant only */}
           {!['STUDENT', 'PARENT'].includes(user?.role) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="card">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
-              <div className="space-y-2">
-                {['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role) && (
-                  <Link href="/students" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <Users className="w-5 h-5 text-primary-600" />
-                      <span className="font-medium">Manage Students</span>
-                    </div>
-                  </Link>
-                )}
-                {['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role) && (
-                  <Link href="/attendance" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <Calendar className="w-5 h-5 text-primary-600" />
-                      <span className="font-medium">Mark Attendance</span>
-                    </div>
-                  </Link>
-                )}
-                {['ADMIN', 'PRINCIPAL', 'ACCOUNTANT'].includes(user?.role) && (
-                  <Link href="/fees" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <DollarSign className="w-5 h-5 text-primary-600" />
-                      <span className="font-medium">Collect Fees</span>
-                    </div>
-                  </Link>
-                )}
-                {['ADMIN', 'PRINCIPAL'].includes(user?.role) && (
-                  <Link href="/students/progression" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <ArrowUpDown className="w-5 h-5 text-primary-600" />
-                      <span className="font-medium">Promote or Transfer Students</span>
-                    </div>
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            <div className="card">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activities</h2>
-              <div className="space-y-3">
-                {recentActivities.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No recent activities</p>
-                ) : (
-                  recentActivities.slice(0, 8).map((activity: any) => (
-                    <div key={activity.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                      <div className="w-2 h-2 rounded-full bg-primary-400 mt-2 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-700 truncate">{activity.description || activity.action}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                          {activity.module || 'System'} &middot;{' '}
-                          {new Date(activity.createdAt).toLocaleString()}
-                        </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="card">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+                <div className="space-y-2">
+                  {['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role) && (
+                    <Link href="/students" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Users className="w-5 h-5 text-primary-600" />
+                        <span className="font-medium">Manage Students</span>
                       </div>
-                    </div>
-                  ))
-                )}
+                    </Link>
+                  )}
+                  {['ADMIN', 'PRINCIPAL', 'TEACHER'].includes(user?.role) && (
+                    <Link href="/attendance" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="w-5 h-5 text-primary-600" />
+                        <span className="font-medium">Mark Attendance</span>
+                      </div>
+                    </Link>
+                  )}
+                  {['ADMIN', 'PRINCIPAL', 'ACCOUNTANT'].includes(user?.role) && (
+                    <Link href="/fees" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <DollarSign className="w-5 h-5 text-primary-600" />
+                        <span className="font-medium">Collect Fees</span>
+                      </div>
+                    </Link>
+                  )}
+                  {['ADMIN', 'PRINCIPAL'].includes(user?.role) && (
+                    <Link href="/students/progression" className="block p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <ArrowUpDown className="w-5 h-5 text-primary-600" />
+                        <span className="font-medium">Promote or Transfer Students</span>
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              <div className="card">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activities</h2>
+                <div className="space-y-3">
+                  {recentActivities.length === 0 ? (
+                    <p className="text-gray-500 text-sm">No recent activities</p>
+                  ) : (
+                    recentActivities.slice(0, 8).map((activity: any) => (
+                      <div key={activity.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                        <div className="w-2 h-2 rounded-full bg-primary-400 mt-2 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700 truncate">{activity.description || activity.action}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {activity.module || 'System'} &middot;{' '}
+                            {new Date(activity.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
-          </div>
           )}
         </main>
       </div>

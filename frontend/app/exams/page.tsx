@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { examAPI, metadataAPI, studentAPI } from '@/lib/api'
+import { useAuth } from '@/lib/useAuth'
 
 export default function ExamsPage() {
   const router = useRouter()
+  const { ready } = useAuth({ roles: ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'] })
   const [activeTab, setActiveTab] = useState<'schedules' | 'results'>('schedules')
   const [loading, setLoading] = useState(true)
   const [schedules, setSchedules] = useState<any[]>([])
@@ -15,14 +17,22 @@ export default function ExamsPage() {
   const [classes, setClasses] = useState<any[]>([])
   const [subjects, setSubjects] = useState<any[]>([])
   const [students, setStudents] = useState<any[]>([])
+  const [academicYears, setAcademicYears] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
   const [myChildren, setMyChildren] = useState<any[]>([])
+  const [selectedChildId, setSelectedChildId] = useState('')
 
   // Schedule modal
   const [showScheduleModal, setShowScheduleModal] = useState(false)
   const [scheduleForm, setScheduleForm] = useState({
-    name: '', examType: 'WRITTEN', classId: '', subjectId: '',
-    examDate: '', startTime: '', endTime: '', totalMarks: '', passingMarks: '', venue: ''
+    name: '',
+    examType: 'UNIT_TEST',
+    classId: '',
+    academicYearId: '',
+    startDate: '',
+    endDate: '',
+    totalMarks: '100',
+    passingMarks: '35',
   })
   const [submittingSchedule, setSubmittingSchedule] = useState(false)
 
@@ -30,40 +40,69 @@ export default function ExamsPage() {
   const [showResultModal, setShowResultModal] = useState(false)
   const [resultForm, setResultForm] = useState({
     examScheduleId: '', studentId: '', subjectId: '',
-    marksObtained: '', totalMarks: '', grade: '', remarks: ''
+    marksObtained: '', remarks: ''
   })
   const [submittingResult, setSubmittingResult] = useState(false)
 
   useEffect(() => {
+    if (!ready) return
     const userData = localStorage.getItem('user')
     if (!userData) { router.push('/auth/login'); return }
     const parsedUser = JSON.parse(userData)
     setUser(parsedUser)
     if (parsedUser.role === 'PARENT') {
       studentAPI.getAll({ parentUserId: parsedUser.id, limit: 20 }).then(res => {
-        setMyChildren(res.data?.data?.students || [])
+        const kids = res.data?.data?.students || []
+        setMyChildren(kids)
+        if (!selectedChildId && kids.length > 0) setSelectedChildId(kids[0].id)
       }).catch(() => {})
     }
     fetchAll(parsedUser)
-  }, [router])
+  }, [ready, router])
+
+  useEffect(() => {
+    if (user?.role === 'PARENT' && selectedChildId) {
+      fetchAll(user)
+    }
+  }, [user?.role, selectedChildId])
 
   const fetchAll = async (currentUser?: any) => {
     setLoading(true)
     const u = currentUser ?? user
-    const studentFilter = u?.role === 'STUDENT' && u?.profile?.id ? { studentId: u.profile.id } : {}
     try {
-      const [schedulesRes, resultsRes, classesRes, subjectsRes, studentsRes] = await Promise.all([
+      const [schedulesRes, classesRes, subjectsRes, ayRes] = await Promise.all([
         examAPI.getAllSchedules(),
-        examAPI.getAllResults(studentFilter),
         metadataAPI.getClasses(),
         metadataAPI.getSubjects(),
-        studentAPI.getAll({ page: 1, limit: 200 }),
+        metadataAPI.getAcademicYears(),
       ])
       setSchedules(schedulesRes.data?.data?.schedules || [])
-      setResults(resultsRes.data?.data?.results || [])
       setClasses(classesRes.data?.data?.classes || classesRes.data?.classes || [])
       setSubjects(subjectsRes.data?.data?.subjects || subjectsRes.data?.subjects || [])
-      setStudents(studentsRes.data?.data?.students || [])
+      setAcademicYears(ayRes.data?.data?.academicYears || [])
+
+      if (u?.role === 'STUDENT' && u?.profile?.id) {
+        const resultsRes = await examAPI.getStudentResults(u.profile.id)
+        setResults(resultsRes.data?.data?.results || [])
+        setStudents([])
+      } else if (u?.role === 'PARENT') {
+        if (selectedChildId) {
+          const resultsRes = await examAPI.getStudentResults(selectedChildId)
+          setResults(resultsRes.data?.data?.results || [])
+        } else {
+          setResults([])
+        }
+        setStudents([])
+      } else {
+        const resultsRes = await examAPI.getAllResults()
+        setResults(resultsRes.data?.data?.results || [])
+        if (['ADMIN', 'TEACHER'].includes(u?.role)) {
+          const studentsRes = await studentAPI.getAll({ page: 1, limit: 200 })
+          setStudents(studentsRes.data?.data?.students || [])
+        } else {
+          setStudents([])
+        }
+      }
     } catch {
       toast.error('Failed to load exam data')
     } finally {
@@ -76,13 +115,18 @@ export default function ExamsPage() {
     setSubmittingSchedule(true)
     try {
       await examAPI.createSchedule({
-        ...scheduleForm,
+        name: scheduleForm.name,
+        examType: scheduleForm.examType,
+        classId: scheduleForm.classId,
+        academicYearId: scheduleForm.academicYearId,
+        startDate: scheduleForm.startDate,
+        endDate: scheduleForm.endDate,
         totalMarks: Number(scheduleForm.totalMarks),
         passingMarks: Number(scheduleForm.passingMarks),
       })
       toast.success('Exam schedule created')
       setShowScheduleModal(false)
-      setScheduleForm({ name: '', examType: 'WRITTEN', classId: '', subjectId: '', examDate: '', startTime: '', endTime: '', totalMarks: '', passingMarks: '', venue: '' })
+      setScheduleForm({ name: '', examType: 'UNIT_TEST', classId: '', academicYearId: '', startDate: '', endDate: '', totalMarks: '100', passingMarks: '35' })
       fetchAll()
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Failed to create schedule')
@@ -96,13 +140,15 @@ export default function ExamsPage() {
     setSubmittingResult(true)
     try {
       await examAPI.createResult({
-        ...resultForm,
+        examScheduleId: resultForm.examScheduleId,
+        studentId: resultForm.studentId,
+        subjectId: resultForm.subjectId,
         marksObtained: Number(resultForm.marksObtained),
-        totalMarks: Number(resultForm.totalMarks),
+        remarks: resultForm.remarks || undefined,
       })
       toast.success('Exam result recorded')
       setShowResultModal(false)
-      setResultForm({ examScheduleId: '', studentId: '', subjectId: '', marksObtained: '', totalMarks: '', grade: '', remarks: '' })
+      setResultForm({ examScheduleId: '', studentId: '', subjectId: '', marksObtained: '', remarks: '' })
       fetchAll()
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Failed to record result')
@@ -111,7 +157,7 @@ export default function ExamsPage() {
     }
   }
 
-  const upcomingCount = schedules.filter(s => new Date(s.examDate) >= new Date()).length
+  const upcomingCount = schedules.filter(s => s.startDate && new Date(s.startDate) >= new Date()).length
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -133,21 +179,25 @@ export default function ExamsPage() {
             {myChildren.length === 0 ? (
               <p className="text-sm text-blue-600">No children linked to your account yet.</p>
             ) : (
-              <div className="flex flex-wrap gap-2">
-                {myChildren.map((child: any) => (
-                  <Link
-                    key={child.id}
-                    href={`/students/${child.id}`}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-300 rounded-full text-sm text-blue-700 hover:bg-blue-100 transition-colors"
-                  >
-                    <span className="font-medium">{child.firstName} {child.lastName}</span>
-                    <span className="text-xs text-blue-400">{child.class?.name}</span>
-                    <span className="text-xs text-blue-500">→ View Results</span>
+              <div className="flex flex-col md:flex-row gap-3 md:items-center">
+                <div className="flex-1">
+                  <label className="label">Select Child</label>
+                  <select className="input" value={selectedChildId} onChange={e => setSelectedChildId(e.target.value)}>
+                    {myChildren.map((child: any) => (
+                      <option key={child.id} value={child.id}>
+                        {child.firstName} {child.lastName} {child.class?.name ? `(${child.class.name})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {selectedChildId && (
+                  <Link href={`/students/${selectedChildId}`} className="btn-secondary text-sm whitespace-nowrap">
+                    View Student Profile
                   </Link>
-                ))}
+                )}
               </div>
             )}
-            <p className="text-xs text-blue-500 mt-2">Click a child to view their exam results and full profile.</p>
+            <p className="text-xs text-blue-500 mt-2">Results list updates based on the selected child.</p>
           </div>
         )}
 
@@ -189,7 +239,7 @@ export default function ExamsPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Exam Schedules</h2>
-              {!['STUDENT', 'PARENT'].includes(user?.role) && (
+              {['ADMIN', 'PRINCIPAL'].includes(user?.role) && (
                 <button onClick={() => setShowScheduleModal(true)} className="btn-primary text-sm">
                   + Add Schedule
                 </button>
@@ -210,11 +260,10 @@ export default function ExamsPage() {
                       <th className="px-4 py-3">Exam Name</th>
                       <th className="px-4 py-3">Type</th>
                       <th className="px-4 py-3">Class</th>
-                      <th className="px-4 py-3">Subject</th>
-                      <th className="px-4 py-3">Date</th>
-                      <th className="px-4 py-3">Time</th>
-                      <th className="px-4 py-3">Max Marks</th>
-                      <th className="px-4 py-3">Venue</th>
+                      <th className="px-4 py-3">Academic Year</th>
+                      <th className="px-4 py-3">Start</th>
+                      <th className="px-4 py-3">End</th>
+                      <th className="px-4 py-3">Marks</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -227,15 +276,10 @@ export default function ExamsPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-600">{schedule.class?.name || '-'}</td>
-                        <td className="px-4 py-3 text-gray-600">{schedule.subject?.name || '-'}</td>
-                        <td className="px-4 py-3 text-gray-600">
-                          {schedule.examDate ? new Date(schedule.examDate).toLocaleDateString() : '-'}
-                        </td>
-                        <td className="px-4 py-3 text-gray-600">
-                          {schedule.startTime && schedule.endTime ? `${schedule.startTime} – ${schedule.endTime}` : '-'}
-                        </td>
-                        <td className="px-4 py-3 text-gray-600">{schedule.totalMarks ?? '-'}</td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">{schedule.venue || '-'}</td>
+                        <td className="px-4 py-3 text-gray-600">{schedule.academicYear?.name || schedule.academicYear?.year || '-'}</td>
+                        <td className="px-4 py-3 text-gray-600">{schedule.startDate ? new Date(schedule.startDate).toLocaleDateString() : '-'}</td>
+                        <td className="px-4 py-3 text-gray-600">{schedule.endDate ? new Date(schedule.endDate).toLocaleDateString() : '-'}</td>
+                        <td className="px-4 py-3 text-gray-600">{schedule.totalMarks ?? '-'} / {schedule.passingMarks ?? '-'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -250,7 +294,7 @@ export default function ExamsPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Exam Results</h2>
-              {!['STUDENT', 'PARENT'].includes(user?.role) && (
+              {['ADMIN', 'TEACHER'].includes(user?.role) && (
                 <button onClick={() => setShowResultModal(true)} className="btn-primary text-sm">
                   + Record Result
                 </button>
@@ -267,33 +311,33 @@ export default function ExamsPage() {
                 <table className="min-w-full text-sm">
                   <thead>
                     <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      <th className="px-4 py-3">Student</th>
+                      {!['STUDENT', 'PARENT'].includes(user?.role) && <th className="px-4 py-3">Student</th>}
                       <th className="px-4 py-3">Exam</th>
                       <th className="px-4 py-3">Subject</th>
                       <th className="px-4 py-3">Marks</th>
-                      <th className="px-4 py-3">Grade</th>
                       <th className="px-4 py-3">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {results.map(result => {
-                      const pct = result.totalMarks > 0 ? Math.round((result.marksObtained / result.totalMarks) * 100) : 0
-                      const passed = pct >= (result.passingMarks ? (result.passingMarks / result.totalMarks) * 100 : 35)
+                      const totalMarks = result.examSchedule?.totalMarks ?? 0
+                      const passingMarks = result.examSchedule?.passingMarks ?? 0
+                      const pct = totalMarks > 0 ? Math.round((result.marksObtained / totalMarks) * 100) : 0
+                      const passed = typeof result.marksObtained === 'number'
+                        ? result.marksObtained >= passingMarks
+                        : false
                       return (
                         <tr key={result.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 font-medium text-gray-900">
-                            {result.student?.firstName || ''} {result.student?.lastName || ''}
-                          </td>
+                          {!['STUDENT', 'PARENT'].includes(user?.role) && (
+                            <td className="px-4 py-3 font-medium text-gray-900">
+                              {result.student?.firstName || ''} {result.student?.lastName || ''}
+                            </td>
+                          )}
                           <td className="px-4 py-3 text-gray-600">{result.examSchedule?.name || '-'}</td>
-                          <td className="px-4 py-3 text-gray-600">{result.subject?.name || result.examSchedule?.subject?.name || '-'}</td>
+                          <td className="px-4 py-3 text-gray-600">{result.subject?.name || '-'}</td>
                           <td className="px-4 py-3 text-gray-600">
-                            {result.marksObtained ?? '-'} / {result.totalMarks ?? '-'}
-                            {result.totalMarks > 0 && <span className="ml-1 text-xs text-gray-400">({pct}%)</span>}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800">
-                              {result.grade || '-'}
-                            </span>
+                            {result.marksObtained ?? '-'} / {totalMarks || '-'}
+                            {totalMarks > 0 && <span className="ml-1 text-xs text-gray-400">({pct}%)</span>}
                           </td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -328,10 +372,11 @@ export default function ExamsPage() {
                 <div>
                   <label className="label">Exam Type</label>
                   <select className="input" value={scheduleForm.examType} onChange={e => setScheduleForm(f => ({ ...f, examType: e.target.value }))}>
-                    <option value="WRITTEN">Written</option>
-                    <option value="ORAL">Oral</option>
-                    <option value="PRACTICAL">Practical</option>
-                    <option value="INTERNAL">Internal</option>
+                    <option value="UNIT_TEST">Unit Test</option>
+                    <option value="QUARTERLY">Quarterly</option>
+                    <option value="HALF_YEARLY">Half Yearly</option>
+                    <option value="ANNUAL">Annual</option>
+                    <option value="MODEL_EXAM">Model Exam</option>
                   </select>
                 </div>
                 <div>
@@ -342,23 +387,21 @@ export default function ExamsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="label">Subject *</label>
-                  <select className="input" required value={scheduleForm.subjectId} onChange={e => setScheduleForm(f => ({ ...f, subjectId: e.target.value }))}>
-                    <option value="">Select Subject</option>
-                    {subjects.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  <label className="label">Academic Year *</label>
+                  <select className="input" required value={scheduleForm.academicYearId} onChange={e => setScheduleForm(f => ({ ...f, academicYearId: e.target.value }))}>
+                    <option value="">Select Year</option>
+                    {academicYears.map((ay: any) => (
+                      <option key={ay.id} value={ay.id}>{ay.name || ay.year}{ay.isCurrent ? ' (Current)' : ''}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label className="label">Exam Date *</label>
-                  <input type="date" className="input" required value={scheduleForm.examDate} onChange={e => setScheduleForm(f => ({ ...f, examDate: e.target.value }))} />
+                  <label className="label">Start Date *</label>
+                  <input type="date" className="input" required value={scheduleForm.startDate} onChange={e => setScheduleForm(f => ({ ...f, startDate: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="label">Start Time</label>
-                  <input type="time" className="input" value={scheduleForm.startTime} onChange={e => setScheduleForm(f => ({ ...f, startTime: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="label">End Time</label>
-                  <input type="time" className="input" value={scheduleForm.endTime} onChange={e => setScheduleForm(f => ({ ...f, endTime: e.target.value }))} />
+                  <label className="label">End Date *</label>
+                  <input type="date" className="input" required value={scheduleForm.endDate} onChange={e => setScheduleForm(f => ({ ...f, endDate: e.target.value }))} />
                 </div>
                 <div>
                   <label className="label">Total Marks *</label>
@@ -367,10 +410,6 @@ export default function ExamsPage() {
                 <div>
                   <label className="label">Passing Marks</label>
                   <input type="number" className="input" placeholder="35" value={scheduleForm.passingMarks} onChange={e => setScheduleForm(f => ({ ...f, passingMarks: e.target.value }))} />
-                </div>
-                <div className="col-span-2">
-                  <label className="label">Venue</label>
-                  <input className="input" placeholder="e.g. Hall A" value={scheduleForm.venue} onChange={e => setScheduleForm(f => ({ ...f, venue: e.target.value }))} />
                 </div>
               </div>
               <div className="flex justify-end gap-3 pt-2">
@@ -409,29 +448,14 @@ export default function ExamsPage() {
               </div>
               <div>
                 <label className="label">Subject</label>
-                <select className="input" value={resultForm.subjectId} onChange={e => setResultForm(f => ({ ...f, subjectId: e.target.value }))}>
+                <select className="input" required value={resultForm.subjectId} onChange={e => setResultForm(f => ({ ...f, subjectId: e.target.value }))}>
                   <option value="">Select Subject</option>
                   {subjects.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="label">Marks Obtained *</label>
-                  <input type="number" className="input" required value={resultForm.marksObtained} onChange={e => setResultForm(f => ({ ...f, marksObtained: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="label">Total Marks *</label>
-                  <input type="number" className="input" required value={resultForm.totalMarks} onChange={e => setResultForm(f => ({ ...f, totalMarks: e.target.value }))} />
-                </div>
-              </div>
               <div>
-                <label className="label">Grade</label>
-                <select className="input" value={resultForm.grade} onChange={e => setResultForm(f => ({ ...f, grade: e.target.value }))}>
-                  <option value="">Auto-calculate</option>
-                  {['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F'].map(g => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
+                <label className="label">Marks Obtained *</label>
+                <input type="number" className="input" required value={resultForm.marksObtained} onChange={e => setResultForm(f => ({ ...f, marksObtained: e.target.value }))} />
               </div>
               <div>
                 <label className="label">Remarks</label>

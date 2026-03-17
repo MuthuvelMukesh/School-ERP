@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { permissionAPI } from '@/lib/api'
+import { useAuth } from '@/lib/useAuth'
 
 const roles = ['ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT', 'ACCOUNTANT', 'LIBRARIAN', 'TRANSPORT_STAFF']
 
 export default function PermissionsPage() {
-  const router = useRouter()
+  const { ready } = useAuth({ roles: ['ADMIN'] })
   const [loading, setLoading] = useState(true)
   const [permissions, setPermissions] = useState<any[]>([])
   const [hierarchy, setHierarchy] = useState<any[]>([])
@@ -49,21 +49,9 @@ export default function PermissionsPage() {
   }, [selectedPermission])
 
   useEffect(() => {
-    const userData = localStorage.getItem('user')
-    if (!userData) {
-      router.push('/auth/login')
-      return
-    }
-
-    const user = JSON.parse(userData)
-    if (!['ADMIN', 'PRINCIPAL'].includes(user?.role)) {
-      toast.error('Access denied')
-      router.push('/dashboard')
-      return
-    }
-
+    if (!ready) return
     fetchData()
-  }, [router, fetchData])
+  }, [ready, fetchData])
 
   const handleInitialize = async () => {
     try {

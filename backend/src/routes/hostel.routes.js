@@ -1,10 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const hostelController = require('../controllers/hostel.controller');
-const { validateToken } = require('../middleware/auth.middleware');
+const {
+	validateToken,
+	authorize,
+	requireOwnership,
+	requireBodyOwnership,
+	requireQueryOwnership
+} = require('../middleware/auth.middleware');
 
 // Apply token validation to all routes
 router.use(validateToken);
+
+const HOSTEL_MANAGERS = ['ADMIN', 'PRINCIPAL'];
+const HOSTEL_FINANCE = ['ADMIN', 'PRINCIPAL', 'ACCOUNTANT'];
+const HOSTEL_VIEWERS = [
+	'ADMIN',
+	'PRINCIPAL',
+	'TEACHER',
+	'STUDENT',
+	'PARENT',
+	'ACCOUNTANT',
+	'LIBRARIAN',
+	'TRANSPORT_STAFF'
+];
 
 // ==================== Hostel Management Routes ====================
 
@@ -14,7 +33,7 @@ router.use(validateToken);
  * @access  Private (Admin, Principal)
  * @body    { name, type, capacity, wardenId?, address?, contactNo?, facilities?, rules? }
  */
-router.post('/hostels', hostelController.addHostel);
+router.post('/hostels', authorize(...HOSTEL_MANAGERS), hostelController.addHostel);
 
 /**
  * @route   GET /api/hostel/hostels
@@ -22,7 +41,7 @@ router.post('/hostels', hostelController.addHostel);
  * @access  Private
  * @query   type?, page?, limit?
  */
-router.get('/hostels', hostelController.getAllHostels);
+router.get('/hostels', authorize(...HOSTEL_VIEWERS), hostelController.getAllHostels);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId
@@ -30,7 +49,7 @@ router.get('/hostels', hostelController.getAllHostels);
  * @access  Private
  * @params  hostelId
  */
-router.get('/hostels/:hostelId', hostelController.getHostelDetails);
+router.get('/hostels/:hostelId', authorize(...HOSTEL_MANAGERS), hostelController.getHostelDetails);
 
 /**
  * @route   PUT /api/hostel/hostels/:hostelId
@@ -39,7 +58,7 @@ router.get('/hostels/:hostelId', hostelController.getHostelDetails);
  * @params  hostelId
  * @body    { name?, type?, capacity?, wardenId?, address?, contactNo?, facilities?, rules? }
  */
-router.put('/hostels/:hostelId', hostelController.updateHostel);
+router.put('/hostels/:hostelId', authorize(...HOSTEL_MANAGERS), hostelController.updateHostel);
 
 /**
  * @route   DELETE /api/hostel/hostels/:hostelId
@@ -47,7 +66,7 @@ router.put('/hostels/:hostelId', hostelController.updateHostel);
  * @access  Private (Admin, Principal)
  * @params  hostelId
  */
-router.delete('/hostels/:hostelId', hostelController.deleteHostel);
+router.delete('/hostels/:hostelId', authorize(...HOSTEL_MANAGERS), hostelController.deleteHostel);
 
 // ==================== Room Management Routes ====================
 
@@ -57,7 +76,7 @@ router.delete('/hostels/:hostelId', hostelController.deleteHostel);
  * @access  Private (Admin, Principal, Warden)
  * @body    { hostelId, roomNumber, floor?, capacity, type, rentAmount, amenities? }
  */
-router.post('/rooms', hostelController.addRoom);
+router.post('/rooms', authorize(...HOSTEL_MANAGERS), hostelController.addRoom);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/rooms
@@ -66,7 +85,7 @@ router.post('/rooms', hostelController.addRoom);
  * @params  hostelId
  * @query   type?, status?
  */
-router.get('/hostels/:hostelId/rooms', hostelController.getRoomsByHostel);
+router.get('/hostels/:hostelId/rooms', authorize(...HOSTEL_MANAGERS), hostelController.getRoomsByHostel);
 
 /**
  * @route   PUT /api/hostel/rooms/:roomId
@@ -75,7 +94,7 @@ router.get('/hostels/:hostelId/rooms', hostelController.getRoomsByHostel);
  * @params  roomId
  * @body    { roomNumber?, floor?, capacity?, type?, rentAmount?, amenities?, status? }
  */
-router.put('/rooms/:roomId', hostelController.updateRoom);
+router.put('/rooms/:roomId', authorize(...HOSTEL_MANAGERS), hostelController.updateRoom);
 
 /**
  * @route   DELETE /api/hostel/rooms/:roomId
@@ -83,7 +102,7 @@ router.put('/rooms/:roomId', hostelController.updateRoom);
  * @access  Private (Admin, Principal)
  * @params  roomId
  */
-router.delete('/rooms/:roomId', hostelController.deleteRoom);
+router.delete('/rooms/:roomId', authorize(...HOSTEL_MANAGERS), hostelController.deleteRoom);
 
 // ==================== Bed Management Routes ====================
 
@@ -93,7 +112,7 @@ router.delete('/rooms/:roomId', hostelController.deleteRoom);
  * @access  Private
  * @params  roomId
  */
-router.get('/rooms/:roomId/beds', hostelController.getBedsByRoom);
+router.get('/rooms/:roomId/beds', authorize(...HOSTEL_MANAGERS), hostelController.getBedsByRoom);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/beds/vacant
@@ -102,7 +121,7 @@ router.get('/rooms/:roomId/beds', hostelController.getBedsByRoom);
  * @params  hostelId
  * @query   roomType?
  */
-router.get('/hostels/:hostelId/beds/vacant', hostelController.getVacantBeds);
+router.get('/hostels/:hostelId/beds/vacant', authorize(...HOSTEL_MANAGERS), hostelController.getVacantBeds);
 
 /**
  * @route   PUT /api/hostel/beds/:bedId
@@ -111,7 +130,7 @@ router.get('/hostels/:hostelId/beds/vacant', hostelController.getVacantBeds);
  * @params  bedId
  * @body    { status, studentId? }
  */
-router.put('/beds/:bedId', hostelController.updateBedStatus);
+router.put('/beds/:bedId', authorize(...HOSTEL_MANAGERS), hostelController.updateBedStatus);
 
 // ==================== Student Allocation Routes ====================
 
@@ -121,7 +140,7 @@ router.put('/beds/:bedId', hostelController.updateBedStatus);
  * @access  Private (Admin, Principal, Warden)
  * @body    { studentId, hostelId, roomId, bedId, checkInDate, depositAmount?, monthlyFee?, emergencyContact?, specialRequirements? }
  */
-router.post('/students/allocate', hostelController.allocateStudent);
+router.post('/students/allocate', authorize(...HOSTEL_MANAGERS), hostelController.allocateStudent);
 
 /**
  * @route   POST /api/hostel/students/:allocationId/deallocate
@@ -130,7 +149,7 @@ router.post('/students/allocate', hostelController.allocateStudent);
  * @params  allocationId
  * @body    { checkOutDate, refundDeposit? }
  */
-router.post('/students/:allocationId/deallocate', hostelController.deallocateStudent);
+router.post('/students/:allocationId/deallocate', authorize(...HOSTEL_MANAGERS), hostelController.deallocateStudent);
 
 /**
  * @route   GET /api/hostel/students/:studentId/allocation
@@ -138,7 +157,7 @@ router.post('/students/:allocationId/deallocate', hostelController.deallocateStu
  * @access  Private
  * @params  studentId
  */
-router.get('/students/:studentId/allocation', hostelController.getStudentAllocation);
+router.get('/students/:studentId/allocation', requireOwnership('studentId', ['ADMIN', 'PRINCIPAL']), hostelController.getStudentAllocation);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/students
@@ -147,7 +166,7 @@ router.get('/students/:studentId/allocation', hostelController.getStudentAllocat
  * @params  hostelId
  * @query   includeCheckedOut?
  */
-router.get('/hostels/:hostelId/students', hostelController.getHostelStudents);
+router.get('/hostels/:hostelId/students', authorize(...HOSTEL_MANAGERS), hostelController.getHostelStudents);
 
 /**
  * @route   PUT /api/hostel/students/:allocationId
@@ -156,7 +175,7 @@ router.get('/hostels/:hostelId/students', hostelController.getHostelStudents);
  * @params  allocationId
  * @body    { monthlyFee?, emergencyContact?, specialRequirements? }
  */
-router.put('/students/:allocationId', hostelController.updateStudentAllocation);
+router.put('/students/:allocationId', authorize(...HOSTEL_MANAGERS), hostelController.updateStudentAllocation);
 
 /**
  * @route   POST /api/hostel/students/:allocationId/mark-paid
@@ -164,7 +183,7 @@ router.put('/students/:allocationId', hostelController.updateStudentAllocation);
  * @access  Private (Admin, Accountant)
  * @params  allocationId
  */
-router.post('/students/:allocationId/mark-paid', hostelController.markHostelFeePaid);
+router.post('/students/:allocationId/mark-paid', authorize(...HOSTEL_FINANCE), hostelController.markHostelFeePaid);
 
 // ==================== Visitor Management Routes ====================
 
@@ -174,7 +193,12 @@ router.post('/students/:allocationId/mark-paid', hostelController.markHostelFeeP
  * @access  Private (Warden, Security)
  * @body    { studentId, visitorName, relation?, contactNo?, purpose, visitDate, inTime?, outTime? }
  */
-router.post('/visitors', hostelController.registerVisitor);
+router.post(
+	'/visitors',
+	authorize('STUDENT', 'PARENT', ...HOSTEL_MANAGERS),
+	requireBodyOwnership('studentId', ['ADMIN', 'PRINCIPAL']),
+	hostelController.registerVisitor
+);
 
 /**
  * @route   GET /api/hostel/students/:studentId/visitors
@@ -183,7 +207,7 @@ router.post('/visitors', hostelController.registerVisitor);
  * @params  studentId
  * @query   dateFrom?, dateTo?
  */
-router.get('/students/:studentId/visitors', hostelController.getVisitorsByStudent);
+router.get('/students/:studentId/visitors', requireOwnership('studentId', ['ADMIN', 'PRINCIPAL']), hostelController.getVisitorsByStudent);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/visitors
@@ -192,7 +216,7 @@ router.get('/students/:studentId/visitors', hostelController.getVisitorsByStuden
  * @params  hostelId
  * @query   date?, approved?
  */
-router.get('/hostels/:hostelId/visitors', hostelController.getVisitorsByHostel);
+router.get('/hostels/:hostelId/visitors', authorize(...HOSTEL_MANAGERS), hostelController.getVisitorsByHostel);
 
 /**
  * @route   PUT /api/hostel/visitors/:visitorId
@@ -201,7 +225,7 @@ router.get('/hostels/:hostelId/visitors', hostelController.getVisitorsByHostel);
  * @params  visitorId
  * @body    { inTime?, outTime?, remarks? }
  */
-router.put('/visitors/:visitorId', hostelController.updateVisitor);
+router.put('/visitors/:visitorId', authorize(...HOSTEL_MANAGERS), hostelController.updateVisitor);
 
 /**
  * @route   POST /api/hostel/visitors/:visitorId/approve
@@ -209,7 +233,7 @@ router.put('/visitors/:visitorId', hostelController.updateVisitor);
  * @access  Private (Warden, Security)
  * @params  visitorId
  */
-router.post('/visitors/:visitorId/approve', hostelController.approveVisitor);
+router.post('/visitors/:visitorId/approve', authorize(...HOSTEL_MANAGERS), hostelController.approveVisitor);
 
 // ==================== Complaint Management Routes ====================
 
@@ -219,7 +243,12 @@ router.post('/visitors/:visitorId/approve', hostelController.approveVisitor);
  * @access  Private (Students, Warden)
  * @body    { studentId, hostelId, category, subject, description, priority? }
  */
-router.post('/complaints', hostelController.registerComplaint);
+router.post(
+	'/complaints',
+	authorize('STUDENT', 'PARENT', ...HOSTEL_MANAGERS),
+	requireBodyOwnership('studentId', ['ADMIN', 'PRINCIPAL']),
+	hostelController.registerComplaint
+);
 
 /**
  * @route   GET /api/hostel/complaints
@@ -227,7 +256,12 @@ router.post('/complaints', hostelController.registerComplaint);
  * @access  Private
  * @query   hostelId?, studentId?, status?, category?, priority?, page?, limit?
  */
-router.get('/complaints', hostelController.getComplaints);
+router.get(
+	'/complaints',
+	authorize('ADMIN', 'PRINCIPAL', 'STUDENT', 'PARENT'),
+	requireQueryOwnership('studentId', ['ADMIN', 'PRINCIPAL']),
+	hostelController.getComplaints
+);
 
 /**
  * @route   PUT /api/hostel/complaints/:complaintId/status
@@ -236,7 +270,7 @@ router.get('/complaints', hostelController.getComplaints);
  * @params  complaintId
  * @body    { status, assignedTo? }
  */
-router.put('/complaints/:complaintId/status', hostelController.updateComplaintStatus);
+router.put('/complaints/:complaintId/status', authorize(...HOSTEL_MANAGERS), hostelController.updateComplaintStatus);
 
 /**
  * @route   POST /api/hostel/complaints/:complaintId/resolve
@@ -245,7 +279,7 @@ router.put('/complaints/:complaintId/status', hostelController.updateComplaintSt
  * @params  complaintId
  * @body    { resolution }
  */
-router.post('/complaints/:complaintId/resolve', hostelController.resolveComplaint);
+router.post('/complaints/:complaintId/resolve', authorize(...HOSTEL_MANAGERS), hostelController.resolveComplaint);
 
 // ==================== Leave Management Routes ====================
 
@@ -255,7 +289,12 @@ router.post('/complaints/:complaintId/resolve', hostelController.resolveComplain
  * @access  Private (Students)
  * @body    { studentId, hostelId, leaveFrom, leaveTo, reason, destination?, contactNo }
  */
-router.post('/leaves', hostelController.applyLeave);
+router.post(
+	'/leaves',
+	authorize('STUDENT', 'PARENT'),
+	requireBodyOwnership('studentId', ['ADMIN', 'PRINCIPAL']),
+	hostelController.applyLeave
+);
 
 /**
  * @route   GET /api/hostel/leaves
@@ -263,7 +302,12 @@ router.post('/leaves', hostelController.applyLeave);
  * @access  Private
  * @query   hostelId?, studentId?, status?, page?, limit?
  */
-router.get('/leaves', hostelController.getLeaveRequests);
+router.get(
+	'/leaves',
+	authorize('ADMIN', 'PRINCIPAL', 'STUDENT', 'PARENT'),
+	requireQueryOwnership('studentId', ['ADMIN', 'PRINCIPAL']),
+	hostelController.getLeaveRequests
+);
 
 /**
  * @route   POST /api/hostel/leaves/:leaveId/approve
@@ -272,7 +316,7 @@ router.get('/leaves', hostelController.getLeaveRequests);
  * @params  leaveId
  * @body    { remarks? }
  */
-router.post('/leaves/:leaveId/approve', hostelController.approveLeave);
+router.post('/leaves/:leaveId/approve', authorize(...HOSTEL_MANAGERS), hostelController.approveLeave);
 
 /**
  * @route   POST /api/hostel/leaves/:leaveId/reject
@@ -281,7 +325,7 @@ router.post('/leaves/:leaveId/approve', hostelController.approveLeave);
  * @params  leaveId
  * @body    { remarks }
  */
-router.post('/leaves/:leaveId/reject', hostelController.rejectLeave);
+router.post('/leaves/:leaveId/reject', authorize(...HOSTEL_MANAGERS), hostelController.rejectLeave);
 
 // ==================== Notice Management Routes ====================
 
@@ -291,7 +335,7 @@ router.post('/leaves/:leaveId/reject', hostelController.rejectLeave);
  * @access  Private (Admin, Warden)
  * @body    { hostelId, title, content, priority?, expiryDate? }
  */
-router.post('/notices', hostelController.createNotice);
+router.post('/notices', authorize(...HOSTEL_MANAGERS), hostelController.createNotice);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/notices
@@ -300,7 +344,7 @@ router.post('/notices', hostelController.createNotice);
  * @params  hostelId
  * @query   activeOnly?
  */
-router.get('/hostels/:hostelId/notices', hostelController.getNotices);
+router.get('/hostels/:hostelId/notices', authorize(...HOSTEL_VIEWERS), hostelController.getNotices);
 
 /**
  * @route   PUT /api/hostel/notices/:noticeId
@@ -309,7 +353,7 @@ router.get('/hostels/:hostelId/notices', hostelController.getNotices);
  * @params  noticeId
  * @body    { title?, content?, priority?, isActive?, expiryDate? }
  */
-router.put('/notices/:noticeId', hostelController.updateNotice);
+router.put('/notices/:noticeId', authorize(...HOSTEL_MANAGERS), hostelController.updateNotice);
 
 /**
  * @route   DELETE /api/hostel/notices/:noticeId
@@ -317,7 +361,7 @@ router.put('/notices/:noticeId', hostelController.updateNotice);
  * @access  Private (Admin, Warden)
  * @params  noticeId
  */
-router.delete('/notices/:noticeId', hostelController.deleteNotice);
+router.delete('/notices/:noticeId', authorize(...HOSTEL_MANAGERS), hostelController.deleteNotice);
 
 // ==================== Attendance Routes ====================
 
@@ -327,7 +371,7 @@ router.delete('/notices/:noticeId', hostelController.deleteNotice);
  * @access  Private (Warden, Security)
  * @body    { studentId, hostelId, date, isPresent?, remarks? }
  */
-router.post('/attendance', hostelController.recordAttendance);
+router.post('/attendance', authorize(...HOSTEL_MANAGERS), hostelController.recordAttendance);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/attendance
@@ -336,7 +380,7 @@ router.post('/attendance', hostelController.recordAttendance);
  * @params  hostelId
  * @query   date (required)
  */
-router.get('/hostels/:hostelId/attendance', hostelController.getAttendanceByHostel);
+router.get('/hostels/:hostelId/attendance', authorize(...HOSTEL_MANAGERS), hostelController.getAttendanceByHostel);
 
 /**
  * @route   GET /api/hostel/students/:studentId/attendance
@@ -345,7 +389,7 @@ router.get('/hostels/:hostelId/attendance', hostelController.getAttendanceByHost
  * @params  studentId
  * @query   dateFrom?, dateTo?
  */
-router.get('/students/:studentId/attendance', hostelController.getAttendanceByStudent);
+router.get('/students/:studentId/attendance', requireOwnership('studentId', ['ADMIN', 'PRINCIPAL']), hostelController.getAttendanceByStudent);
 
 // ==================== Reports Routes ====================
 
@@ -354,7 +398,7 @@ router.get('/students/:studentId/attendance', hostelController.getAttendanceBySt
  * @desc    Get overall hostel system summary
  * @access  Private (Admin, Principal)
  */
-router.get('/summary', hostelController.getHostelSummary);
+router.get('/summary', authorize('ADMIN', 'PRINCIPAL'), hostelController.getHostelSummary);
 
 /**
  * @route   GET /api/hostel/hostels/:hostelId/occupancy-report
@@ -362,7 +406,7 @@ router.get('/summary', hostelController.getHostelSummary);
  * @access  Private
  * @params  hostelId
  */
-router.get('/hostels/:hostelId/occupancy-report', hostelController.getOccupancyReport);
+router.get('/hostels/:hostelId/occupancy-report', authorize(...HOSTEL_MANAGERS), hostelController.getOccupancyReport);
 
 /**
  * @route   GET /api/hostel/reports/fees
@@ -370,7 +414,7 @@ router.get('/hostels/:hostelId/occupancy-report', hostelController.getOccupancyR
  * @access  Private (Admin, Accountant)
  * @query   hostelId?, month?, year?
  */
-router.get('/reports/fees', hostelController.getFeeCollectionReport);
+router.get('/reports/fees', authorize(...HOSTEL_FINANCE), hostelController.getFeeCollectionReport);
 
 // ==================== Settings Routes ====================
 
@@ -379,7 +423,7 @@ router.get('/reports/fees', hostelController.getFeeCollectionReport);
  * @desc    Get hostel settings
  * @access  Private (Admin)
  */
-router.get('/settings', hostelController.getHostelSettings);
+router.get('/settings', authorize('ADMIN'), hostelController.getHostelSettings);
 
 /**
  * @route   PUT /api/hostel/settings
@@ -387,6 +431,6 @@ router.get('/settings', hostelController.getHostelSettings);
  * @access  Private (Admin)
  * @body    { defaultMonthlyFee?, defaultDepositAmount?, visitorTimeFrom?, visitorTimeTo?, leaveApprovalRequired?, attendanceRequired? }
  */
-router.put('/settings', hostelController.updateHostelSettings);
+router.put('/settings', authorize('ADMIN'), hostelController.updateHostelSettings);
 
 module.exports = router;
