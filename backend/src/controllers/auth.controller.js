@@ -7,13 +7,29 @@ const nodemailer = require('nodemailer');
 const prisma = require('../utils/prisma');
 
 // Setup email transporter
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+const hasSmtpHost = !!process.env.SMTP_HOST;
+
+const transporter = nodemailer.createTransport(
+  hasSmtpHost
+    ? {
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      secure: parseInt(process.env.SMTP_PORT || '587', 10) === 465,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    }
+    : {
+      service: process.env.EMAIL_SERVICE || 'gmail',
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    }
+);
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -26,6 +42,7 @@ const generateToken = (userId) => {
 exports.register = async (req, res) => {
   try {
     const { email, password, role, firstName, lastName, phone, ...otherData } = req.body;
+    const staffRoles = ['TEACHER', 'PRINCIPAL', 'ACCOUNTANT', 'LIBRARIAN', 'TRANSPORT_STAFF'];
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
@@ -41,6 +58,26 @@ exports.register = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    if (role === 'STUDENT') {
+      const missing = ['admissionNo', 'dateOfBirth', 'gender', 'classId'].filter((field) => !otherData[field]);
+      if (missing.length > 0) {
+        return res.status(400).json({
+          status: 'error',
+          message: `Missing required student fields: ${missing.join(', ')}`
+        });
+      }
+    }
+
+    if (staffRoles.includes(role)) {
+      const missing = ['employeeId', 'dateOfBirth', 'gender', 'designation'].filter((field) => !otherData[field]);
+      if (missing.length > 0) {
+        return res.status(400).json({
+          status: 'error',
+          message: `Missing required staff fields: ${missing.join(', ')}`
+        });
+      }
+    }
 
     // Create user with transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -70,7 +107,7 @@ exports.register = async (req, res) => {
             classId: otherData.classId
           }
         });
-      } else if (['TEACHER', 'PRINCIPAL', 'ACCOUNTANT', 'ADMIN', 'LIBRARIAN', 'TRANSPORT_STAFF'].includes(role)) {
+      } else if (staffRoles.includes(role)) {
         profile = await tx.staff.create({
           data: {
             userId: user.id,
@@ -178,7 +215,7 @@ exports.login = async (req, res) => {
     let profile = null;
     if (user.role === 'STUDENT') {
       profile = user.student;
-    } else if (['TEACHER', 'PRINCIPAL', 'ACCOUNTANT'].includes(user.role)) {
+    } else if (['TEACHER', 'PRINCIPAL', 'ACCOUNTANT', 'ADMIN', 'LIBRARIAN', 'TRANSPORT_STAFF'].includes(user.role)) {
       profile = user.staff;
     } else if (user.role === 'PARENT') {
       profile = user.parent;
@@ -356,7 +393,7 @@ exports.forgotPassword = async (req, res) => {
     });
 
     // Send email with reset link
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/reset-password?token=${resetToken}`;
 
     try {
       await transporter.sendMail({

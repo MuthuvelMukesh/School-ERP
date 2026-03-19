@@ -88,7 +88,7 @@ export default function LoginPage() {
           {config.auth.showDemoCredentials && (
             <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm">
               <p className="font-semibold text-blue-900 mb-1">Demo Credentials:</p>
-              <p className="text-blue-800">Admin: admin@school.com / admin123</p>
+              <p className="text-blue-800">Admin: admin@school.com / Admin@123</p>
             </div>
           )}
 
